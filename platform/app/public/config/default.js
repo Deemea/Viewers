@@ -1,15 +1,14 @@
 /** @type {AppTypes.Config} */
 
 window.config = {
-  name: 'config/default.js',
-  routerBasename: null,
-  // whiteLabeling: {},
+  routerBasename: '/',
+  showStudyList: true,
+  customizationService: {
+    dicomUploadComponent:
+      '@ohif/extension-cornerstone.customizationModule.cornerstoneDicomUploadComponent',
+  },
   extensions: [],
   modes: [],
-  customizationService: {},
-  showStudyList: true,
-  // some windows systems have issues with more than 3 web workers
-  maxNumberOfWebWorkers: 3,
   // below flag is for performance reasons, but it might not work for all servers
   showWarningMessageForCrossOrigin: true,
   showCPUFallbackMessage: true,
@@ -87,7 +86,6 @@ window.config = {
       ],
     },
   ],
-  defaultDataSourceName: 'dicomweb',
   /* Dynamic config allows user to pass "configUrl" query string this allows to load config without recompiling application. The regex will ensure valid configuration source */
   // dangerouslyUseDynamicConfig: {
   //   enabled: true,
@@ -98,16 +96,57 @@ window.config = {
   //   // regex: /(https:\/\/hospital.com(\/[0-9A-Za-z.]+)*)|(https:\/\/othersite.com(\/[0-9A-Za-z.]+)*)/
   //   regex: /.*/,
   // },
+  studyPrefetcher: {
+    enabled: true,
+    displaySetsCount: 2,
+    maxNumPrefetchRequests: 10,
+    order: 'closest',
+  },
+  defaultDataSourceName: 'orthanc',
   dataSources: [
+    {
+      namespace: '@ohif/extension-default.dataSourcesModule.dicomweb',
+      sourceName: 'orthanc',
+      configuration: {
+        friendlyName: 'Orthanc Deemea',
+        name: 'DCM4CHEE',
+        wadoUriRoot: 'http://100.92.76.68/orthanc/dicom-web',
+        qidoRoot: 'http://100.92.76.68/orthanc/dicom-web',
+        wadoRoot: 'http://100.92.76.68/orthanc/dicom-web',
+        qidoSupportsIncludeField: true,
+        supportsReject: true,
+        imageRendering: 'wadors',
+        thumbnailRendering: 'wadors',
+        enableStudyLazyLoad: true,
+        supportsFuzzyMatching: true,
+        supportsWildcard: true,
+        dicomUploadEnabled: true,
+        omitQuotationForMultipartRequest: true,
+        bulkDataURI: {
+          enabled: true,
+          // This is an example config that can be used to fix the retrieve URL
+          // where it has the wrong prefix (eg a canned prefix).  It is better to
+          // just use the correct prefix out of the box, but that is sometimes hard
+          // when URLs go through several systems.
+          // Example URLS are:
+          // "BulkDataURI" : "http://localhost/dicom-web/studies/1.2.276.0.7230010.3.1.2.2344313775.14992.1458058363.6979/series/1.2.276.0.7230010.3.1.3.1901948703.36080.1484835349.617/instances/1.2.276.0.7230010.3.1.4.1901948703.36080.1484835349.618/bulk/00420011",
+          // when running on http://localhost:3003 with no server running on localhost.  This can be corrected to:
+          // /orthanc/dicom-web/studies/1.2.276.0.7230010.3.1.2.2344313775.14992.1458058363.6979/series/1.2.276.0.7230010.3.1.3.1901948703.36080.1484835349.617/instances/1.2.276.0.7230010.3.1.4.1901948703.36080.1484835349.618/bulk/00420011
+          // which is a valid relative URL, and will result in using the http://localhost:3003/orthanc/.... path
+          // startsWith: 'http://localhost/',
+          // prefixWith: '/orthanc/',
+        },
+      },
+    },
     {
       namespace: '@ohif/extension-default.dataSourcesModule.dicomweb',
       sourceName: 'dicomweb',
       configuration: {
-        friendlyName: 'AWS S3 Static wado server',
+        friendlyName: 'Not working',
         name: 'aws',
-        wadoUriRoot: 'https://d14fa38qiwhyfd.cloudfront.net/dicomweb',
-        qidoRoot: 'https://d14fa38qiwhyfd.cloudfront.net/dicomweb',
-        wadoRoot: 'https://d14fa38qiwhyfd.cloudfront.net/dicomweb',
+        wadoUriRoot: 'http://100.92.76.68/orthanc/dicom-web',
+        qidoRoot: 'http://100.92.76.68/orthanc/dicom-web',
+        wadoRoot: 'http://100.92.76.68/orthanc/dicom-web',
         qidoSupportsIncludeField: false,
         imageRendering: 'wadors',
         thumbnailRendering: 'wadors',
@@ -127,7 +166,6 @@ window.config = {
         omitQuotationForMultipartRequest: true,
       },
     },
-
     {
       namespace: '@ohif/extension-default.dataSourcesModule.dicomweb',
       sourceName: 'ohif2',
