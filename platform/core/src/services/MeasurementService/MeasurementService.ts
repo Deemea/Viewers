@@ -539,6 +539,16 @@ class MeasurementService extends PubSubService {
         });
       } else {
         log.info('Measurement added.', newMeasurement);
+        window.parent.postMessage(
+          {
+            type: 'measurement_added',
+            message: {
+              points: newMeasurement.points,
+              measureType: newMeasurement.toolName,
+            },
+          },
+          '*'
+        );
         this._broadcastEvent(this.EVENTS.MEASUREMENT_ADDED, {
           source,
           measurement: newMeasurement,
