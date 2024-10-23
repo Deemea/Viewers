@@ -544,7 +544,7 @@ class MeasurementService extends PubSubService {
             type: 'measurement_added',
             message: {
               points: newMeasurement.points,
-              measureType: newMeasurement.toolName,
+              unit: newMeasurement.toolName,
             },
           },
           '*'
