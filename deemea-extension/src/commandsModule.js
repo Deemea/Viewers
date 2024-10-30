@@ -14,7 +14,7 @@ const commandsModule = ({ servicesManager }) => {
   const actions = {
     demonstrateMeasurementService: () => {
       const {
-        MeasurementService,
+        measurementService,
         ViewportGridService,
         CornerstoneViewportService,
         UINotificationService,
@@ -22,12 +22,12 @@ const commandsModule = ({ servicesManager }) => {
         PanelService,
       } = servicesManager.services;
 
-      console.log('MeasurementService:', MeasurementService.EVENTS);
+      console.log('measurementService:', measurementService.EVENTS);
       console.log('ViewportGridService:', ViewportGridService);
       console.log('CornerstoneViewportService:', CornerstoneViewportService);
       console.log('UINotificationService:', UINotificationService);
       console.log('PanelService:', PanelService);
-      if (!MeasurementService || !ViewportGridService || !CornerstoneViewportService) {
+      if (!measurementService || !ViewportGridService || !CornerstoneViewportService) {
         console.error('Required services are not available');
         return;
       }
@@ -37,6 +37,11 @@ const commandsModule = ({ servicesManager }) => {
           console.log('Points updated:', event.data.points);
           // Update measurements based on points
           demonstrateMeasurementService(servicesManager);
+        }
+
+        if (event.data.type === 'remove_measure') {
+          console.log('here', event.data);
+          measurementService.remove(event.data.message.uid);
         }
       });
 
