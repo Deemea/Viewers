@@ -65,7 +65,6 @@ const commandsModule = ({ servicesManager }) => {
         servicesManager.services;
 
       measurementService.subscribe(measurementService.EVENTS.MEASUREMENT_ADDED, event => {
-        console.log('ADDING NEW POINTS', event);
         const viewportId = viewportGridService.getActiveViewportId();
         const viewport = cornerstoneViewportService.getCornerstoneViewport(viewportId);
         const imageId = viewport.getCurrentImageId();
@@ -85,6 +84,7 @@ const commandsModule = ({ servicesManager }) => {
               message: {
                 points: newPoints,
                 elementType: event.measurement.toolName,
+                uid: event.measurement.uid,
               },
             },
             '*'
