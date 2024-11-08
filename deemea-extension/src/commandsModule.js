@@ -70,6 +70,8 @@ const commandsModule = ({ servicesManager }) => {
         const imageId = viewport.getCurrentImageId();
         const imageMetadata = viewport.getImageData(imageId);
 
+        console.log('event', event.measurement.points);
+
         const newPoints = [];
 
         event.measurement.points.forEach(point =>
@@ -80,7 +82,7 @@ const commandsModule = ({ servicesManager }) => {
         if (newPoints) {
           window.parent.postMessage(
             {
-              type: 'send_points_to_front',
+              type: 'create_measure',
               message: {
                 points: newPoints,
                 elementType: event.measurement.toolName,
@@ -90,6 +92,36 @@ const commandsModule = ({ servicesManager }) => {
             '*'
           );
         }
+      });
+
+      let dataToSend = [];
+      measurementService.subscribe(measurementService.EVENTS.MEASUREMENT_UPDATED, event => {
+        const viewportId = viewportGridService.getActiveViewportId();
+        const viewport = cornerstoneViewportService.getCornerstoneViewport(viewportId);
+        const imageId = viewport.getCurrentImageId();
+        const imageMetadata = viewport.getImageData(imageId);
+
+        const updatedPoints = [];
+        event.measurement.points.forEach(point =>
+          updatedPoints.push(NormalizeDicomCoordinates(imageMetadata.direction, point))
+        );
+
+        dataToSend = {
+          points: updatedPoints,
+          elementType: event.measurement.toolName,
+          uid: event.measurement.uid,
+        };
+
+        if (updatedPoints) {
+          window.parent.postMessage(
+            {
+              type: 'update_measure',
+              message: dataToSend,
+            },
+            '*'
+          );
+        }
+        console.log('send points ', dataToSend);
       });
     },
   };
