@@ -38,11 +38,6 @@ const commandsModule = ({ servicesManager }) => {
           // Update measurements based on points
           demonstrateMeasurementService(servicesManager);
         }
-
-        if (event.data.type === 'remove_measure') {
-          console.log('here', event.data);
-          measurementService.remove(event.data.message.uid);
-        }
       });
 
       // permet de capturer les changements de viewport et de déclencher la fonction demonstrateMeasurementService
@@ -60,6 +55,18 @@ const commandsModule = ({ servicesManager }) => {
         type: 'info',
       });
     },
+    linkMeasurement: info => {
+      window.parent.postMessage(
+        {
+          type: 'link_measure',
+          message: {
+            elementType: info.toolName,
+            uid: info.uid,
+          },
+        },
+        '*'
+      );
+    },
     createForms: () => {
       const { measurementService, viewportGridService, cornerstoneViewportService } =
         servicesManager.services;
@@ -70,7 +77,7 @@ const commandsModule = ({ servicesManager }) => {
         const imageId = viewport.getCurrentImageId();
         const imageMetadata = viewport.getImageData(imageId);
 
-        console.log('event', event.measurement.points);
+        console.log('event', event);
 
         const newPoints = [];
 
@@ -124,6 +131,20 @@ const commandsModule = ({ servicesManager }) => {
         console.log('send points ', dataToSend);
       });
     },
+    deleteMeasurement: ({ uid }) => {
+      if (uid) {
+        const { measurementService } = servicesManager.services;
+        measurementService.remove(uid);
+
+        window.parent.postMessage(
+          {
+            type: 'delete_measure',
+            message: { uid },
+          },
+          '*'
+        );
+      }
+    },
   };
 
   return {
@@ -135,6 +156,12 @@ const commandsModule = ({ servicesManager }) => {
       },
       createForms: {
         commandFn: actions.createForms,
+      },
+      linkMeasurement: {
+        commandFn: actions.linkMeasurement,
+      },
+      deleteMeasurement: {
+        commandFn: actions.deleteMeasurement,
       },
     },
     defaultContext: 'VIEWER',
