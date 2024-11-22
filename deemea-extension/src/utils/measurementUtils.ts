@@ -1,33 +1,39 @@
-// Importez les types nécessaires si vous utilisez TypeScript
-// import { Types } from '@ohif/core';
-
-import { metaData } from '@cornerstonejs/core';
 import * as cs3dTools from '@cornerstonejs/tools';
 
-/*
-{
-    "id": 35133,
-    "name": "patella_transverse_interior_left",
-    "x": null,
-    "y": null,
-    "xOrigin": "0.6696428656578064",
-    "yOrigin": "0.8514971137046814",
-    "lastModificationUserId": null,
-    "lastModificationDate": "2024-10-22T07:52:00.716Z"
-}
-{
-    "id": 35128,
-    "name": "patella_transverse_exterior_left",
-    "x": null,
-    "y": null,
-    "xOrigin": "0.7879464030265808",
-    "yOrigin": "0.8514971137046814",
-    "lastModificationUserId": null,
-    "lastModificationDate": "2024-10-22T07:52:00.714Z"
-}
+function convertFromDicomCoordinates(
+  dicomX,
+  dicomY,
+  dicomZ,
+  imageWidth,
+  imageHeight,
+  pixelSpacingX,
+  pixelSpacingY,
+  imagePositionPatient,
+  orientationMatrix
+) {
+  // Step 1: Calculate the difference vector from the Image Position (Patient)
+  const diffX = dicomX - imagePositionPatient[0];
+  const diffY = dicomY - imagePositionPatient[1];
+  const diffZ = dicomZ - imagePositionPatient[2];
 
-8ca9e2a6-42d3-48aa-b2d0-92e05d62149c
-*/
+  // Step 2: Extract row and column direction vectors from the orientation matrix
+  const rowDir = [orientationMatrix[0], orientationMatrix[1], orientationMatrix[2]]; // [rx, ry, rz]
+  const colDir = [orientationMatrix[3], orientationMatrix[4], orientationMatrix[5]]; // [cx, cy, cz]
+
+  // Step 3: Project the difference vector onto the row and column directions to get physical coordinates
+  const physicalX = diffX * rowDir[0] + diffY * rowDir[1] + diffZ * rowDir[2];
+  const physicalY = diffX * colDir[0] + diffY * colDir[1] + diffZ * colDir[2];
+
+  // Step 4: Convert physical coordinates to pixel coordinates using pixel spacing
+  const pixelX = physicalX / pixelSpacingX;
+  const pixelY = physicalY / pixelSpacingY;
+
+  // Step 5: Normalize pixel coordinates to the range [0, 1]
+  const normalizedX = pixelX / imageWidth;
+  const normalizedY = pixelY / imageHeight;
+
+  return [normalizedX, normalizedY];
+}
 
 function convertToDicomCoordinates(
   normalizedX,
@@ -59,8 +65,7 @@ function convertToDicomCoordinates(
   return [dicomX, dicomY, dicomZ];
 }
 
-export async function demonstrateMeasurementService(servicesManager) {
-  console.log('Demonstrating MeasurementService functionality');
+export async function demonstrateMeasurementService(servicesManager, points) {
   const { ViewportGridService, CornerstoneViewportService } = servicesManager.services;
 
   const viewportId = ViewportGridService.getActiveViewportId();
@@ -70,10 +75,6 @@ export async function demonstrateMeasurementService(servicesManager) {
   const imageId = viewport.getCurrentImageId();
 
   const imageMetadata = viewport.getImageData(imageId);
-
-  console.log('imageMetadata:', imageMetadata, imageId);
-
-  console.log('test', cs3dTools.state.enabledElements);
 
   if (!imageId) {
     console.error('No image ID found');
@@ -85,13 +86,78 @@ export async function demonstrateMeasurementService(servicesManager) {
     return;
   }
 
-  const imageSize = imageMetadata.dimensions.map(
-    (dimension, index) => dimension * imageMetadata.spacing[index]
-  );
-  console.log('imageSize', imageSize, imageMetadata);
+  points?.forEach(point => {
+    try {
+      const normalizedX = point[0].x ? point[0].x : point[0].xOrigin;
+      const normalizedY = point[0].y ? point[0].y : point[0].yOrigin;
+      const imageWidth = imageMetadata.dimensions[0];
+      const imageHeight = imageMetadata.dimensions[1];
+      const pixelSpacingX = imageMetadata.spacing[0];
+      const pixelSpacingY = imageMetadata.spacing[1];
+      const imagePositionPatient = imageMetadata.origin;
+      const orientationMatrix = imageMetadata.direction;
 
-  const normalizedX = '0.6696428656578064';
-  const normalizedY = '0.8514971137046814';
+      const dicomCoords = convertToDicomCoordinates(
+        normalizedX,
+        normalizedY,
+        imageWidth,
+        imageHeight,
+        pixelSpacingX,
+        pixelSpacingY,
+        imagePositionPatient,
+        orientationMatrix
+      );
+
+      const normalizedX2 = point[1].x ? point[1].x : point[1].xOrigin;
+      const normalizedY2 = point[1].y ? point[1].y : point[1].yOrigin;
+      const imageWidth2 = imageMetadata.dimensions[0];
+      const imageHeight2 = imageMetadata.dimensions[1];
+      const pixelSpacingX2 = imageMetadata.spacing[0];
+      const pixelSpacingY2 = imageMetadata.spacing[1];
+      const imagePositionPatient2 = imageMetadata.origin;
+      const orientationMatrix2 = imageMetadata.direction;
+
+      const dicomCoords2 = convertToDicomCoordinates(
+        normalizedX2,
+        normalizedY2,
+        imageWidth2,
+        imageHeight2,
+        pixelSpacingX2,
+        pixelSpacingY2,
+        imagePositionPatient2,
+        orientationMatrix2
+      );
+
+      cs3dTools.LengthTool.createAndAddAnnotation(viewport, {
+        data: {
+          handles: {
+            points: [dicomCoords, dicomCoords2],
+          },
+          cachedStats: {
+            [`imageId:${imageId}`]: {
+              length: 'X',
+              unit: 'px',
+            },
+          },
+        },
+      });
+    } catch (error) {
+      console.error('Error adding measurement:', error);
+    }
+  });
+}
+
+export async function createMeasurement(servicesManager, points) {
+  const { ViewportGridService, CornerstoneViewportService } = servicesManager.services;
+
+  const viewportId = ViewportGridService.getActiveViewportId();
+  console.log(viewportId);
+  const viewport = CornerstoneViewportService.getCornerstoneViewport(viewportId);
+
+  const imageId = viewport.getCurrentImageId();
+
+  const imageMetadata = viewport.getImageData(imageId);
+
   const imageWidth = imageMetadata.dimensions[0];
   const imageHeight = imageMetadata.dimensions[1];
   const pixelSpacingX = imageMetadata.spacing[0];
@@ -99,129 +165,21 @@ export async function demonstrateMeasurementService(servicesManager) {
   const imagePositionPatient = imageMetadata.origin;
   const orientationMatrix = imageMetadata.direction;
 
-  const dicomCoords = convertToDicomCoordinates(
-    normalizedX,
-    normalizedY,
-    imageWidth,
-    imageHeight,
-    pixelSpacingX,
-    pixelSpacingY,
-    imagePositionPatient,
-    orientationMatrix
-  );
-  console.log(dicomCoords); // Outputs the DICOM coordinates (x, y, z)
+  const normalizedPoints: number[][] = [];
+  points?.forEach(point => {
+    const normalizedCoords = convertFromDicomCoordinates(
+      point[0],
+      point[1],
+      point[2],
+      imageWidth,
+      imageHeight,
+      pixelSpacingX,
+      pixelSpacingY,
+      imagePositionPatient,
+      orientationMatrix
+    );
+    normalizedPoints.push(normalizedCoords);
+  });
 
-  const normalizedX2 = '0.7879464030265808';
-  const normalizedY2 = '0.8514971137046814';
-  const imageWidth2 = imageMetadata.dimensions[0];
-  const imageHeight2 = imageMetadata.dimensions[1];
-  const pixelSpacingX2 = imageMetadata.spacing[0];
-  const pixelSpacingY2 = imageMetadata.spacing[1];
-  const imagePositionPatient2 = imageMetadata.origin;
-  const orientationMatrix2 = imageMetadata.direction;
-
-  const dicomCoords2 = convertToDicomCoordinates(
-    normalizedX2,
-    normalizedY2,
-    imageWidth2,
-    imageHeight2,
-    pixelSpacingX2,
-    pixelSpacingY2,
-    imagePositionPatient2,
-    orientationMatrix2
-  );
-
-  console.log(dicomCoords2); // Outputs the DICOM coordinates (x, y, z)
-
-  //const testMeasurement = createTestMeasurement(imageId, imageSize);
-
-  try {
-    cs3dTools.LengthTool.createAndAddAnnotation(viewport, {
-      data: {
-        handles: {
-          points: [dicomCoords, dicomCoords2],
-        },
-        cachedStats: {
-          [`imageId:${imageId}`]: {
-            length: '114',
-            unit: 'mm',
-          },
-        },
-      },
-    });
-    /*const annotation: cs3dTools.Types.Annotation = {
-      metadata: {
-        toolName: testMeasurement.toolName,
-        FrameOfReferenceUID: testMeasurement.metadata.FrameOfReferenceUID,
-        referencedImageId: imageId,
-      },
-      data: {
-        handles: {
-          points: testMeasurement.data.handles.points.map(point => [point.x, point.y, point.z]),
-        },
-        cachedStats: testMeasurement.data.cachedStats,
-      },
-      highlighted: false,
-      isLocked: false,
-      isVisible: true,
-      invalidated: false,
-    };
-
-    cs3dTools.annotation.state.addAnnotation(annotation, 'CORNERSTONE_3D_TOOLS');*/
-
-    //viewport.render();
-  } catch (error) {
-    console.error('Error adding measurement:', error);
-  }
+  return normalizedPoints;
 }
-
-function createTestMeasurement(imageId, imageSize) {
-  const instanceMetadata = metaData.get('instance', imageId);
-  const imageWidth = imageSize[0];
-  const imageHeight = imageSize[1];
-
-  console.log('imageWidth:', imageSize[0]);
-  console.log('imageHeight:', imageSize[1]);
-
-  return {
-    toolName: 'Length',
-    lesionNamingNumber: 1,
-    finding: {},
-    metadata: {
-      toolName: 'Length',
-      FrameOfReferenceUID: instanceMetadata.FrameOfReferenceUID,
-      referencedImageId: imageId,
-    },
-    data: {
-      handles: {
-        // y: is like a x in a orthonormed plan
-        // z: is like a y in a orthonormed plan
-        // x: is like a z in a orthonormed plan (not sure)
-        points: [
-          { x: 0, y: 0, z: 0 },
-          { x: 0, y: imageWidth, z: -imageHeight },
-        ],
-      },
-      cachedStats: {
-        [`imageId:${imageId}`]: {
-          length: '114',
-          unit: 'mm',
-        },
-      },
-    },
-  };
-}
-
-/*
-// Example usage
-const normalizedX = 0.5;  // Example: center of the image
-const normalizedY = 0.5;
-const imageWidth = 512;  // Example image size in pixels
-const imageHeight = 512;
-const pixelSpacingX = 0.5;  // mm
-const pixelSpacingY = 0.5;  // mm
-const imagePositionPatient = [100, 200, -50];  // Example DICOM origin in mm
-const orientationMatrix = [1, 0, 0, 0, 1, 0];  // Identity matrix: rows and columns aligned with X and Y axis
-
-const dicomCoords = convertToDicomCoordinates(normalizedX, normalizedY, imageWidth, imageHeight, pixelSpacingX, pixelSpacingY, imagePositionPatient, orientationMatrix);
-console.log(dicomCoords);  // Outputs the DICOM coordinates (x, y, z)*/
