@@ -78,15 +78,12 @@ async function matchNameWithAxis(pointName1, pointName2): Promise<string | null>
 
 async function setMeasurementStyle() {
   const annotations = cs3dTools.annotation.state.getAllAnnotations();
-  console.log('aaaaaa', annotations);
   annotations?.map(async annotation => {
     const color = await matchNameWithAxis(
       annotation.data.handles?.headName,
       annotation.data.handles?.tailName
     );
-    console.log('color ?', color);
     if (color) {
-      console.log('set color', color);
       cs3dTools.annotation.config.style.setAnnotationStyles(annotation.annotationUID!, {
         color: color,
         colorHighlighted: color,
@@ -118,8 +115,6 @@ export async function demonstrateMeasurementService(servicesManager, points) {
   }
 
   points?.forEach(point => {
-    console.log('point info', point);
-
     try {
       const normalizedX = point[0].x ? point[0].x : point[0].xOrigin;
       const normalizedY = point[0].y ? point[0].y : point[0].yOrigin;
