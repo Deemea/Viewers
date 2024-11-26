@@ -1,4 +1,5 @@
 import * as cs3dTools from '@cornerstonejs/tools';
+import { axis } from './axisColors';
 
 function convertFromDicomCoordinates(
   dicomX,
@@ -65,6 +66,36 @@ function convertToDicomCoordinates(
   return [dicomX, dicomY, dicomZ];
 }
 
+async function matchNameWithAxis(pointName1, pointName2): Promise<string | null> {
+  const matchedAxis = axis.find(
+    axe =>
+      ((pointName1 === axe.head || pointName1 === axe.tail) && pointName2 === axe.head) ||
+      pointName2 === axe.tail
+  );
+
+  return matchedAxis ? matchedAxis.color : null;
+}
+
+async function setMeasurementStyle() {
+  const annotations = cs3dTools.annotation.state.getAllAnnotations();
+  console.log('aaaaaa', annotations);
+  annotations?.map(async annotation => {
+    const color = await matchNameWithAxis(
+      annotation.data.handles?.headName,
+      annotation.data.handles?.tailName
+    );
+    console.log('color ?', color);
+    if (color) {
+      console.log('set color', color);
+      cs3dTools.annotation.config.style.setAnnotationStyles(annotation.annotationUID!, {
+        color: color,
+        colorHighlighted: color,
+        colorSelected: color,
+      });
+    }
+  });
+}
+
 export async function demonstrateMeasurementService(servicesManager, points) {
   const { ViewportGridService, CornerstoneViewportService } = servicesManager.services;
 
@@ -87,6 +118,8 @@ export async function demonstrateMeasurementService(servicesManager, points) {
   }
 
   points?.forEach(point => {
+    console.log('point info', point);
+
     try {
       const normalizedX = point[0].x ? point[0].x : point[0].xOrigin;
       const normalizedY = point[0].y ? point[0].y : point[0].yOrigin;
@@ -132,6 +165,8 @@ export async function demonstrateMeasurementService(servicesManager, points) {
         data: {
           handles: {
             points: [dicomCoords, dicomCoords2],
+            headName: point[0].name,
+            tailName: point[1].name,
           },
           cachedStats: {
             [`imageId:${imageId}`]: {
@@ -145,6 +180,8 @@ export async function demonstrateMeasurementService(servicesManager, points) {
       console.error('Error adding measurement:', error);
     }
   });
+
+  setMeasurementStyle();
 }
 
 export async function createMeasurement(servicesManager, points) {
