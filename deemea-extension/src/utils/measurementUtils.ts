@@ -104,6 +104,7 @@ async function setMeasurementStyle() {
 }
 
 export async function demonstrateMeasurementService(servicesManager, points) {
+  console.log('demonstrateMeasurementService piints:', points);
   const { ViewportGridService, CornerstoneViewportService } = servicesManager.services;
 
   const viewportId = ViewportGridService.getActiveViewportId();
@@ -181,6 +182,7 @@ export async function demonstrateMeasurementService(servicesManager, points) {
           },
         },
       });
+
     } catch (error) {
       console.error('Error adding measurement:', error);
     }
@@ -188,6 +190,7 @@ export async function demonstrateMeasurementService(servicesManager, points) {
 
   setMeasurementStyle();
 }
+
 
 export async function createMeasurement(servicesManager, points) {
   const { ViewportGridService, CornerstoneViewportService } = servicesManager.services;

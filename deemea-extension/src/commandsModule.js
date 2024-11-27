@@ -19,29 +19,21 @@ const commandsModule = ({ servicesManager }) => {
         if (event.data.type === 'POINTS_UPDATED') {
           const relatedPoints = event.data.points;
           // Update measurements based on points
-          // demonstrateMeasurementService(servicesManager, event.data.points);
           CornerstoneViewportService.subscribe(
             CornerstoneViewportService.EVENTS.VIEWPORT_DATA_CHANGED,
             () => {
               demonstrateMeasurementService(servicesManager, relatedPoints);
-              measurementService.removeAll();
             }
           );
         }
       });
 
-      CornerstoneViewportService.subscribe(
+      /*CornerstoneViewportService.subscribe(
         CornerstoneViewportService.EVENTS.VIEWPORT_DATA_CHANGED,
         () => {
           demonstrateMeasurementService(servicesManager);
         }
-      );
-
-      UINotificationService.show({
-        title: 'Measurement Service',
-        message: 'Demonstrating Measurement Service functionality...',
-        type: 'info',
-      });
+      );*/
     },
     linkMeasurement: info => {
       window.parent.postMessage(
