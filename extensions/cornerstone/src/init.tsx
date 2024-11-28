@@ -46,7 +46,7 @@ export default async function init({
   servicesManager,
   commandsManager,
   extensionManager,
-  appConfig
+  appConfig,
 }: Types.Extensions.ExtensionParams): Promise<void> {
   // Note: this should run first before initializing the cornerstone
   // DO NOT CHANGE THE ORDER
@@ -106,6 +106,9 @@ export default async function init({
   window.services = servicesManager.services;
   window.extensionManager = extensionManager;
   window.commandsManager = commandsManager;
+
+  console.log('appConfig', appConfig);
+  console.log('window.crossOriginIsolated', window.crossOriginIsolated);
 
   if (
     appConfig.showWarningMessageForCrossOrigin &&
