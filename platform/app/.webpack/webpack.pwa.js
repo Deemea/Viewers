@@ -154,6 +154,9 @@ module.exports = (env, argv) => {
       client: {
         overlay: { errors: true, warnings: false },
       },
+      headers: {
+        'Cross-Origin-Resource-Policy': 'same-site',
+      },
       proxy: {
         '/dicomweb': 'http://localhost:5000',
       },
