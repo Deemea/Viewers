@@ -77,11 +77,12 @@ const commandsModule = ({ servicesManager }) => {
         event.measurement.points.forEach(point => updatedPoints.push(point));
 
         const normalizedPoints = await createMeasurement(servicesManager, updatedPoints);
-
         dataToSend = {
           points: normalizedPoints,
+          pointIds: event?.measurement?.label.pointIds,
           elementType: event.measurement.toolName,
           uid: event.measurement.uid,
+          measurementId: event?.measurement?.label.measurementId,
         };
 
         if (normalizedPoints) {
