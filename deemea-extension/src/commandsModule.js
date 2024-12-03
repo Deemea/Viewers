@@ -1,4 +1,4 @@
-import { demonstrateMeasurementService, createMeasurement } from './utils/measurementUtils';
+import { demonstrateMeasurementService, createMeasurement, createRectangleROI } from './utils/measurementUtils';
 
 const commandsModule = ({ servicesManager }) => {
   const actions = {

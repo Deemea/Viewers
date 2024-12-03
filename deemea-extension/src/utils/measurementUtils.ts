@@ -66,11 +66,9 @@ function convertToDicomCoordinates(
 }
 
 export async function demonstrateMeasurementService(servicesManager, points) {
-  console.log('demonstrateMeasurementService piints:', points);
   const { ViewportGridService, CornerstoneViewportService } = servicesManager.services;
 
   const viewportId = ViewportGridService.getActiveViewportId();
-  console.log(viewportId);
   const viewport = CornerstoneViewportService.getCornerstoneViewport(viewportId);
 
   const imageId = viewport.getCurrentImageId();
@@ -88,9 +86,19 @@ export async function demonstrateMeasurementService(servicesManager, points) {
   }
 
   points?.forEach(point => {
-    try {
-      const normalizedX = point[0].x ? point[0].x : point[0].xOrigin;
-      const normalizedY = point[0].y ? point[0].y : point[0].yOrigin;
+    if (point.length === 2) {
+      createLength(viewport, imageMetadata, imageId, point);
+    } else if (point.length === 4) {
+      createRectangleROI(viewport, imageMetadata, imageId, point);
+    }
+  });
+}
+
+export function createRectangleROI(viewport, imageMetadata, imageId, points) {
+  try {
+    const normalizedPoints = points.map(point => {
+      const normalizedX = point.x ? point.x : point.xOrigin;
+      const normalizedY = point.y ? point.y : point.yOrigin;
       const imageWidth = imageMetadata.dimensions[0];
       const imageHeight = imageMetadata.dimensions[1];
       const pixelSpacingX = imageMetadata.spacing[0];
@@ -98,7 +106,7 @@ export async function demonstrateMeasurementService(servicesManager, points) {
       const imagePositionPatient = imageMetadata.origin;
       const orientationMatrix = imageMetadata.direction;
 
-      const dicomCoords = convertToDicomCoordinates(
+      return convertToDicomCoordinates(
         normalizedX,
         normalizedY,
         imageWidth,
@@ -108,47 +116,127 @@ export async function demonstrateMeasurementService(servicesManager, points) {
         imagePositionPatient,
         orientationMatrix
       );
+    });
 
-      const normalizedX2 = point[1].x ? point[1].x : point[1].xOrigin;
-      const normalizedY2 = point[1].y ? point[1].y : point[1].yOrigin;
-      const imageWidth2 = imageMetadata.dimensions[0];
-      const imageHeight2 = imageMetadata.dimensions[1];
-      const pixelSpacingX2 = imageMetadata.spacing[0];
-      const pixelSpacingY2 = imageMetadata.spacing[1];
-      const imagePositionPatient2 = imageMetadata.origin;
-      const orientationMatrix2 = imageMetadata.direction;
-
-      const dicomCoords2 = convertToDicomCoordinates(
-        normalizedX2,
-        normalizedY2,
-        imageWidth2,
-        imageHeight2,
-        pixelSpacingX2,
-        pixelSpacingY2,
-        imagePositionPatient2,
-        orientationMatrix2
-      );
-
-      cs3dTools.LengthTool.createAndAddAnnotation(viewport, {
-        data: {
-          handles: {
-            points: [dicomCoords, dicomCoords2],
-          },
+    cs3dTools.RectangleROITool.createAndAddAnnotation(viewport, {
+      data: {
+        handles: {
+          points: normalizedPoints,
+          activeHandleIndex: null,
           cachedStats: {
             [`imageId:${imageId}`]: {
-              length: 'X',
-              unit: 'px',
+              modality: 'CT',
+              area: 0,
+              modalityUnit: 'HU',
+              max: 0,
+              mean: 0,
+              stdDev: 0,
+              statsArray: [
+                {
+                  name: 'max',
+                  label: 'Max Pixel',
+                  value: 988,
+                  unit: null,
+                },
+                {
+                  name: 'mean',
+                  label: 'Mean Pixel',
+                  value: -170.3221583652618,
+                  unit: null,
+                },
+                {
+                  name: 'stdDev',
+                  label: 'Standard Deviation',
+                  value: 456.7336608514075,
+                  unit: null,
+                },
+                {
+                  name: 'stdDev',
+                  label: 'Standard Deviation',
+                  value: 456.7336608514075,
+                  unit: null,
+                },
+                {
+                  name: 'count',
+                  label: 'Pixel Count',
+                  value: 6264,
+                  unit: null,
+                },
+              ],
             },
           },
         },
-      });
-
-    } catch (error) {
-      console.error('Error adding measurement:', error);
-    }
-  });
+      },
+    });
+  } catch (error) {
+    console.error('Error adding measurement:', error);
+  }
 }
 
+export function createLength(viewport, imageMetadata, imageId, point) {
+  if (!imageMetadata) {
+    console.error('No image metadata found');
+    return;
+  }
+
+  try {
+    const normalizedX = point[0].x ? point[0].x : point[0].xOrigin;
+    const normalizedY = point[0].y ? point[0].y : point[0].yOrigin;
+    const imageWidth = imageMetadata.dimensions[0];
+    const imageHeight = imageMetadata.dimensions[1];
+    const pixelSpacingX = imageMetadata.spacing[0];
+    const pixelSpacingY = imageMetadata.spacing[1];
+    const imagePositionPatient = imageMetadata.origin;
+    const orientationMatrix = imageMetadata.direction;
+
+    const dicomCoords = convertToDicomCoordinates(
+      normalizedX,
+      normalizedY,
+      imageWidth,
+      imageHeight,
+      pixelSpacingX,
+      pixelSpacingY,
+      imagePositionPatient,
+      orientationMatrix
+    );
+
+    const normalizedX2 = point[1].x ? point[1].x : point[1].xOrigin;
+    const normalizedY2 = point[1].y ? point[1].y : point[1].yOrigin;
+    const imageWidth2 = imageMetadata.dimensions[0];
+    const imageHeight2 = imageMetadata.dimensions[1];
+    const pixelSpacingX2 = imageMetadata.spacing[0];
+    const pixelSpacingY2 = imageMetadata.spacing[1];
+    const imagePositionPatient2 = imageMetadata.origin;
+    const orientationMatrix2 = imageMetadata.direction;
+
+    const dicomCoords2 = convertToDicomCoordinates(
+      normalizedX2,
+      normalizedY2,
+      imageWidth2,
+      imageHeight2,
+      pixelSpacingX2,
+      pixelSpacingY2,
+      imagePositionPatient2,
+      orientationMatrix2
+    );
+
+    cs3dTools.LengthTool.createAndAddAnnotation(viewport, {
+      data: {
+        handles: {
+          points: [dicomCoords, dicomCoords2],
+        },
+        cachedStats: {
+          [`imageId:${imageId}`]: {
+            length: 'X',
+            unit: 'px',
+          },
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Error adding measurement:', error);
+  }
+}
 
 export async function createMeasurement(servicesManager, points) {
   const { ViewportGridService, CornerstoneViewportService } = servicesManager.services;
