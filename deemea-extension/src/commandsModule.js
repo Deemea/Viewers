@@ -1,3 +1,4 @@
+import { OHIFMessageType } from './utils/enums';
 import { demonstrateMeasurementService, createMeasurement } from './utils/measurementUtils';
 
 const commandsModule = ({ servicesManager }) => {
@@ -20,7 +21,7 @@ const commandsModule = ({ servicesManager }) => {
         () => {
           window.parent.postMessage(
             {
-              type: 'image_ready',
+              type: OHIFMessageType.IMAGE_READY,
             },
             '*'
           );
@@ -28,7 +29,7 @@ const commandsModule = ({ servicesManager }) => {
       );
 
       window.addEventListener('message', event => {
-        if (event.data.type === 'send_measure') {
+        if (event.data.type === OHIFMessageType.SEND_MEASURE) {
           const relatedPoints = event.data.points;
           // Update measurements based on points
           demonstrateMeasurementService(servicesManager, relatedPoints);
@@ -38,7 +39,7 @@ const commandsModule = ({ servicesManager }) => {
     linkMeasurement: info => {
       window.parent.postMessage(
         {
-          type: 'link_measure',
+          type: OHIFMessageType.LINK_MEASURE,
           message: {
             elementType: info.toolName,
             uid: info.uid,
@@ -59,7 +60,7 @@ const commandsModule = ({ servicesManager }) => {
           const normalizedPoints = await createMeasurement(servicesManager, newPoints);
           window.parent.postMessage(
             {
-              type: 'create_measure',
+              type: OHIFMessageType.CREATE_MEASURE,
               message: {
                 points: normalizedPoints,
                 elementType: event.measurement.toolName,
@@ -88,7 +89,7 @@ const commandsModule = ({ servicesManager }) => {
         if (normalizedPoints) {
           window.parent.postMessage(
             {
-              type: 'update_measure',
+              type: OHIFMessageType.UPDATE_MEASURE,
               message: dataToSend,
             },
             '*'
@@ -103,7 +104,7 @@ const commandsModule = ({ servicesManager }) => {
 
         window.parent.postMessage(
           {
-            type: 'delete_measure',
+            type: OHIFMessageType.DELETE_MEASURE,
             message: { uid },
           },
           '*'
