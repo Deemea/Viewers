@@ -15,25 +15,25 @@ const commandsModule = ({ servicesManager }) => {
         return;
       }
 
-      window.addEventListener('message', event => {
-        if (event.data.type === 'POINTS_UPDATED') {
-          const relatedPoints = event.data.points;
-          // Update measurements based on points
-          CornerstoneViewportService.subscribe(
-            CornerstoneViewportService.EVENTS.VIEWPORT_DATA_CHANGED,
-            () => {
-              demonstrateMeasurementService(servicesManager, relatedPoints);
-            }
-          );
-        }
-      });
-
-      /*CornerstoneViewportService.subscribe(
+      CornerstoneViewportService.subscribe(
         CornerstoneViewportService.EVENTS.VIEWPORT_DATA_CHANGED,
         () => {
-          demonstrateMeasurementService(servicesManager);
+          window.parent.postMessage(
+            {
+              type: 'image_ready',
+            },
+            '*'
+          );
         }
-      );*/
+      );
+
+      window.addEventListener('message', event => {
+        if (event.data.type === 'send_measure') {
+          const relatedPoints = event.data.points;
+          // Update measurements based on points
+          demonstrateMeasurementService(servicesManager, relatedPoints);
+        }
+      });
     },
     linkMeasurement: info => {
       window.parent.postMessage(

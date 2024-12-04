@@ -12,10 +12,10 @@ const extension = {
   onModeEnter: ({ extensionManager, servicesManager, commandsManager }) => {
     console.log('onModeEnter', servicesManager);
 
-    const { measurementService } = servicesManager.services;
+    // const { measurementService } = servicesManager.services;
     commandsManager.runCommand('demonstrateMeasurementService');
 
-    measurementService.clearMeasurements();
+    // measurementService.clearMeasurements();
     if (!onModeInit) {
       onModeInit = true;
       commandsManager.runCommand('createForms');
