@@ -1,4 +1,5 @@
 import * as cs3dTools from '@cornerstonejs/tools';
+import { axis } from './axisColors';
 
 function convertFromDicomCoordinates(
   dicomX,
@@ -65,7 +66,46 @@ function convertToDicomCoordinates(
   return [dicomX, dicomY, dicomZ];
 }
 
-export async function demonstrateMeasurementService(servicesManager, points) {
+async function matchNameWithAxis(
+  pointName1,
+  pointName2
+): Promise<{ color: string; highlighted: string; dotted?: boolean } | null> {
+  const matchedAxis = axis.find(
+    axe =>
+      ((pointName1 === axe.head || pointName1 === axe.tail) && pointName2 === axe.head) ||
+      pointName2 === axe.tail
+  );
+
+  return matchedAxis ? matchedAxis : null;
+}
+
+async function setMeasurementStyle() {
+  const annotations = cs3dTools.annotation.state.getAllAnnotations();
+  annotations?.map(async annotation => {
+    const axisColor = await matchNameWithAxis(
+      annotation.data.handles?.headName,
+      annotation.data.handles?.tailName
+    );
+    let style = {
+      color: '#00ff00',
+      colorHighlighted: '#fff000',
+      colorSelected: '#fff000',
+      lineDash: '',
+    };
+    if (axisColor) {
+      style = {
+        ...style,
+        color: axisColor.color,
+        colorHighlighted: axisColor.highlighted,
+        colorSelected: axisColor.highlighted,
+        lineDash: axisColor.dotted ? '3,2' : '',
+      };
+    }
+    cs3dTools.annotation.config.style.setAnnotationStyles(annotation.annotationUID!, style);
+  });
+}
+
+export async function demonstrateMeasurementService(servicesManager, relatedPoints) {
   const { ViewportGridService, CornerstoneViewportService } = servicesManager.services;
 
   const viewportId = ViewportGridService.getActiveViewportId();
@@ -233,6 +273,7 @@ export function createLength(viewport, imageMetadata, imageId, point) {
         },
       },
     });
+    setMeasurementStyle();
   } catch (error) {
     console.error('Error adding measurement:', error);
   }
