@@ -1,3 +1,4 @@
+import { demonstrateMeasurementService, createMeasurement, createRectangleROI } from './utils/measurementUtils';
 import { OHIFMessageType } from './utils/enums';
 import { demonstrateMeasurementService, createMeasurement } from './utils/measurementUtils';
 
