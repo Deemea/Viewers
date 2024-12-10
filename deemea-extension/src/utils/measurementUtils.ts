@@ -1,5 +1,6 @@
 import * as cs3dTools from '@cornerstonejs/tools';
 import { axis } from './axisColors';
+import { Palette } from './palette';
 
 function convertFromDicomCoordinates(
   dicomX,
@@ -82,16 +83,25 @@ async function matchNameWithAxis(
 async function setMeasurementStyle() {
   const annotations = cs3dTools.annotation.state.getAllAnnotations();
   annotations?.map(async annotation => {
-    const axisColor = await matchNameWithAxis(
-      annotation.data.handles?.headName,
-      annotation.data.handles?.tailName
-    );
     let style = {
       color: '#00ff00',
       colorHighlighted: '#fff000',
       colorSelected: '#fff000',
       lineDash: '',
     };
+    if (annotation.data.handles?.type === 'rectangle') {
+      style = {
+        color: Palette.Turquoise,
+        colorHighlighted: Palette.DarkTurquoise,
+        colorSelected: Palette.Turquoise,
+        lineDash: '',
+      };
+    }
+    const axisColor = await matchNameWithAxis(
+      annotation.data.handles?.headName,
+      annotation.data.handles?.tailName
+    );
+
     if (axisColor) {
       style = {
         ...style,
@@ -125,20 +135,22 @@ export async function demonstrateMeasurementService(servicesManager, relatedPoin
     return;
   }
 
-  relatedPoints?.forEach(point => {
-    if (point.length === 2) {
-      console.log('Length');
-      createLength(viewport, imageMetadata, imageId, point);
-    } else if (point.length === 4) {
-      console.log('Rectangle');
-      createRectangleROI(viewport, imageMetadata, imageId, point);
+  relatedPoints?.forEach(data => {
+    if (data.points.length === 2) {
+      console.log('Length', data);
+      createLength(viewport, imageMetadata, imageId, data);
+    } else if (data.points.length === 4) {
+      console.log('Rectangle', data);
+      createRectangleROI(viewport, imageMetadata, imageId, data);
     }
   });
+  setMeasurementStyle();
 }
 
-export function createRectangleROI(viewport, imageMetadata, imageId, points) {
+export function createRectangleROI(viewport, imageMetadata, imageId, data) {
   try {
-    const normalizedPoints = points.map(point => {
+    const normalizedPoints = data.points.map(point => {
+      console.log('point reeec', point);
       const normalizedX = point.x ? point.x : point.xOrigin;
       const normalizedY = point.y ? point.y : point.yOrigin;
       const imageWidth = imageMetadata.dimensions[0];
@@ -162,8 +174,14 @@ export function createRectangleROI(viewport, imageMetadata, imageId, points) {
 
     cs3dTools.RectangleROITool.createAndAddAnnotation(viewport, {
       data: {
+        label: {
+          measurementId: data?.measurementId,
+          pointsInfo: data.points,
+          predicted: true,
+        },
         handles: {
           points: normalizedPoints,
+          type: 'rectangle',
           activeHandleIndex: null,
           cachedStats: {
             [`imageId:${imageId}`]: {
@@ -215,15 +233,15 @@ export function createRectangleROI(viewport, imageMetadata, imageId, points) {
   }
 }
 
-export function createLength(viewport, imageMetadata, imageId, point) {
+export function createLength(viewport, imageMetadata, imageId, data) {
   if (!imageMetadata) {
     console.error('No image metadata found');
     return;
   }
 
   try {
-    const normalizedX = point[0].x ? point[0].x : point[0].xOrigin;
-    const normalizedY = point[0].y ? point[0].y : point[0].yOrigin;
+    const normalizedX = data.points[0].x ? data.points[0].x : data.points[0].xOrigin;
+    const normalizedY = data.points[0].y ? data.points[0].y : data.points[0].yOrigin;
     const imageWidth = imageMetadata.dimensions[0];
     const imageHeight = imageMetadata.dimensions[1];
     const pixelSpacingX = imageMetadata.spacing[0];
@@ -242,8 +260,8 @@ export function createLength(viewport, imageMetadata, imageId, point) {
       orientationMatrix
     );
 
-    const normalizedX2 = point[1].x ? point[1].x : point[1].xOrigin;
-    const normalizedY2 = point[1].y ? point[1].y : point[1].yOrigin;
+    const normalizedX2 = data.points[1].x ? data.points[1].x : data.points[1].xOrigin;
+    const normalizedY2 = data.points[1].y ? data.points[1].y : data.points[1].yOrigin;
     const imageWidth2 = imageMetadata.dimensions[0];
     const imageHeight2 = imageMetadata.dimensions[1];
     const pixelSpacingX2 = imageMetadata.spacing[0];
@@ -266,6 +284,13 @@ export function createLength(viewport, imageMetadata, imageId, point) {
       data: {
         handles: {
           points: [dicomCoords, dicomCoords2],
+          headName: data.points[0].name,
+          tailName: data.points[1].name,
+        },
+        label: {
+          measurementId: data?.measurementId,
+          pointsInfo: data.points,
+          predicted: true,
         },
         cachedStats: {
           [`imageId:${imageId}`]: {
@@ -275,7 +300,6 @@ export function createLength(viewport, imageMetadata, imageId, point) {
         },
       },
     });
-    setMeasurementStyle();
   } catch (error) {
     console.error('Error adding measurement:', error);
   }
