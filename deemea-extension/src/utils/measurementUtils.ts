@@ -125,10 +125,12 @@ export async function demonstrateMeasurementService(servicesManager, relatedPoin
     return;
   }
 
-  points?.forEach(point => {
+  relatedPoints?.forEach(point => {
     if (point.length === 2) {
+      console.log('Length');
       createLength(viewport, imageMetadata, imageId, point);
     } else if (point.length === 4) {
+      console.log('Rectangle');
       createRectangleROI(viewport, imageMetadata, imageId, point);
     }
   });
