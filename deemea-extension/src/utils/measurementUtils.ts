@@ -137,10 +137,8 @@ export async function demonstrateMeasurementService(servicesManager, relatedPoin
 
   relatedPoints?.forEach(data => {
     if (data.points.length === 2) {
-      console.log('Length', data);
       createLength(viewport, imageMetadata, imageId, data);
     } else if (data.points.length === 4) {
-      console.log('Rectangle', data);
       createRectangleROI(viewport, imageMetadata, imageId, data);
     }
   });
@@ -150,7 +148,6 @@ export async function demonstrateMeasurementService(servicesManager, relatedPoin
 export function createRectangleROI(viewport, imageMetadata, imageId, data) {
   try {
     const normalizedPoints = data.points.map(point => {
-      console.log('point reeec', point);
       const normalizedX = point.x ? point.x : point.xOrigin;
       const normalizedY = point.y ? point.y : point.yOrigin;
       const imageWidth = imageMetadata.dimensions[0];
@@ -309,7 +306,6 @@ export async function createMeasurement(servicesManager, points) {
   const { ViewportGridService, CornerstoneViewportService } = servicesManager.services;
 
   const viewportId = ViewportGridService.getActiveViewportId();
-  console.log(viewportId);
   const viewport = CornerstoneViewportService.getCornerstoneViewport(viewportId);
 
   const imageId = viewport.getCurrentImageId();
