@@ -243,8 +243,6 @@ export function createLength(viewport, imageMetadata, imageId, data, imageStatus
     return;
   }
 
-  console.log('laaa', imageStatus);
-
   try {
     const normalizedX = data.points[0].x ? data.points[0].x : data.points[0].xOrigin;
     const normalizedY = data.points[0].y ? data.points[0].y : data.points[0].yOrigin;
