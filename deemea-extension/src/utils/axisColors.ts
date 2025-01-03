@@ -100,13 +100,6 @@ export const axis = [
     color: Palette.Turquoise,
     highlighted: Palette.DarkTurquoise,
   },
-  {
-    // Calibration ball
-    tail: 'calibration_p1',
-    head: 'calibration_p2',
-    color: Palette.Orange,
-    highlighted: Palette.DarkOrange,
-  },
 
   // LILIA
   {
@@ -200,7 +193,7 @@ export const axis = [
     highlighted: Palette.DarkRed,
   },
 
-  // Hippolyne
+  // HIPPOLYNE
   {
     tail: 'pelvis_distal_left',
     head: 'pelvis_distal_right',
@@ -257,13 +250,6 @@ export const axis = [
     head: 'stem_axis_distal_right',
     color: Palette.Purple,
     highlighted: Palette.DarkPurple,
-  },
-  // Calibration ball
-  {
-    tail: 'calibration_p1',
-    head: 'calibration_p2',
-    color: Palette.Orange,
-    highlighted: Palette.DarkOrange,
   },
 
   // AMELYA
