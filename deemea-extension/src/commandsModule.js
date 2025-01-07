@@ -130,8 +130,6 @@ const commandsModule = ({ servicesManager }) => {
           imagingData: event?.measurement?.label?.imagingData,
         };
 
-        console.log('sended', dataToSend);
-
         if (normalizedPoints) {
           window.parent.postMessage(
             {
