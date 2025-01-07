@@ -127,7 +127,10 @@ const commandsModule = ({ servicesManager }) => {
           uid: event.measurement.uid,
           measurementId: event?.measurement?.label.measurementId,
           hide: event?.measurement?.label?.hide,
+          imagingData: event?.measurement?.label?.imagingData,
         };
+
+        console.log('sended', dataToSend);
 
         if (normalizedPoints) {
           window.parent.postMessage(
