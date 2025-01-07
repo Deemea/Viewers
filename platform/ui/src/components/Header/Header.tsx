@@ -66,7 +66,7 @@ function Header({
           )}
           <div className="border-primary-dark mx-1.5 h-[25px] border-r"></div>
           <div className="flex-shrink-0">
-            <Dropdown
+            {/* <Dropdown
               id="options"
               showDropdownIcon={false}
               list={menuOptions}
@@ -81,7 +81,17 @@ function Header({
               >
                 <Icons.ByName name="icon-settings" />
               </IconButton>
-            </Dropdown>
+            </Dropdown> */}
+            <IconButton
+              id={'options-settings-icon'}
+              variant="text"
+              color="inherit"
+              size="initial"
+              className="text-primary-active hover:bg-primary-dark h-full w-full"
+              onClick={() => menuOptions[0].onClick()}
+            >
+              <Icon name="icon-settings" />
+            </IconButton>
           </div>
         </div>
       </div>
