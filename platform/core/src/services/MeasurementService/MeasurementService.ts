@@ -240,7 +240,7 @@ class MeasurementService extends PubSubService {
       return this.getAnnotation(source, annotationType, measurementId);
     };
 
-    log.info(`New '${name}@${version}' source added.`);
+    // log.info(`New '${name}@${version}' source added.`);
     this.sources[uid] = source;
 
     return source;
@@ -304,7 +304,7 @@ class MeasurementService extends PubSubService {
       this.mappings[source.uid] = [mapping];
     }
 
-    log.info(`New measurement mapping added to source '${this._getSourceToString(source)}'.`);
+    // log.info(`New measurement mapping added to source '${this._getSourceToString(source)}'.`);
   }
 
   /**
@@ -538,14 +538,14 @@ class MeasurementService extends PubSubService {
           notYetUpdatedAtSource: false,
         });
       } else {
-        log.info('Measurement added.', newMeasurement);
+        // log.info('Measurement added.', newMeasurement);
         this._broadcastEvent(this.EVENTS.MEASUREMENT_ADDED, {
           source,
           measurement: newMeasurement,
         });
       }
     } else {
-      log.info('Measurement started.', newMeasurement);
+      // log.info('Measurement started.', newMeasurement);
       this.measurements.set(internalUID, newMeasurement);
     }
 

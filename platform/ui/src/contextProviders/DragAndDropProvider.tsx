@@ -21,7 +21,7 @@ function DragAndDropProvider({ children }) {
   const backend = HTML5Backend; // isTouchDevice ? TouchBackend : HTML5Backend;
   const opts = {}; // isTouchDevice ? { enableMouseEvents: true } : {};
 
-  console.log('using... touch backend?', isTouchDevice);
+  // console.log('using... touch backend?', isTouchDevice);
 
   return (
     <DndProvider
