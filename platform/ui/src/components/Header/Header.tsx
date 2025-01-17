@@ -49,7 +49,7 @@ function Header({
           >
             {isReturnEnabled && <Icons.ChevronClosed className="text-primary-active w-8" />}
             <div className="ml-1">
-              {WhiteLabeling?.createLogoComponentFn?.(React, props) || <Icons.OHIFLogo />}
+              {/* {WhiteLabeling?.createLogoComponentFn?.(React, props) || <Svg name="logo-ohif" />} */}
             </div>
           </div>
         </div>
@@ -58,13 +58,12 @@ function Header({
           <div className="flex items-center justify-center space-x-2">{children}</div>
         </div>
         <div className="absolute right-0 top-1/2 flex -translate-y-1/2 select-none items-center">
-          {showPatientInfo !== PatientInfoVisibility.DISABLED && (
+          {/* {showPatientInfo !== PatientInfoVisibility.DISABLED && (
             <HeaderPatientInfo
               servicesManager={servicesManager}
               appConfig={appConfig}
             />
-          )}
-          <div className="border-primary-dark mx-1.5 h-[25px] border-r"></div>
+          )} */}
           <div className="flex-shrink-0">
             {/* <Dropdown
               id="options"
