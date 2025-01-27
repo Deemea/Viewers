@@ -87,14 +87,17 @@ function modeFactory({ modeConfiguration }) {
             id: ohif.layout,
             props: {
               leftPanels: [ohif.leftPanel],
+              leftPanelResizable: true,
               leftPanelClosed: true, // we have problem with rendering thumbnails for microscopy images
               rightPanelClosed: true, // we do not have the save microscopy measurements yet
               rightPanels: ['@ohif/extension-dicom-microscopy.panelModule.measure'],
+              rightPanelResizable: true,
               viewports: [
                 {
                   namespace: '@ohif/extension-dicom-microscopy.viewportModule.microscopy-dicom',
                   displaySetsToDisplay: [
-                    '@ohif/extension-dicom-microscopy.sopClassHandlerModule.DicomMicroscopySopClassHandler',
+                    // Share the sop class handler with cornerstone version of it
+                    '@ohif/extension-cornerstone.sopClassHandlerModule.DicomMicroscopySopClassHandler',
                     '@ohif/extension-dicom-microscopy.sopClassHandlerModule.DicomMicroscopySRSopClassHandler',
                   ],
                 },
@@ -113,14 +116,9 @@ function modeFactory({ modeConfiguration }) {
       },
     ],
     extensions: extensionDependencies,
-    hangingProtocol: ['default'],
-
-    // Order is important in sop class handlers when two handlers both use
-    // the same sop class under different situations.  In that case, the more
-    // general handler needs to come last.  For this case, the dicomvideo must
-    // come first to remove video transfer syntax before ohif uses images
+    hangingProtocol: 'default',
     sopClassHandlers: [
-      '@ohif/extension-dicom-microscopy.sopClassHandlerModule.DicomMicroscopySopClassHandler',
+      '@ohif/extension-cornerstone.sopClassHandlerModule.DicomMicroscopySopClassHandler',
       '@ohif/extension-dicom-microscopy.sopClassHandlerModule.DicomMicroscopySRSopClassHandler',
       dicomvideo.sopClassHandler,
       dicompdf.sopClassHandler,

@@ -3,10 +3,6 @@ window.config = {
   routerBasename: '/',
   extensions: [],
   modes: [],
-  customizationService: {
-    dicomUploadComponent:
-      '@ohif/extension-cornerstone.customizationModule.cornerstoneDicomUploadComponent',
-  },
   showStudyList: true,
   maxNumberOfWebWorkers: 3,
   showLoadingIndicator: true,
@@ -27,12 +23,12 @@ window.config = {
         wadoRoot: 'http://localhost/dicom-web',
         qidoSupportsIncludeField: true,
         supportsReject: true,
+        dicomUploadEnabled: true,
         imageRendering: 'wadors',
         thumbnailRendering: 'wadors',
         enableStudyLazyLoad: true,
         supportsFuzzyMatching: true,
         supportsWildcard: true,
-        dicomUploadEnabled: true,
         omitQuotationForMultipartRequest: true,
         bulkDataURI: {
           enabled: true,

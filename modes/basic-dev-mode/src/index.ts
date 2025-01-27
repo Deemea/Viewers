@@ -1,4 +1,4 @@
-import toolbarButtons from './toolbarButtons.js';
+import toolbarButtons from './toolbarButtons';
 import { hotkeys } from '@ohif/core';
 import { id } from './id';
 import i18n from 'i18next';
@@ -72,7 +72,10 @@ function modeFactory({ modeConfiguration }) {
             toolName: toolNames.Zoom,
             bindings: [{ mouseButton: Enums.MouseBindings.Secondary }],
           },
-          { toolName: toolNames.StackScrollMouseWheel, bindings: [] },
+          {
+            toolName: toolNames.StackScroll,
+            bindings: [{ mouseButton: Enums.MouseBindings.Wheel }],
+          },
         ],
         passive: [
           { toolName: toolNames.Length },
@@ -138,7 +141,9 @@ function modeFactory({ modeConfiguration }) {
             props: {
               // TODO: Should be optional, or required to pass empty array for slots?
               leftPanels: [ohif.thumbnailList],
+              leftPanelResizable: true,
               rightPanels: [ohif.measurements],
+              rightPanelResizable: true,
               viewports: [
                 {
                   namespace: cs3d.viewport,

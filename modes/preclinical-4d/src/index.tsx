@@ -36,7 +36,7 @@ function modeFactory({ modeConfiguration }) {
   return {
     id,
     routeName: 'dynamic-volume',
-    displayName: '4D PT/CT',
+    displayName: 'Preclinical 4D',
     onModeEnter: function ({ servicesManager, extensionManager, commandsManager }: withAppTypes) {
       const {
         measurementService,
@@ -62,16 +62,19 @@ function modeFactory({ modeConfiguration }) {
 
       // the primary button section is created in the workflow steps
       // specific to the step
-      customizationService.addModeCustomizations([
-        {
-          id: 'segmentation.panel',
-          segmentationPanelMode: 'expanded',
-          addSegment: false,
-          onSegmentationAdd: () => {
-            commandsManager.run('createNewLabelmapFromPT');
+      customizationService.setCustomizations({
+        'panelSegmentation.tableMode': {
+          $set: 'expanded',
+        },
+        'panelSegmentation.onSegmentationAdd': {
+          $set: () => {
+            commandsManager.run('createNewLabelMapForDynamicVolume');
           },
         },
-      ]);
+        'panelSegmentation.showAddSegment': {
+          $set: false,
+        },
+      });
 
       // Auto play the clip initially when the volumes are loaded
       const { unsubscribe } = cornerstoneViewportService.subscribe(
@@ -138,7 +141,9 @@ function modeFactory({ modeConfiguration }) {
             id: ohif.layout,
             props: {
               leftPanels: [[dynamicVolume.leftPanel, cornerstone.activeViewportWindowLevel]],
+              leftPanelResizable: true,
               rightPanels: [],
+              rightPanelResizable: true,
               rightPanelClosed: true,
               viewports: [
                 {

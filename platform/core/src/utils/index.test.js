@@ -22,6 +22,7 @@ describe('Top level exports', () => {
       'imageIdToURI',
       'roundNumber',
       'b64toBlob',
+      'sopClassDictionary',
       'createStudyBrowserTabs',
       'formatDate',
       'formatTime',
@@ -40,9 +41,9 @@ describe('Top level exports', () => {
       'resolveObjectPath',
       'hierarchicalListUtils',
       'progressTrackingUtils',
-      'subscribeToNextViewportGridChange',
       'uuidv4',
       'addAccessors',
+      'MeasurementFilters',
     ].sort();
 
     const exports = Object.keys(utils.default).sort();

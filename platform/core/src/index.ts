@@ -30,15 +30,16 @@ import {
   PubSubService,
   UserAuthenticationService,
   CustomizationService,
-  StateSyncService,
   PanelService,
   WorkflowStepsService,
   StudyPrefetcherService,
+  MultiMonitorService,
 } from './services';
 
 import { DisplaySetMessage, DisplaySetMessageList } from './services/DisplaySetService';
 
 import IWebApiDataSource from './DataSources/IWebApiDataSource';
+import useActiveViewportDisplaySets from './hooks/useActiveViewportDisplaySets';
 
 const hotkeys = {
   ...utils.hotkeys,
@@ -68,7 +69,6 @@ const OHIF = {
   //
   CineService,
   CustomizationService,
-  StateSyncService,
   UIDialogService,
   UIModalService,
   UINotificationService,
@@ -79,12 +79,14 @@ const OHIF = {
   ViewportGridService,
   HangingProtocolService,
   UserAuthenticationService,
+  MultiMonitorService,
   IWebApiDataSource,
   DicomMetadataStore,
   pubSubServiceInterface,
   PubSubService,
   PanelService,
   useToolbar,
+  useActiveViewportDisplaySets,
   WorkflowStepsService,
   StudyPrefetcherService,
 };
@@ -111,7 +113,6 @@ export {
   //
   CineService,
   CustomizationService,
-  StateSyncService,
   UIDialogService,
   UIModalService,
   UINotificationService,
@@ -120,6 +121,7 @@ export {
   DisplaySetMessage,
   DisplaySetMessageList,
   MeasurementService,
+  MultiMonitorService,
   ToolbarService,
   ViewportGridService,
   HangingProtocolService,
@@ -129,13 +131,15 @@ export {
   pubSubServiceInterface,
   PubSubService,
   Enums,
-  Types,
   PanelService,
   WorkflowStepsService,
   StudyPrefetcherService,
   useToolbar,
+  useActiveViewportDisplaySets,
 };
 
 export { OHIF };
+
+export type { Types };
 
 export default OHIF;

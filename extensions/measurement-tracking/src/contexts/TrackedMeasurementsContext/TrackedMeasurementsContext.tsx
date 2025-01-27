@@ -1,17 +1,16 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Machine } from 'xstate';
 import { useMachine } from '@xstate/react';
-import { useViewportGrid } from '@ohif/ui';
+import { useViewportGrid } from '@ohif/ui-next';
+import { promptLabelAnnotation, promptSaveReport } from '@ohif/extension-default';
 import { machineConfiguration, defaultOptions, RESPONSE } from './measurementTrackingMachine';
 import promptBeginTracking from './promptBeginTracking';
 import promptTrackNewSeries from './promptTrackNewSeries';
 import promptTrackNewStudy from './promptTrackNewStudy';
-import promptSaveReport from './promptSaveReport';
 import promptHydrateStructuredReport from './promptHydrateStructuredReport';
 import hydrateStructuredReport from './hydrateStructuredReport';
 import { useAppConfig } from '@state';
-import promptLabelAnnotation from './promptLabelAnnotation';
 
 const TrackedMeasurementsContext = React.createContext();
 TrackedMeasurementsContext.displayName = 'TrackedMeasurementsContext';
@@ -31,12 +30,7 @@ function TrackedMeasurementsContextProvider(
 
   const [viewportGrid, viewportGridService] = useViewportGrid();
   const { activeViewportId, viewports } = viewportGrid;
-  const {
-    measurementService,
-    displaySetService,
-    customizationService,
-    cornerstoneViewportService,
-  } = servicesManager.services;
+  const { measurementService, displaySetService, customizationService } = servicesManager.services;
 
   const machineOptions = Object.assign({}, defaultOptions);
   machineOptions.actions = Object.assign({}, machineOptions.actions, {
@@ -96,17 +90,18 @@ function TrackedMeasurementsContextProvider(
 
       const trackedMeasurement = trackedMeasurements[0];
       const referencedDisplaySetUID = trackedMeasurement.displaySetInstanceUID;
-      const viewport = cornerstoneViewportService.getCornerstoneViewport(activeViewportId);
-      const imageIndex = viewport.getCurrentImageIdIndex();
+
+      // update the previously stored positionPresentation with the new viewportId
+      // presentation so that when we put the referencedDisplaySet back in the viewport
+      // it will be in the correct position zoom and pan
+      commandsManager.runCommand('updateStoredPositionPresentation', {
+        viewportId: activeViewportId,
+        displaySetInstanceUID: referencedDisplaySetUID,
+      });
 
       viewportGridService.setDisplaySetsForViewport({
         viewportId: activeViewportId,
         displaySetInstanceUIDs: [referencedDisplaySetUID],
-        viewportOptions: {
-          initialImageOptions: {
-            index: imageIndex,
-          },
-        },
       });
     },
     showStructuredReportDisplaySetInActiveViewport: (ctx, evt) => {
@@ -164,6 +159,7 @@ function TrackedMeasurementsContextProvider(
     promptHydrateStructuredReport: promptHydrateStructuredReport.bind(null, {
       servicesManager,
       extensionManager,
+      commandsManager,
       appConfig,
     }),
     hydrateStructuredReport: hydrateStructuredReport.bind(null, {
@@ -178,11 +174,11 @@ function TrackedMeasurementsContextProvider(
   });
   machineOptions.guards = Object.assign({}, machineOptions.guards, {
     isLabelOnMeasure: (ctx, evt, condMeta) => {
-      const labelConfig = customizationService.get('measurementLabels');
+      const labelConfig = customizationService.getCustomization('measurementLabels');
       return labelConfig?.labelOnMeasure;
     },
     isLabelOnMeasureAndShouldKillMachine: (ctx, evt, condMeta) => {
-      const labelConfig = customizationService.get('measurementLabels');
+      const labelConfig = customizationService.getCustomization('measurementLabels');
       return evt.data && evt.data.userResponse === RESPONSE.NO_NEVER && labelConfig?.labelOnMeasure;
     },
   });
@@ -196,7 +192,9 @@ function TrackedMeasurementsContextProvider(
   // - Fix viewport border resize
   // - created/destroyed hooks for extensions (cornerstone measurement subscriptions in it's `init`)
 
-  const measurementTrackingMachine = Machine(machineConfiguration, machineOptions);
+  const measurementTrackingMachine = useMemo(() => {
+    return Machine(machineConfiguration, machineOptions);
+  }, []); // Empty dependency array ensures this is only created once
 
   const [trackedMeasurements, sendTrackedMeasurementsEvent] = useMachine(
     measurementTrackingMachine
@@ -274,6 +272,14 @@ function TrackedMeasurementsContextProvider(
     servicesManager.services,
     viewports,
   ]);
+
+  useEffect(() => {
+    // The command needs to be bound to the context's sendTrackedMeasurementsEvent
+    // so the command has to be registered in a React component.
+    commandsManager.registerCommand('DEFAULT', 'loadTrackedSRMeasurements', {
+      commandFn: props => sendTrackedMeasurementsEvent('HYDRATE_SR', props),
+    });
+  }, [commandsManager, sendTrackedMeasurementsEvent]);
 
   return (
     <TrackedMeasurementsContext.Provider

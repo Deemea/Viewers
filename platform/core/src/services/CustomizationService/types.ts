@@ -1,11 +1,11 @@
-import Command from '../../types/Command';
+import { Command } from '../../types/Command';
 import { ComponentType } from 'react';
 
 export type Obj = Record<string, unknown>;
 
 export interface BaseCustomization extends Obj {
-  id: string;
-  customizationType?: string;
+  id?: string;
+  inheritsFrom?: string;
   description?: string;
   label?: string;
   commands?: Command[];

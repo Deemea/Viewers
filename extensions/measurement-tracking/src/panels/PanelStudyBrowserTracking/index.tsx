@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 //
 import PanelStudyBrowserTracking from './PanelStudyBrowserTracking';
 import getImageSrcFromImageId from './getImageSrcFromImageId';
-import requestDisplaySetCreationForStudy from './requestDisplaySetCreationForStudy';
+import { requestDisplaySetCreationForStudy } from '@ohif/extension-default';
 
 function _getStudyForPatientUtility(extensionManager) {
   const utilityModule = extensionManager.getModuleEntry(
@@ -42,6 +42,7 @@ function WrappedPanelStudyBrowserTracking({
   return (
     <PanelStudyBrowserTracking
       servicesManager={servicesManager}
+      commandsManager={commandsManager}
       dataSource={dataSource}
       getImageSrc={_getImageSrcFromImageId}
       getStudiesForPatientByMRN={_getStudiesForPatientByMRN}

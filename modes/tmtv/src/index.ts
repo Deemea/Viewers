@@ -11,20 +11,19 @@ const { MetadataProvider } = classes;
 const ohif = {
   layout: '@ohif/extension-default.layoutTemplateModule.viewerLayout',
   sopClassHandler: '@ohif/extension-default.sopClassHandlerModule.stack',
-  measurements: '@ohif/extension-default.panelModule.measure',
   thumbnailList: '@ohif/extension-default.panelModule.seriesList',
 };
 
 const cs3d = {
   viewport: '@ohif/extension-cornerstone.viewportModule.cornerstone',
-  segPanel: '@ohif/extension-cornerstone-dicom-seg.panelModule.panelSegmentation',
+  segPanel: '@ohif/extension-cornerstone.panelModule.panelSegmentationNoHeader',
+  measurements: '@ohif/extension-cornerstone.panelModule.measurements',
 };
 
 const tmtv = {
   hangingProtocol: '@ohif/extension-tmtv.hangingProtocolModule.ptCT',
   petSUV: '@ohif/extension-tmtv.panelModule.petSUV',
-  toolbox: '@ohif/extension-tmtv.panelModule.tmtvBox',
-  export: '@ohif/extension-tmtv.panelModule.tmtvExport',
+  tmtv: '@ohif/extension-tmtv.panelModule.tmtv',
 };
 
 const extensionDependencies = {
@@ -102,16 +101,16 @@ function modeFactory({ modeConfiguration }) {
         'BrushTools',
       ]);
 
-      customizationService.addModeCustomizations([
-        {
-          id: 'segmentation.panel',
-          segmentationPanelMode: 'expanded',
-          addSegment: false,
-          onSegmentationAdd: () => {
+      customizationService.setCustomizations({
+        'panelSegmentation.tableMode': {
+          $set: 'expanded',
+        },
+        'panelSegmentation.onSegmentationAdd': {
+          $set: () => {
             commandsManager.run('createNewLabelmapFromPT');
           },
         },
-      ]);
+      });
 
       // For the hanging protocol we need to decide on the window level
       // based on whether the SUV is corrected or not, hence we can't hard
@@ -199,8 +198,10 @@ function modeFactory({ modeConfiguration }) {
             id: ohif.layout,
             props: {
               leftPanels: [ohif.thumbnailList],
+              leftPanelResizable: true,
               leftPanelClosed: true,
-              rightPanels: [[tmtv.toolbox, cs3d.segPanel, tmtv.export], tmtv.petSUV],
+              rightPanels: [tmtv.tmtv, tmtv.petSUV],
+              rightPanelResizable: true,
               viewports: [
                 {
                   namespace: cs3d.viewport,

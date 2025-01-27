@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 //
-import PanelStudyBrowser from './PanelStudyBrowser';
+import PanelStudyBrowser from './StudyBrowser/PanelStudyBrowser';
 import getImageSrcFromImageId from './getImageSrcFromImageId';
 import getStudiesForPatientByMRN from './getStudiesForPatientByMRN';
 import requestDisplaySetCreationForStudy from './requestDisplaySetCreationForStudy';
@@ -13,10 +13,10 @@ import requestDisplaySetCreationForStudy from './requestDisplaySetCreationForStu
  * @param {object} commandsManager
  * @param {object} extensionManager
  */
-function WrappedPanelStudyBrowser({ commandsManager, extensionManager, servicesManager }) {
+function WrappedPanelStudyBrowser({ extensionManager, servicesManager, commandsManager }) {
   // TODO: This should be made available a different way; route should have
   // already determined our datasource
-  const dataSource = extensionManager.getDataSources()[0];
+  const [dataSource] = extensionManager.getActiveDataSource();
   const _getStudiesForPatientByMRN = getStudiesForPatientByMRN.bind(null, dataSource);
   const _getImageSrcFromImageId = useCallback(
     _createGetImageSrcFromImageIdFn(extensionManager),
@@ -30,6 +30,7 @@ function WrappedPanelStudyBrowser({ commandsManager, extensionManager, servicesM
   return (
     <PanelStudyBrowser
       servicesManager={servicesManager}
+      commandsManager={commandsManager}
       dataSource={dataSource}
       getImageSrc={_getImageSrcFromImageId}
       getStudiesForPatientByMRN={_getStudiesForPatientByMRN}

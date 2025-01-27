@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import classnames from 'classnames';
-import PropTypes, { object } from 'prop-types';
+import PropTypes from 'prop-types';
 import { Link, useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import qs from 'query-string';
@@ -11,16 +11,14 @@ import filtersMeta from './filtersMeta.js';
 import { useAppConfig } from '@state';
 import { useDebounce, useSearchParams } from '@hooks';
 import { utils, hotkeys } from '@ohif/core';
+import publicUrl from '../../utils/publicUrl';
 
 import {
-  Icon,
   StudyListExpandedRow,
   EmptyStudies,
   StudyListTable,
   StudyListPagination,
   StudyListFilter,
-  TooltipClipboard,
-  Header,
   useModal,
   AboutModal,
   UserPreferences,
@@ -31,9 +29,21 @@ import {
   ButtonEnums,
 } from '@ohif/ui';
 
+import {
+  Header,
+  Icons,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  Clipboard,
+  Onboarding,
+  ScrollArea,
+} from '@ohif/ui-next';
+
 import { Types } from '@ohif/ui';
 
 import i18n from '@ohif/i18n';
+import { preserveQueryParameters, preserveQueryStrings } from '../../utils/preserveQueryParameters';
 
 const PatientInfoVisibility = Types.PatientInfoVisibility;
 
@@ -93,10 +103,13 @@ function WorkList({
   const sortModifier = sortDirection === 'descending' ? 1 : -1;
   const defaultSortValues =
     shouldUseDefaultSort && canSort ? { sortBy: 'studyDate', sortDirection: 'ascending' } : {};
-  const sortedStudies = studies;
 
-  if (canSort) {
-    studies.sort((s1, s2) => {
+  const sortedStudies = useMemo(() => {
+    if (!canSort) {
+      return studies;
+    }
+
+    return [...studies].sort((s1, s2) => {
       if (shouldUseDefaultSort) {
         const ascendingSortModifier = -1;
         return _sortStringDates(s1, s2, ascendingSortModifier);
@@ -119,7 +132,7 @@ function WorkList({
 
       return 0;
     });
-  }
+  }, [canSort, studies, shouldUseDefaultSort, sortBy, sortModifier]);
 
   // ~ Rows & Studies
   const [expandedRows, setExpandedRows] = useState([]);
@@ -194,13 +207,14 @@ function WorkList({
       }
     });
 
+    preserveQueryStrings(queryString);
+
     const search = qs.stringify(queryString, {
       skipNull: true,
       skipEmptyString: true,
     });
-
     navigate({
-      pathname: '/',
+      pathname: publicUrl,
       search: search ? `?${search}` : undefined,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -268,22 +282,37 @@ function WorkList({
         t('Common:localTimeFormat', 'hh:mm A')
       );
 
+    const makeCopyTooltipCell = textValue => {
+      if (!textValue) {
+        return '';
+      }
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="cursor-pointer truncate">{textValue}</span>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            <div className="flex items-center justify-between gap-2">
+              {textValue}
+              <Clipboard>{textValue}</Clipboard>
+            </div>
+          </TooltipContent>
+        </Tooltip>
+      );
+    };
+
     return {
       dataCY: `studyRow-${studyInstanceUid}`,
       clickableCY: studyInstanceUid,
       row: [
         {
           key: 'patientName',
-          content: patientName ? (
-            <TooltipClipboard>{patientName}</TooltipClipboard>
-          ) : (
-            <span className="text-gray-700">(Empty)</span>
-          ),
+          content: patientName ? makeCopyTooltipCell(patientName) : null,
           gridCol: 4,
         },
         {
           key: 'mrn',
-          content: <TooltipClipboard>{mrn}</TooltipClipboard>,
+          content: makeCopyTooltipCell(mrn),
           gridCol: 3,
         },
         {
@@ -299,7 +328,7 @@ function WorkList({
         },
         {
           key: 'description',
-          content: <TooltipClipboard>{description}</TooltipClipboard>,
+          content: makeCopyTooltipCell(description),
           gridCol: 4,
         },
         {
@@ -310,15 +339,14 @@ function WorkList({
         },
         {
           key: 'accession',
-          content: <TooltipClipboard>{accession}</TooltipClipboard>,
+          content: makeCopyTooltipCell(accession),
           gridCol: 3,
         },
         {
           key: 'instances',
           content: (
             <>
-              <Icon
-                name="group-layers"
+              <Icons.GroupLayers
                 className={classnames('mr-2 inline-flex w-4', {
                   'text-primary-active': isExpanded,
                   'text-secondary-light': !isExpanded,
@@ -387,14 +415,14 @@ function WorkList({
                 query.append('configUrl', filterValues.configUrl);
               }
               query.append('StudyInstanceUIDs', studyInstanceUid);
+              preserveQueryParameters(query);
+
               return (
                 mode.displayName && (
                   <Link
                     className={isValidMode ? '' : 'cursor-not-allowed'}
                     key={i}
-                    to={`${dataPath ? '../../' : ''}${mode.routeName}${
-                      dataPath || ''
-                    }?${query.toString()}`}
+                    to={`${publicUrl}${mode.routeName}${dataPath || ''}?${query.toString()}`}
                     onClick={event => {
                       // In case any event bubbles up for an invalid mode, prevent the navigation.
                       // For example, the event bubbles up when the icon embedded in the disabled button is clicked.
@@ -411,17 +439,18 @@ function WorkList({
                       disabled={!isValidMode}
                       startIconTooltip={
                         !isValidMode ? (
-                          <div className="font-inter flex w-[206px] whitespace-normal text-left text-xs font-normal text-white	">
+                          <div className="font-inter flex w-[206px] whitespace-normal text-left text-xs font-normal text-white">
                             {invalidModeDescription}
                           </div>
                         ) : null
                       }
                       startIcon={
-                        <Icon
-                          className="!h-[20px] !w-[20px] text-black"
-                          name={isValidMode ? 'launch-arrow' : 'launch-info'}
-                        />
-                      } // launch-arrow | launch-info
+                        isValidMode ? (
+                          <Icons.LaunchArrow className="!h-[20px] !w-[20px] text-black" />
+                        ) : (
+                          <Icons.LaunchInfo className="!h-[20px] !w-[20px] text-black" />
+                        )
+                      }
                       onClick={() => {}}
                       dataCY={`mode-${mode.routeName}-${studyInstanceUid}`}
                       className={isValidMode ? 'text-[13px]' : 'bg-[#222d44] text-[13px]'}
@@ -496,34 +525,37 @@ function WorkList({
   }
 
   const { customizationService } = servicesManager.services;
-  const { component: dicomUploadComponent } =
-    customizationService.get('dicomUploadComponent') ?? {};
+  const DicomUploadComponent = customizationService.getCustomization('dicomUploadComponent');
+
   const uploadProps =
-    dicomUploadComponent && dataSource.getConfig()?.dicomUploadEnabled
+    DicomUploadComponent && dataSource.getConfig()?.dicomUploadEnabled
       ? {
           title: 'Upload files',
           closeButton: true,
           shouldCloseOnEsc: false,
           shouldCloseOnOverlayClick: false,
-          content: dicomUploadComponent.bind(null, {
-            dataSource,
-            onComplete: () => {
-              hide();
-              onRefresh();
-            },
-            onStarted: () => {
-              show({
-                ...uploadProps,
-                // when upload starts, hide the default close button as closing the dialogue must be handled by the upload dialogue itself
-                closeButton: false,
-              });
-            },
-          }),
+          content: () => (
+            <DicomUploadComponent
+              dataSource={dataSource}
+              onComplete={() => {
+                hide();
+                onRefresh();
+              }}
+              onStarted={() => {
+                show({
+                  ...uploadProps,
+                  // when upload starts, hide the default close button as closing the dialogue must be handled by the upload dialogue itself
+                  closeButton: false,
+                });
+              }}
+            />
+          ),
         }
       : undefined;
 
-  const { component: dataSourceConfigurationComponent } =
-    customizationService.get('ohif.dataSourceConfigurationComponent') ?? {};
+  const dataSourceConfigurationComponent = customizationService.getCustomization(
+    'ohif.dataSourceConfigurationComponent'
+  );
 
   return (
     <div className="flex h-screen flex-col bg-black">
@@ -534,46 +566,53 @@ function WorkList({
         WhiteLabeling={appConfig.whiteLabeling}
         showPatientInfo={PatientInfoVisibility.DISABLED}
       />
+      <Onboarding />
       <InvestigationalUseDialog dialogConfiguration={appConfig?.investigationalUseDialog} />
-      <div className="ohif-scrollbar ohif-scrollbar-stable-gutter flex grow flex-col overflow-y-auto sm:px-5">
-        <StudyListFilter
-          numOfStudies={pageNumber * resultsPerPage > 100 ? 101 : numOfStudies}
-          filtersMeta={filtersMeta}
-          filterValues={{ ...filterValues, ...defaultSortValues }}
-          onChange={setFilterValues}
-          clearFilters={() => setFilterValues(defaultFilterValues)}
-          isFiltering={isFiltering(filterValues, defaultFilterValues)}
-          onUploadClick={uploadProps ? () => show(uploadProps) : undefined}
-          getDataSourceConfigurationComponent={
-            dataSourceConfigurationComponent ? () => dataSourceConfigurationComponent() : undefined
-          }
-        />
-        {hasStudies ? (
+      <div className="flex h-full flex-col overflow-y-auto">
+        <ScrollArea>
           <div className="flex grow flex-col">
-            <StudyListTable
-              tableDataSource={tableDataSource.slice(offset, offsetAndTake)}
-              numOfStudies={numOfStudies}
-              querying={querying}
+            <StudyListFilter
+              numOfStudies={pageNumber * resultsPerPage > 100 ? 101 : numOfStudies}
               filtersMeta={filtersMeta}
+              filterValues={{ ...filterValues, ...defaultSortValues }}
+              onChange={setFilterValues}
+              clearFilters={() => setFilterValues(defaultFilterValues)}
+              isFiltering={isFiltering(filterValues, defaultFilterValues)}
+              onUploadClick={uploadProps ? () => show(uploadProps) : undefined}
+              getDataSourceConfigurationComponent={
+                dataSourceConfigurationComponent
+                  ? () => dataSourceConfigurationComponent()
+                  : undefined
+              }
             />
-            <div className="grow">
-              <StudyListPagination
-                onChangePage={onPageNumberChange}
-                onChangePerPage={onResultsPerPageChange}
-                currentPage={pageNumber}
-                perPage={resultsPerPage}
+          </div>
+          {hasStudies ? (
+            <div className="flex grow flex-col">
+              <StudyListTable
+                tableDataSource={tableDataSource.slice(offset, offsetAndTake)}
+                numOfStudies={numOfStudies}
+                querying={querying}
+                filtersMeta={filtersMeta}
               />
+              <div className="grow">
+                <StudyListPagination
+                  onChangePage={onPageNumberChange}
+                  onChangePerPage={onResultsPerPageChange}
+                  currentPage={pageNumber}
+                  perPage={resultsPerPage}
+                />
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center pt-48">
-            {appConfig.showLoadingIndicator && isLoadingData ? (
-              <LoadingIndicatorProgress className={'h-full w-full bg-black'} />
-            ) : (
-              <EmptyStudies />
-            )}
-          </div>
-        )}
+          ) : (
+            <div className="flex flex-col items-center justify-center pt-48">
+              {appConfig.showLoadingIndicator && isLoadingData ? (
+                <LoadingIndicatorProgress className={'h-full w-full bg-black'} />
+              ) : (
+                <EmptyStudies />
+              )}
+            </div>
+          )}
+        </ScrollArea>
       </div>
     </div>
   );
@@ -604,7 +643,6 @@ const defaultFilterValues = {
   pageNumber: 1,
   resultsPerPage: 25,
   datasources: '',
-  configUrl: null,
 };
 
 function _tryParseInt(str, defaultValue) {
