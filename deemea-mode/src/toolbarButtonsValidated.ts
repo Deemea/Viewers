@@ -133,6 +133,22 @@ const toolbarButtonsValidated: Button[] = [
       evaluate: 'evaluate.cornerstoneTool',
     },
   },
+  {
+    id: 'Reset',
+    uiType: 'ohif.radioGroup',
+    props: {
+      icon: 'tool-reset',
+      tooltip: 'Reset View',
+      label: 'Reset',
+      commands: [
+        {
+          commandName: 'resetViewport',
+          context: 'CORNERSTONE',
+        },
+      ],
+      evaluate: 'evaluate.action',
+    },
+  },
 ];
 
 export default toolbarButtonsValidated;
