@@ -15,7 +15,7 @@ const toolbarButtons: Button[] = [
     uiType: 'ohif.radioGroup',
     props: {
       icon: 'icon-transferring',
-      label: 'Reset Points',
+      label: 'Reset predictions',
       commands: {
         commandName: 'resetPoints',
         context: 'VIEWER',
@@ -111,7 +111,7 @@ const toolbarButtons: Button[] = [
     props: {
       icon: 'tool-reset',
       tooltip: 'Reset View',
-      label: 'Reset viewport',
+      label: 'Reset image position',
       commands: [
         {
           commandName: 'resetViewport',
