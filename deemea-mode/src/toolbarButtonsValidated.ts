@@ -139,7 +139,7 @@ const toolbarButtonsValidated: Button[] = [
     props: {
       icon: 'tool-reset',
       tooltip: 'Reset View',
-      label: 'Reset',
+      label: 'Reset viewport',
       commands: [
         {
           commandName: 'resetViewport',
