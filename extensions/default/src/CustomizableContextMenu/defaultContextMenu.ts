@@ -24,16 +24,11 @@ const defaultContextMenu = {
     },
     {
       id: 'forRadiolucentBoxes',
-      selector: ({ value, nearbyToolData }) => {
-        console.log('ca', value);
-
-        return (
-          !!nearbyToolData &&
-          value.data.handles.points.length === 4 &&
-          value.data.handles.name &&
-          !value.data.handles.name?.includes('custom_point')
-        );
-      },
+      selector: ({ value, nearbyToolData }) =>
+        !!nearbyToolData &&
+        value.data.handles.points.length === 4 &&
+        value.data.handles.name &&
+        !value.data.handles.name?.includes('custom_point'),
       items: [
         {
           label: 'Delete measurement',
