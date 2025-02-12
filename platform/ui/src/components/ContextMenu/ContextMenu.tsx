@@ -4,6 +4,8 @@ import Typography from '../Typography';
 import Icon from '../Icon';
 
 const ContextMenu = ({ items, ...props }) => {
+  console.log('items', items);
+
   if (!items) {
     return null;
   }
@@ -17,9 +19,10 @@ const ContextMenu = ({ items, ...props }) => {
         <div
           key={index}
           data-cy="context-menu-item"
-          onClick={() => item.action(item, props)}
+          onClick={() => !item?.disabled && item.action(item, props)}
           style={{ justifyContent: 'space-between' }}
-          className="hover:bg-primary-dark border-primary-dark flex cursor-pointer items-center border-b px-4 py-3 transition duration-300 last:border-b-0"
+          title={item.tooltip}
+          className={`hover:bg-primary-dark border-primary-dark flex cursor-pointer items-center border-b px-4 py-3 transition duration-300 last:border-b-0 ${item.disabled && 'cursor-not-allowed'}`}
         >
           <Typography>{item.label}</Typography>
           {item.iconRight && (
