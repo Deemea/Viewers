@@ -4,8 +4,6 @@ import Typography from '../Typography';
 import Icon from '../Icon';
 
 const ContextMenu = ({ items, ...props }) => {
-  console.log('items', items);
-
   if (!items) {
     return null;
   }
