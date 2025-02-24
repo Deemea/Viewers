@@ -30,7 +30,7 @@ function _createWwwcPreset(preset, title, subtitle) {
 export const setToolActiveToolbar = {
   commandName: 'setToolActiveToolbar',
   commandOptions: {
-    toolGroupIds: ['default3d'],
+    toolGroupIds: ['default'],
   },
 };
 
@@ -54,11 +54,7 @@ const toolbarButtons: Button[] = [
       icon: 'tool-length',
       label: 'Length',
       commands: setToolActiveToolbar,
-      evaluate: () => {
-        return {
-          disabled: false,
-        };
-      },
+      evaluate: 'evaluate.cornerstoneTool',
     },
   },
   {
@@ -68,11 +64,7 @@ const toolbarButtons: Button[] = [
       icon: 'tool-rectangle',
       label: 'Rectangle',
       commands: setToolActiveToolbar,
-      evaluate: () => {
-        return {
-          disabled: false,
-        };
-      },
+      evaluate: 'evaluate.cornerstoneTool',
     },
   },
   {
@@ -82,11 +74,7 @@ const toolbarButtons: Button[] = [
       icon: 'tool-angle',
       label: 'Angle',
       commands: setToolActiveToolbar,
-      evaluate: () => {
-        return {
-          disabled: false,
-        };
-      },
+      evaluate: 'evaluate.cornerstoneTool',
     },
   },
   {
@@ -96,11 +84,7 @@ const toolbarButtons: Button[] = [
       icon: 'tool-probe',
       label: 'Probe',
       commands: setToolActiveToolbar,
-      evaluate: () => {
-        return {
-          disabled: false,
-        };
-      },
+      evaluate: 'evaluate.cornerstoneTool',
     },
   },
   {
@@ -110,11 +94,7 @@ const toolbarButtons: Button[] = [
       icon: 'tool-calibration',
       label: 'Calibration',
       commands: setToolActiveToolbar,
-      evaluate: () => {
-        return {
-          disabled: false,
-        };
-      },
+      evaluate: 'evaluate.cornerstoneTool',
     },
   },
   // Window Level
@@ -129,11 +109,7 @@ const toolbarButtons: Button[] = [
         label: 'Window Level',
         tooltip: 'Window Level',
         commands: setToolActiveToolbar,
-        evaluate: () => {
-          return {
-            disabled: false,
-          };
-        },
+        evaluate: 'evaluate.cornerstoneTool',
       }),
       secondary: {
         icon: 'chevron-down',
@@ -159,11 +135,7 @@ const toolbarButtons: Button[] = [
       icon: 'tool-move',
       label: 'Pan',
       commands: setToolActiveToolbar,
-      evaluate: () => {
-        return {
-          disabled: false,
-        };
-      },
+      evaluate: 'evaluate.cornerstoneTool',
     },
   },
   {
@@ -183,11 +155,7 @@ const toolbarButtons: Button[] = [
       icon: 'tool-zoom',
       label: 'Zoom',
       commands: setToolActiveToolbar,
-      evaluate: () => {
-        return {
-          disabled: false,
-        };
-      },
+      evaluate: 'evaluate.cornerstoneTool',
     },
   },
   {

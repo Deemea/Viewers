@@ -30,7 +30,7 @@ function _createWwwcPreset(preset, title, subtitle) {
 export const setToolActiveToolbar = {
   commandName: 'setToolActiveToolbar',
   commandOptions: {
-    toolGroupIds: ['default3d'],
+    toolGroupIds: ['default'],
   },
 };
 

@@ -1,4 +1,4 @@
-function initDefaultToolGroup3d(
+function initDefaultToolGroup(
   extensionManager,
   toolGroupService,
   commandsManager,
@@ -26,28 +26,28 @@ function initDefaultToolGroup3d(
         bindings: [{ mouseButton: Enums.MouseBindings.Secondary }],
       },
       { toolName: toolNames.StackScrollMouseWheel, bindings: [] },
-
+    ],
+    passive: [
       { toolName: toolNames.Length },
       { toolName: toolNames.Probe },
       { toolName: toolNames.RectangleROI },
       { toolName: toolNames.Angle },
       { toolName: toolNames.CalibrationLine },
-      { toolName: toolNames.Layout },
+      { toolName: toolNames.WindowLevelRegion },
     ],
-    passive: [{ toolName: toolNames.WindowLevelRegion }],
   };
 
   toolGroupService.createToolGroupAndAddTools(toolGroupId, tools);
 }
 
-function initToolGroups3d(extensionManager, toolGroupService, commandsManager, modeLabelConfig) {
-  initDefaultToolGroup3d(
+function initToolGroups(extensionManager, toolGroupService, commandsManager, modeLabelConfig) {
+  initDefaultToolGroup(
     extensionManager,
     toolGroupService,
     commandsManager,
-    'default3d',
+    'default',
     modeLabelConfig
   );
 }
 
-export default initToolGroups3d;
+export default initToolGroups;

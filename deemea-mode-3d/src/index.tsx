@@ -1,5 +1,5 @@
 import { hotkeys } from '@ohif/core';
-import toolbarButtons from './toolbarButtons3d';
+import toolbarButtons from '../src/toolbarButtons3d';
 import initToolGroups from '../src/initToolGroups3d';
 import { id } from './id';
 
@@ -40,10 +40,16 @@ function modeFactory({ modeConfiguration }) {
      * Runs when the Mode Route is mounted to the DOM. Usually used to initialize
      * Services and other resources.
      */
-    onModeEnter: ({ servicesManager, extensionManager, commandsManager }: withAppTypes) => {
-      const { measurementService, toolbarService, toolGroupService } = servicesManager.services;
+    onModeEnter: async ({ servicesManager, extensionManager, commandsManager }: withAppTypes) => {
+      const { measurementService, toolbarService, toolGroupService, cornerstoneViewportService } =
+        servicesManager.services;
 
       measurementService.clearMeasurements();
+
+      // Initialiser le CornerstoneViewportService si nécessaire
+      if (cornerstoneViewportService && typeof cornerstoneViewportService.init === 'function') {
+        await cornerstoneViewportService.init();
+      }
 
       // Init Default and SR ToolGroups
       initToolGroups(extensionManager, toolGroupService, commandsManager);
@@ -57,7 +63,6 @@ function modeFactory({ modeConfiguration }) {
         'Probe',
         'CalibrationLine',
         'WindowLevel',
-        'WindowLevelRegion',
         'Pan',
         'Layout',
         'Zoom',
@@ -114,6 +119,8 @@ function modeFactory({ modeConfiguration }) {
             props: {
               leftPanels: [],
               rightPanels: [],
+              leftPanelClosed: true,
+              rightPanelClosed: true,
               viewports: [
                 {
                   namespace: cornerstone.viewport,
@@ -132,6 +139,7 @@ function modeFactory({ modeConfiguration }) {
     /** SopClassHandlers used by the mode */
     sopClassHandlers: [ohif.sopClassHandler],
     hangingProtocol: 'default',
+
     /** hotkeys for mode */
     hotkeys: [...hotkeys.defaults.hotkeyBindings],
   };

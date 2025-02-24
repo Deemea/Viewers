@@ -10,7 +10,6 @@ const extension = {
 
   onModeEnter: ({ extensionManager, servicesManager, commandsManager }) => {
     const { measurementService } = servicesManager.services;
-    console.log('ENTER 2D');
     commandsManager.runCommand('demonstrateMeasurementService');
 
     measurementService.clearMeasurements();
