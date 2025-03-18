@@ -31,11 +31,11 @@ module.exports = {
       primary: {
         light: '#6CDC91',
         main: '#4CD479',
-        dark: '#4CD47910',
+        dark: '#030d06',
         active: '#4CD479',
       },
       inputfield: {
-        main: '#4CD47980',
+        main: '#329653',
         disabled: '#4CD479',
         focus: '#6CDC91',
         placeholder: '#39383f',
@@ -49,7 +49,7 @@ module.exports = {
       },
 
       indigo: {
-        dark: '#4CD47920',
+        dark: '#0e361b',
       },
 
       common: {
