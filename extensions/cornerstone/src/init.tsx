@@ -107,11 +107,14 @@ export default async function init({
   window.extensionManager = extensionManager;
   window.commandsManager = commandsManager;
 
+  console.log('CROSS origin 1', appConfig.showWarningMessageForCrossOrigin);
+  console.log('CROSS origin 2', window.crossOriginIsolated);
+  console.log('CROSS origin 3', sharedArrayBufferDisabled);
+
   if (
     appConfig.showWarningMessageForCrossOrigin &&
     !window.crossOriginIsolated &&
-    !sharedArrayBufferDisabled &&
-    false
+    !sharedArrayBufferDisabled
   ) {
     uiNotificationService.show({
       title: 'Cross Origin Isolation',
