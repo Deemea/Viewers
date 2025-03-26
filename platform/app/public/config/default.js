@@ -96,6 +96,7 @@ window.config = {
   //   // regex: /(https:\/\/hospital.com(\/[0-9A-Za-z.]+)*)|(https:\/\/othersite.com(\/[0-9A-Za-z.]+)*)/
   //   regex: /.*/,
   // },
+  useSharedArrayBuffer: 'FALSE',
   studyPrefetcher: {
     enabled: false,
     displaySetsCount: 1,
