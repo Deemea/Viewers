@@ -72,6 +72,7 @@ const commandsModule = ({ servicesManager }) => {
 
           const imageWidth = imageMetadata.dimensions[0];
           const imageHeight = imageMetadata.dimensions[1];
+          const pixelSpacing = imageMetadata.spacing[0];
 
           window.parent.postMessage(
             {
@@ -79,6 +80,7 @@ const commandsModule = ({ servicesManager }) => {
               message: {
                 width: imageWidth,
                 height: imageHeight,
+                pixelSpacing,
               },
             },
             '*'
