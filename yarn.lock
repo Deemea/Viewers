@@ -1296,17 +1296,10 @@
   resolved "https://registry.yarnpkg.com/@cornerstonejs/ai/-/ai-4.5.13.tgz#d2d662344266d0957bd90d154d94113b83a6633d"
   integrity sha512-5eVrkiUuSWcqc8KOWwXzN/1KwbgVzS/9AZjwZ7GJdFYBmRTOkFVhgKlx86VsXecgzuJ6tUSP72ChyPEDgYuh+g==
   dependencies:
-    "@babel/runtime-corejs2" "7.26.10"
     buffer "6.0.3"
     dcmjs "0.43.1"
     gl-matrix "3.4.3"
     lodash.clonedeep "4.5.0"
-    ndarray "1.0.19"
-    onnxruntime-common "1.17.1"
-    onnxruntime-web "1.17.1"
-
-"@cornerstonejs/calculate-suv@1.1.0":
-  version "1.1.0"
   resolved "https://registry.yarnpkg.com/@cornerstonejs/calculate-suv/-/calculate-suv-1.1.0.tgz#35c8049d3eea03611225a8398d398cd81bf0031a"
   integrity sha512-Q9XraiDJif9aMFArD2iEuDO/HXbcRVCqB7KfaHgDrdTTjgDFovS91Psbdim7crypRSvE6dh/+HKeFNHdvNkA6w==
 

@@ -34,13 +34,13 @@ function PanelMeasurementTableTracking(props) {
       .some(measurement => measurement.isDirty);
     hasDirtyMeasurements
       ? uiModalService.show({
-          title: 'Untrack Study',
-          content: UntrackSeriesModal,
-          contentProps: {
-            onConfirm: onUntrackConfirm,
-            message: 'Are you sure you want to untrack study and delete all measurements?',
-          },
-        })
+        title: 'Untrack Study',
+        content: UntrackSeriesModal,
+        contentProps: {
+          onConfirm: onUntrackConfirm,
+          message: 'Are you sure you want to untrack study and delete all measurements?',
+        },
+      })
       : onUntrackConfirm();
   };
 
