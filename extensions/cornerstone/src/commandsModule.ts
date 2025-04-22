@@ -36,6 +36,7 @@ import CornerstoneViewportDownloadForm from './utils/CornerstoneViewportDownload
 import { updateSegmentBidirectionalStats } from './utils/updateSegmentationStats';
 import { generateSegmentationCSVReport } from './utils/generateSegmentationCSVReport';
 import { getUpdatedViewportsForSegmentation } from './utils/hydrationUtils';
+import { colormaps } from './utils/colormaps';
 
 const { DefaultHistoryMemo } = csUtils.HistoryMemo;
 const toggleSyncFunctions = {
@@ -848,6 +849,7 @@ function commandsModule({
       const { viewport } = enabledElement;
 
       viewport.resetProperties?.();
+      viewport.setColormap(colormaps[1]);
       viewport.resetCamera();
 
       viewport.render();
