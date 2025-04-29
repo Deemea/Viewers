@@ -1,5 +1,6 @@
 import * as cs3dTools from '@cornerstonejs/tools';
 import { axis } from './axisColors';
+import { points } from './pointsColors';
 import { Palette } from './palette';
 
 function convertFromDicomCoordinates(
@@ -80,6 +81,14 @@ async function matchNameWithAxis(
   return matchedAxis ? matchedAxis : null;
 }
 
+async function matchNameWithPoint(
+  pointName
+): Promise<{ color: string; highlighted: string } | null> {
+  const matchedPoint = points.find(point => pointName === point.name);
+
+  return matchedPoint ? matchedPoint : null;
+}
+
 async function setMeasurementStyle() {
   const annotations = cs3dTools.annotation.state.getAllAnnotations();
   annotations?.map(async annotation => {
@@ -97,13 +106,18 @@ async function setMeasurementStyle() {
         lineDash: '',
       };
     }
+
     if (annotation.data.handles?.type === 'probe') {
-      style = {
-        color: Palette.Red,
-        colorHighlighted: Palette.DarkRed,
-        colorSelected: Palette.Red,
-        lineDash: '',
-      };
+      const pointColor = await matchNameWithPoint(annotation.data.handles.name);
+
+      if (pointColor) {
+        style = {
+          color: pointColor.color,
+          colorHighlighted: pointColor.highlighted,
+          colorSelected: pointColor.highlighted,
+          lineDash: '',
+        };
+      }
     }
     const axisColor = await matchNameWithAxis(
       annotation.data.handles?.headName,
