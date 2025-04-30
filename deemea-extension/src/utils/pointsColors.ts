@@ -102,4 +102,134 @@ export const points = [
     color: Palette.Red,
     highlighted: Palette.DarkRed,
   },
+  {
+    name: 'pelvis_distal_left',
+    color: Palette.Yellow,
+    highlighted: Palette.DarkYellow,
+  },
+  {
+    name: 'pelvis_distal_right',
+    color: Palette.Yellow,
+    highlighted: Palette.DarkYellow,
+  },
+  {
+    name: 'hip_rotation_center_left',
+    color: Palette.LightBlue,
+    highlighted: Palette.DarkLightBlue,
+  },
+  {
+    name: 'hip_rotation_center_right',
+    color: Palette.LightBlue,
+    highlighted: Palette.DarkLightBlue,
+  },
+  {
+    name: 'stem_proximal_left',
+    color: Palette.Purple,
+    highlighted: Palette.DarkPurple,
+  },
+  {
+    name: 'stem_proximal_right',
+    color: Palette.Purple,
+    highlighted: Palette.DarkPurple,
+  },
+  {
+    name: 'femur_proximal_left',
+    color: Palette.Pink,
+    highlighted: Palette.DarkPink,
+  },
+  {
+    name: 'femur_proximal_right',
+    color: Palette.Pink,
+    highlighted: Palette.DarkPink,
+  },
+  {
+    name: 'femur_distal_center_left',
+    color: Palette.Pink,
+    highlighted: Palette.DarkPink,
+  },
+  {
+    name: 'femur_distal_center_right',
+    color: Palette.Pink,
+    highlighted: Palette.DarkPink,
+  },
+  {
+    name: 'femur_neck_femoral_anatomical_axis_intersection_left',
+    color: Palette.LightBlue,
+    highlighted: Palette.DarkLightBlue,
+  },
+  {
+    name: 'femur_neck_femoral_anatomical_axis_intersection_right',
+    color: Palette.LightBlue,
+    highlighted: Palette.DarkLightBlue,
+  },
+  {
+    name: 'femur_anatomical_axis_hip_offset_intersection_left',
+    color: Palette.Pink,
+    highlighted: Palette.DarkPink,
+  },
+  {
+    name: 'femur_anatomical_axis_hip_offset_intersection_right',
+    color: Palette.Pink,
+    highlighted: Palette.DarkPink,
+  },
+  {
+    name: 'cup_edge_external_left',
+    color: Palette.Red,
+    highlighted: Palette.DarkRed,
+  },
+  {
+    name: 'cup_edge_external_right',
+    color: Palette.Red,
+    highlighted: Palette.DarkRed,
+  },
+  {
+    name: 'cup_edge_internal_left',
+    color: Palette.Red,
+    highlighted: Palette.DarkRed,
+  },
+  {
+    name: 'cup_edge_internal_right',
+    color: Palette.Red,
+    highlighted: Palette.DarkRed,
+  },
+  {
+    name: 'stem_axis_proximal_left',
+    color: Palette.Purple,
+    highlighted: Palette.DarkPurple,
+  },
+  {
+    name: 'stem_axis_proximal_right',
+    color: Palette.Purple,
+    highlighted: Palette.DarkPurple,
+  },
+  {
+    name: 'stem_axis_distal_left',
+    color: Palette.Purple,
+    highlighted: Palette.DarkPurple,
+  },
+  {
+    name: 'stem_axis_distal_right',
+    color: Palette.Purple,
+    highlighted: Palette.DarkPurple,
+  },
+  {
+    name: 'u_radiologique_left',
+    color: Palette.Turquoise,
+    highlighted: Palette.DarkTurquoise,
+  },
+  {
+    name: 'u_radiologique_right',
+    color: Palette.Turquoise,
+    highlighted: Palette.DarkTurquoise,
+  },
+  {
+    name: 'lesser_trochanter_left',
+    color: Palette.Blue,
+    highlighted: Palette.DarkBlue,
+  },
+  {
+    name: 'lesser_trochanter_right',
+    color: Palette.Blue,
+    highlighted: Palette.DarkBlue,
+  },
 ];
