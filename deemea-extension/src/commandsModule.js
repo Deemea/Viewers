@@ -89,6 +89,8 @@ const commandsModule = ({ servicesManager }) => {
           const imageHeight = imageMetadata.dimensions[1];
           const pixelSpacing = imageMetadata.spacing[0];
 
+          viewport.render();
+
           window.parent.postMessage(
             {
               type: OHIFMessageType.IMAGE_SIZE,
