@@ -84,6 +84,33 @@ const segmentAI = new ONNXSegmentationController({
   modelName: 'sam_b',
 });
 let segmentAIEnabled = false;
+function invertColorMap(obj) {
+  const result = {};
+
+  for (const key in obj) {
+    if (Array.isArray(obj[key])) {
+      result[key] = obj[key].map(value => {
+        if (value === 0) {
+          return 1;
+        }
+        if (value === 1) {
+          return 0;
+        }
+        return value;
+      });
+    } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+      result[key] = invertColorMap(obj[key]);
+    } else if (obj[key] === 0) {
+      result[key] = 1;
+    } else if (obj[key] === 1) {
+      result[key] = 0;
+    } else {
+      result[key] = obj[key];
+    }
+  }
+
+  return result;
+}
 
 function commandsModule({
   servicesManager,
@@ -848,10 +875,13 @@ function commandsModule({
 
       const { viewport } = enabledElement;
 
+      const imageProperties = viewport.getProperties();
       viewport.resetProperties?.();
-      viewport.setColormap(colormaps[1]);
       viewport.resetCamera();
 
+      if (imageProperties && imageProperties.invert) {
+        viewport.setColormap(invertColorMap(colormaps[1]));
+      }
       viewport.render();
     },
     scaleViewport: ({ direction }) => {
