@@ -206,7 +206,9 @@ export function createRectangleROI(viewport, imageMetadata, imageId, data, image
           pointsInfo: data.points,
           predicted: true,
           imagingData: data?.imagingData,
-          hide: data.hide,
+          hide: data.hide || false,
+          forceHide: data.forceHide || false,
+          locked: data.locked || false,
         },
         handles: {
           points: normalizedPoints,
@@ -216,7 +218,7 @@ export function createRectangleROI(viewport, imageMetadata, imageId, data, image
         },
       },
 
-      isVisible: !data.hide,
+      isVisible: !data.forceHide && !data.hide,
       isLocked: imageStatus || data.locked,
     });
   } catch (error) {
@@ -263,6 +265,9 @@ export function createPoint(viewport, imageMetadata, imageId, data, imageStatus)
           pointsInfo: data.points,
           predicted: true,
           imagingData: data?.imagingData,
+          hide: data.hide || false,
+          forceHide: data.forceHide || false,
+          locked: data.locked || false,
         },
         cachedStats: {
           [`imageId:${imageId}`]: {
@@ -271,7 +276,7 @@ export function createPoint(viewport, imageMetadata, imageId, data, imageStatus)
           },
         },
       },
-      isVisible: !data.hide,
+      isVisible: !data.forceHide && !data.hide,
       isLocked: imageStatus || data.locked,
     });
   } catch (error) {
@@ -339,6 +344,9 @@ export function createLength(viewport, imageMetadata, imageId, data, imageStatus
           pointsInfo: data.points,
           predicted: true,
           imagingData: data?.imagingData,
+          hide: data.hide || false,
+          forceHide: data.forceHide || false,
+          locked: data.locked || false,
         },
         cachedStats: {
           [`imageId:${imageId}`]: {
@@ -347,7 +355,7 @@ export function createLength(viewport, imageMetadata, imageId, data, imageStatus
           },
         },
       },
-      isVisible: !data.hide,
+      isVisible: !data.forceHide && !data.hide,
       isLocked: imageStatus || data.locked,
     });
   } catch (error) {
@@ -397,6 +405,9 @@ export function createAngleROI(viewport, imageMetadata, imageId, data, imageStat
           pointsInfo: data.points,
           predicted: true,
           imagingData: data?.imagingData,
+          hide: data.hide || false,
+          forceHide: data.forceHide || false,
+          locked: data.locked || false,
         },
         cachedStats: {
           [`imageId:${imageId}`]: {
@@ -405,7 +416,7 @@ export function createAngleROI(viewport, imageMetadata, imageId, data, imageStat
           },
         },
       },
-      isVisible: !data.hide,
+      isVisible: !data.forceHide && !data.hide,
       isLocked: imageStatus || data.locked,
     });
   } catch (error) {

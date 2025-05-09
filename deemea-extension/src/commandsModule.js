@@ -166,7 +166,9 @@ const commandsModule = ({ servicesManager }) => {
           elementType: event.measurement.toolName,
           uid: event.measurement.uid,
           measurementId: event?.measurement?.label.measurementId,
-          hide: event?.measurement?.label?.hide,
+          hide: event?.measurement?.label?.hide || false,
+          forceHide: event?.measurement?.label?.forceHide || false,
+          locked: event?.measurement?.label?.locked || false,
           imagingData: event?.measurement?.label?.imagingData,
         };
 
