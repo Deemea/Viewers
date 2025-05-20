@@ -152,6 +152,29 @@ window.config = {
     },
     {
       namespace: '@ohif/extension-default.dataSourcesModule.dicomweb',
+      sourceName: 'SANDBOX_BIS',
+      configuration: {
+        friendlyName: 'sandbox-didier',
+        name: 'sandbox-didier',
+        wadoUriRoot: 'https://sandbox.deemea.com/didier',
+        qidoRoot: 'https://sandbox.deemea.com/didier',
+        wadoRoot: 'https://sandbox.deemea.com/didier',
+        qidoSupportsIncludeField: true,
+        supportsReject: true,
+        imageRendering: 'wadors',
+        thumbnailRendering: 'wadors',
+        enableStudyLazyLoad: true,
+        supportsFuzzyMatching: true,
+        supportsWildcard: true,
+        dicomUploadEnabled: true,
+        omitQuotationForMultipartRequest: true,
+        bulkDataURI: {
+          enabled: true,
+        },
+      },
+    },
+    {
+      namespace: '@ohif/extension-default.dataSourcesModule.dicomweb',
       sourceName: 'PROD_F4C',
       configuration: {
         friendlyName: 'f4c-didier',
