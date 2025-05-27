@@ -53,8 +53,8 @@ us.
    - `git clone https://github.com/deemea/Viewers.git`
 2. Navigate to the cloned project's directory
 3. `yarn install` to restore dependencies and link projects
-4. `yarn run cli link-extension deemea-extension` to link our custom extension
-5. `yarn run cli link-mode deemea-mode` to link our custom mode
+4. `yarn run cli link-extension deemea-extension` and `yarn run cli link-extension deemea-extension-3d` to link our custom extensions
+5. `yarn run cli link-mode deemea-mode` and `yarn run cli link-mode deemea-mode-3d` to link our custom modes
 
 If you want to try OHIF on standalone mode you just have to do `yarn dev`
 
