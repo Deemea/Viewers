@@ -1,5 +1,6 @@
 export enum Palette {
   Blue = '#4358F1',
+  DeemeaBlue = '#488BDC',
   DarkBlue = '#2839B5',
   Purple = '#9777F8',
   DarkPurple = '#645298',
