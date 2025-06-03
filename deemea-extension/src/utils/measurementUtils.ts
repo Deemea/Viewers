@@ -2,6 +2,7 @@ import * as cs3dTools from '@cornerstonejs/tools';
 import { axis } from './axisColors';
 import { points } from './pointsColors';
 import { Palette } from './palette';
+import { boxes } from './boxColors';
 
 function convertFromDicomCoordinates(
   dicomX,
@@ -89,6 +90,12 @@ async function matchNameWithPoint(
   return matchedPoint ? matchedPoint : null;
 }
 
+async function matchNameWithBox(pointName): Promise<{ color: string; highlighted: string } | null> {
+  const matchedBox = boxes.find(point => pointName.includes(point.name));
+
+  return matchedBox ? matchedBox : null;
+}
+
 async function setMeasurementStyle() {
   const annotations = cs3dTools.annotation.state.getAllAnnotations();
   annotations?.map(async annotation => {
@@ -105,6 +112,16 @@ async function setMeasurementStyle() {
         colorSelected: Palette.Turquoise,
         lineDash: '',
       };
+
+      const boxColor = await matchNameWithBox(annotation.data.handles.name);
+      if (boxColor) {
+        style = {
+          color: boxColor.color,
+          colorHighlighted: boxColor.highlighted,
+          colorSelected: boxColor.highlighted,
+          lineDash: '',
+        };
+      }
     }
 
     if (annotation.data.handles?.type === 'probe') {
