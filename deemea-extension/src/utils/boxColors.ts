@@ -1,47 +1,49 @@
+import { Palette } from './palette';
+
 export const boxes = [
   {
     name: 'wrist',
-    color: '#488BDC',
-    highlighted: '#488BDC',
+    color: Palette.DeemeaBlue,
+    highlighted: Palette.DeemeaBlue,
   },
   {
     name: 'shoulder',
-    color: '#488BDC',
-    highlighted: '#488BDC',
+    color: Palette.DeemeaBlue,
+    highlighted: Palette.DeemeaBlue,
   },
   {
     name: 'mediastinum',
-    color: '#488BDC',
-    highlighted: '#488BDC',
+    color: Palette.DeemeaBlue,
+    highlighted: Palette.DeemeaBlue,
   },
   {
     name: 'lateral_control',
-    color: '#488BDC',
-    highlighted: '#488BDC',
+    color: Palette.DeemeaBlue,
+    highlighted: Palette.DeemeaBlue,
   },
   {
     name: 'knee',
-    color: '#488BDC',
-    highlighted: '#488BDC',
+    color: Palette.DeemeaBlue,
+    highlighted: Palette.DeemeaBlue,
   },
   {
     name: 'heart',
-    color: '#488BDC',
-    highlighted: '#488BDC',
+    color: Palette.DeemeaBlue,
+    highlighted: Palette.DeemeaBlue,
   },
   {
     name: 'elbow',
-    color: '#488BDC',
-    highlighted: '#488BDC',
+    color: Palette.DeemeaBlue,
+    highlighted: Palette.DeemeaBlue,
   },
   {
     name: 'ankle',
-    color: '#488BDC',
-    highlighted: '#488BDC',
+    color: Palette.DeemeaBlue,
+    highlighted: Palette.DeemeaBlue,
   },
   {
     name: 'pelvis',
-    color: '#488BDC',
-    highlighted: '#488BDC',
+    color: Palette.DeemeaBlue,
+    highlighted: Palette.DeemeaBlue,
   },
 ];
