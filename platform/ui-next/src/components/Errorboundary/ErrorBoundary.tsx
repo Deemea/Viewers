@@ -139,7 +139,7 @@ interface ErrorBoundaryProps {
 const DefaultFallback = ({
   error,
   context,
-  resetErrorBoundary = () => {},
+  resetErrorBoundary = () => { },
   showErrorDetails,
 }: DefaultFallbackProps) => {
   const isShowDetailsButtonVisible =
@@ -182,9 +182,9 @@ const DefaultFallback = ({
       id: errorId,
       action: isShowDetailsButtonVisible
         ? {
-            label: t('Show Details'),
-            onClick: () => setShowDetails(true),
-          }
+          label: t('Show Details'),
+          onClick: () => setShowDetails(true),
+        }
         : undefined,
     });
   }, [error, errorTitle, subtitle, t, title, show]);
@@ -258,8 +258,8 @@ const DefaultFallback = ({
 
 const ErrorBoundary = ({
   context = 'OHIF',
-  onReset = () => {},
-  onError = _error => {},
+  onReset = () => { },
+  onError = _error => { },
   fallbackComponent: FallbackComponent = DefaultFallback,
   children,
   showErrorDetails,

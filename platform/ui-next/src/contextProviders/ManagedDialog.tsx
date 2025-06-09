@@ -130,14 +130,14 @@ const ManagedDialog = forwardRef<ManagedDialogRef, ManagedDialogProps>(
           style={{
             ...(currentPosition
               ? {
-                  position: 'fixed',
-                  left: `${currentPosition.x}px`,
-                  top: `${currentPosition.y}px`,
-                  transform: 'translate(0, 0)',
-                  margin: 0,
-                  animation: 'none',
-                  transition: 'none',
-                }
+                position: 'fixed',
+                left: `${currentPosition.x}px`,
+                top: `${currentPosition.y}px`,
+                transform: 'translate(0, 0)',
+                margin: 0,
+                animation: 'none',
+                transition: 'none',
+              }
               : {}),
           }}
         >
