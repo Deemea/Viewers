@@ -41,7 +41,7 @@ const commandsModule = ({ servicesManager }) => {
               toolbarService?.refreshToolbarState();
             } else {
               toolbarService?.setButtons(toolbarButtonsValidated3d);
-              // toolbarService?.addButtons(segmentationButtons);
+              toolbarService?.register(segmentationButtons);
               toolbarService?.refreshToolbarState();
             }
           } else {
@@ -50,7 +50,7 @@ const commandsModule = ({ servicesManager }) => {
               toolbarService?.refreshToolbarState();
             } else {
               toolbarService?.setButtons(toolbarButtons3d);
-              // toolbarService?.addButtons(segmentationButtons);
+              toolbarService?.register(segmentationButtons);
               toolbarService?.refreshToolbarState();
             }
           }

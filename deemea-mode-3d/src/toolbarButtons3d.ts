@@ -1,9 +1,9 @@
 // TODO: torn, can either bake this here; or have to create a whole new button type
 // Only ways that you can pass in a custom React component for render :l
-import {
-  // ListMenu,
-  WindowLevelMenuItem,
-} from '@ohif/ui';
+// import {
+//   // ListMenu,
+//   WindowLevelMenuItem,
+// } from '@ohif/ui';
 import { defaults, ToolbarService } from '@ohif/core';
 import type { Button } from '@ohif/core/types';
 
@@ -104,34 +104,34 @@ const toolbarButtons: Button[] = [
     },
   },
   // Window Level
-  {
-    id: 'WindowLevel',
-    uiType: 'ohif.toolButtonList',
-    props: {
-      groupId: 'WindowLevel',
-      primary: createButton({
-        id: 'WindowLevel',
-        icon: 'tool-window-level',
-        label: 'Window Level',
-        tooltip: 'Window Level',
-        commands: setToolActiveToolbar,
-        evaluate: 'evaluate.cornerstoneTool',
-      }),
-      secondary: {
-        icon: 'chevron-down',
-        label: 'W/L Manual',
-        tooltip: 'W/L Presets',
-      },
-      renderer: WindowLevelMenuItem,
-      items: [
-        _createWwwcPreset(1, 'Soft tissue', '400 / 40'),
-        _createWwwcPreset(2, 'Lung', '1500 / -600'),
-        _createWwwcPreset(3, 'Liver', '150 / 90'),
-        _createWwwcPreset(4, 'Bone', '2500 / 480'),
-        _createWwwcPreset(5, 'Brain', '80 / 40'),
-      ],
-    },
-  },
+  // {
+  //   id: 'WindowLevel',
+  //   uiType: 'ohif.toolButtonList',
+  //   props: {
+  //     groupId: 'WindowLevel',
+  //     primary: createButton({
+  //       id: 'WindowLevel',
+  //       icon: 'tool-window-level',
+  //       label: 'Window Level',
+  //       tooltip: 'Window Level',
+  //       commands: setToolActiveToolbar,
+  //       evaluate: 'evaluate.cornerstoneTool',
+  //     }),
+  //     secondary: {
+  //       icon: 'chevron-down',
+  //       label: 'W/L Manual',
+  //       tooltip: 'W/L Presets',
+  //     },
+  //     renderer: WindowLevelMenuItem,
+  //     items: [
+  //       _createWwwcPreset(1, 'Soft tissue', '400 / 40'),
+  //       _createWwwcPreset(2, 'Lung', '1500 / -600'),
+  //       _createWwwcPreset(3, 'Liver', '150 / 90'),
+  //       _createWwwcPreset(4, 'Bone', '2500 / 480'),
+  //       _createWwwcPreset(5, 'Brain', '80 / 40'),
+  //     ],
+  //   },
+  // },
   // Pan...
   {
     id: 'Pan',
