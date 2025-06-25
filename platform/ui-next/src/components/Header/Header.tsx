@@ -87,11 +87,12 @@ function Header({
                   variant="ghost"
                   size="icon"
                   className="text-primary hover:bg-primary-dark mt-2 h-full w-full"
+                  onClick={() => menuOptions[0].onClick()}
                 >
                   <Icons.GearSettings />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              {/* <DropdownMenuContent align="end">
                 {menuOptions.map((option, index) => {
                   const IconComponent = option.icon
                     ? Icons[option.icon as keyof typeof Icons]
@@ -111,7 +112,7 @@ function Header({
                     </DropdownMenuItem>
                   );
                 })}
-              </DropdownMenuContent>
+              </DropdownMenuContent> */}
             </DropdownMenu>
           </div>
         </div>
