@@ -12,11 +12,10 @@ export const setToolActiveToolbar = {
 const toolbarButtons: Button[] = [
   {
     id: 'ResetButton',
-    uiType: 'ohif.toolButton',
+    uiType: 'ohif.radioGroup',
     props: {
       icon: 'icon-transferring',
       label: 'Reset predictions',
-      tooltip: 'Reset predictions',
       commands: {
         commandName: 'resetPoints',
         context: 'VIEWER',
@@ -25,55 +24,50 @@ const toolbarButtons: Button[] = [
   },
   {
     id: 'Length',
-    uiType: 'ohif.toolButton',
+    uiType: 'ohif.radioGroup',
     props: {
       icon: 'tool-length',
       label: 'Length',
-      tooltip: 'Length',
       commands: setToolActiveToolbar,
       evaluate: 'evaluate.cornerstoneTool',
     },
   },
   {
     id: 'RectangleROI',
-    uiType: 'ohif.toolButton',
+    uiType: 'ohif.radioGroup',
     props: {
       icon: 'tool-rectangle',
       label: 'Rectangle',
-      tooltip: 'Rectangle',
       commands: setToolActiveToolbar,
       evaluate: 'evaluate.cornerstoneTool',
     },
   },
   {
     id: 'Angle',
-    uiType: 'ohif.toolButton',
+    uiType: 'ohif.radioGroup',
     props: {
       icon: 'tool-angle',
       label: 'Angle',
-      tooltip: 'Angle',
       commands: setToolActiveToolbar,
       evaluate: 'evaluate.cornerstoneTool',
     },
   },
   {
     id: 'Probe',
-    uiType: 'ohif.toolButton',
+    uiType: 'ohif.radioGroup',
     props: {
       icon: 'tool-probe',
       label: 'Probe',
-      tooltip: 'Probe',
       commands: setToolActiveToolbar,
       evaluate: 'evaluate.cornerstoneTool',
     },
   },
   {
     id: 'CalibrationLine',
-    uiType: 'ohif.toolButton',
+    uiType: 'ohif.radioGroup',
     props: {
       icon: 'tool-calibration',
       label: 'Calibration',
-      tooltip: 'Calibration',
       commands: setToolActiveToolbar,
       evaluate: 'evaluate.cornerstoneTool',
     },
@@ -81,11 +75,10 @@ const toolbarButtons: Button[] = [
   // Window Level
   {
     id: 'WindowLevel',
-    uiType: 'ohif.toolButton',
+    uiType: 'ohif.radioGroup',
     props: {
       icon: 'tool-window-level',
       label: 'Window Level',
-      tooltip: 'Window Level',
       commands: setToolActiveToolbar,
       evaluate: 'evaluate.cornerstoneTool',
     },
@@ -93,30 +86,28 @@ const toolbarButtons: Button[] = [
   // Pan...
   {
     id: 'Pan',
-    uiType: 'ohif.toolButton',
+    uiType: 'ohif.radioGroup',
     props: {
       type: 'tool',
       icon: 'tool-move',
       label: 'Pan',
-      tooltip: 'Pan',
       commands: setToolActiveToolbar,
       evaluate: 'evaluate.cornerstoneTool',
     },
   },
   {
     id: 'Zoom',
-    uiType: 'ohif.toolButton',
+    uiType: 'ohif.radioGroup',
     props: {
       icon: 'tool-zoom',
       label: 'Zoom',
-      tooltip: 'Zoom',
       commands: setToolActiveToolbar,
       evaluate: 'evaluate.cornerstoneTool',
     },
   },
   {
     id: 'Reset',
-    uiType: 'ohif.toolButton',
+    uiType: 'ohif.radioGroup',
     props: {
       icon: 'tool-reset',
       tooltip: 'Reset View',

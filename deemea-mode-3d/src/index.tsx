@@ -66,7 +66,7 @@ function modeFactory({ modeConfiguration }) {
 
       toolbarService?.addButtons(toolbarButtons);
       toolbarService?.addButtons(segmentationButtons);
-      toolbarService.addButtons('primary', [
+      toolbarService.createButtonSection('primary', [
         'ResetButton',
         'Length',
         'RectangleROI',
@@ -79,7 +79,7 @@ function modeFactory({ modeConfiguration }) {
         'Zoom',
         'Reset',
       ]);
-      toolbarService.addButtons('segmentationToolbox', ['BrushTools', 'Shapes']);
+      toolbarService.createButtonSection('segmentationToolbox', ['BrushTools', 'Shapes']);
     },
     onModeExit: ({ servicesManager }: withAppTypes) => {
       const {
