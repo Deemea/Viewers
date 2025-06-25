@@ -8,12 +8,65 @@ export default {
         selector: ({ nearbyToolData }) => !!nearbyToolData,
         items: [
           {
-            label: 'Delete measurement',
-            commands: 'removeMeasurement',
+            id: 'forPredictedMeasurement',
+            selector: ({ value, nearbyToolData }) =>
+              !!nearbyToolData &&
+              value.data.handles.points.length !== 4 &&
+              value.data.handles.name &&
+              !value.data.handles.name?.includes('custom_point'),
+            items: [
+              {
+                label: 'Delete measurement',
+                tooltip: 'Deletion is not allowed on this prediction',
+                disabled: true,
+                commands: [
+                  {
+                    commandName: '',
+                  },
+                ],
+              },
+            ],
           },
           {
-            label: 'Add Label',
-            commands: 'setMeasurementLabel',
+            id: 'forRadiolucentBoxes',
+            selector: ({ value, nearbyToolData }) =>
+              (!!nearbyToolData &&
+                value.data.handles.points.length === 4 &&
+                value.data.handles.name &&
+                !value.data.handles.name?.includes('custom_point')) ||
+              (!!nearbyToolData && value.data.handles.points.length === 1),
+            items: [
+              {
+                label: 'Delete measurement',
+                commands: [
+                  {
+                    commandName: 'deleteMeasurement',
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            id: 'forCustomMeasurement',
+            selector: ({ nearbyToolData }) => !!nearbyToolData,
+            items: [
+              {
+                label: 'Link to an imaging data',
+                commands: [
+                  {
+                    commandName: 'linkMeasurement',
+                  },
+                ],
+              },
+              {
+                label: 'Delete measurement',
+                commands: [
+                  {
+                    commandName: 'deleteMeasurement',
+                  },
+                ],
+              },
+            ],
           },
         ],
       },
