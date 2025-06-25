@@ -37,7 +37,7 @@ export const setToolActiveToolbar = {
 const toolbarButtons: Button[] = [
   {
     id: 'ResetButton',
-    uiType: 'ohif.radioGroup',
+    uiType: 'ohif.toolButton',
     props: {
       icon: 'icon-transferring',
       label: 'Reset predictions',
@@ -49,7 +49,7 @@ const toolbarButtons: Button[] = [
   },
   {
     id: 'Length',
-    uiType: 'ohif.radioGroup',
+    uiType: 'ohif.toolButton',
     props: {
       icon: 'tool-length',
       label: 'Length',
@@ -59,7 +59,7 @@ const toolbarButtons: Button[] = [
   },
   {
     id: 'RectangleROI',
-    uiType: 'ohif.radioGroup',
+    uiType: 'ohif.toolButton',
     props: {
       icon: 'tool-rectangle',
       label: 'Rectangle',
@@ -69,7 +69,7 @@ const toolbarButtons: Button[] = [
   },
   {
     id: 'Angle',
-    uiType: 'ohif.radioGroup',
+    uiType: 'ohif.toolButton',
     props: {
       icon: 'tool-angle',
       label: 'Angle',
@@ -79,7 +79,7 @@ const toolbarButtons: Button[] = [
   },
   {
     id: 'Probe',
-    uiType: 'ohif.radioGroup',
+    uiType: 'ohif.toolButton',
     props: {
       icon: 'tool-probe',
       label: 'Probe',
@@ -89,7 +89,7 @@ const toolbarButtons: Button[] = [
   },
   {
     id: 'CalibrationLine',
-    uiType: 'ohif.radioGroup',
+    uiType: 'ohif.toolButton',
     props: {
       icon: 'tool-calibration',
       label: 'Calibration',
@@ -100,7 +100,7 @@ const toolbarButtons: Button[] = [
   // Window Level
   {
     id: 'WindowLevel',
-    uiType: 'ohif.splitButton',
+    uiType: 'ohif.toolButtonList',
     props: {
       groupId: 'WindowLevel',
       primary: createButton({
@@ -129,7 +129,7 @@ const toolbarButtons: Button[] = [
   // Pan...
   {
     id: 'Pan',
-    uiType: 'ohif.radioGroup',
+    uiType: 'ohif.toolButton',
     props: {
       type: 'tool',
       icon: 'tool-move',
@@ -150,7 +150,7 @@ const toolbarButtons: Button[] = [
   },
   {
     id: 'Zoom',
-    uiType: 'ohif.radioGroup',
+    uiType: 'ohif.toolButton',
     props: {
       icon: 'tool-zoom',
       label: 'Zoom',
@@ -160,7 +160,7 @@ const toolbarButtons: Button[] = [
   },
   {
     id: 'Reset',
-    uiType: 'ohif.radioGroup',
+    uiType: 'ohif.toolButton',
     props: {
       icon: 'tool-reset',
       tooltip: 'Reset View',
