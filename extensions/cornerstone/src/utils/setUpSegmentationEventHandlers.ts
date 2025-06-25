@@ -30,6 +30,8 @@ export const setUpSegmentationEventHandlers = ({ servicesManager, commandsManage
       const label = segmentation.cachedStats.info;
       const imageIds = segmentation.representationData.Labelmap.imageIds;
 
+      console.log('ADD SEG', segmentation);
+
       // Create a display set for the segmentation
       const segmentationDisplaySet = {
         displaySetInstanceUID: segmentationId,

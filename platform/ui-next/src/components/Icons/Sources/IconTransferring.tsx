@@ -3,14 +3,14 @@ import type { IconProps } from '../types';
 
 export const IconTransferring = (props: IconProps) => (
   <svg
-    width="20"
-    height="16"
+    width="25"
+    height="20"
     viewBox="0 0 20 16"
     xmlns="http://www.w3.org/2000/svg"
     {...props}
   >
     <g
-      stroke="#5ACCE6"
+      stroke="#FFFFFF"
       fill="none"
       fillRule="evenodd"
       strokeLinecap="round"

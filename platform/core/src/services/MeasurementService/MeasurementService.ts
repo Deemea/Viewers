@@ -543,6 +543,9 @@ class MeasurementService extends PubSubService {
 
     const oldMeasurement = this.measurements.get(internalUID);
 
+    console.log('oldMeasurement', oldMeasurement);
+    console.log('measurement', measurement);
+
     const newMeasurement = {
       ...oldMeasurement,
       ...measurement,
@@ -802,6 +805,8 @@ class MeasurementService extends PubSubService {
       console.debug(`No measurement found for uid: ${measurementUID}`);
       return;
     }
+
+    console.log('CIIICC');
 
     measurement.isLocked = !measurement.isLocked;
 

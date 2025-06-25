@@ -216,6 +216,8 @@ export function createRectangleROI(viewport, imageMetadata, imageId, data, image
       );
     });
 
+    console.log('imageStatus || data.locked', imageStatus || data.locked);
+
     cs3dTools.RectangleROITool.createAndAddAnnotation(viewport, {
       data: {
         label: {

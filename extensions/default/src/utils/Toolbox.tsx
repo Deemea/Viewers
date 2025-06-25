@@ -34,6 +34,8 @@ export function Toolbox({ buttonSectionId, title }: { buttonSectionId: string; t
     return null;
   }
 
+  console.log('toolboxSections', toolboxSections);
+
   // Ensure we have proper button sections at the top level.
   if (!toolboxSections.every(section => section.componentProps.buttonSection)) {
     throw new Error(
