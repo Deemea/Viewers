@@ -66,17 +66,11 @@ function modeFactory({ modeConfiguration }) {
       toolbarService.addButtons(toolbarButtons);
       toolbarService.addButtons(segmentationButtons);
       toolbarService.createButtonSection('primary', [
-        'ResetButton',
-        'Length',
-        'RectangleROI',
-        'Angle',
-        'Probe',
-        'CalibrationLine',
-        'WindowLevel',
-        'Pan',
         'Layout',
+        'Pan',
         'Zoom',
         'Reset',
+        'WindowLevel',
       ]);
       toolbarService.createButtonSection('segmentationToolbox', ['BrushTools', 'Shapes']);
     },
