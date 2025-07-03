@@ -56,8 +56,8 @@ const commandsModule = ({ servicesManager }) => {
           }
         }
         if (event.data.type === OHIFMessageType.UPDATE_TOOLBAR) {
-          const CalibrationLineButton = document.querySelector('[data-cy="CalibrationLine"]');
-          const ResetButton = document.querySelector('[data-cy="ResetButton"]');
+          const CalibrationLineButton = document.querySelector('[aria-label="Calibration"]');
+          const ResetButton = document.querySelector('[aria-label="Reset predictions"]');
           if (CalibrationLineButton) {
             if (event?.data.message.calibration) {
               CalibrationLineButton.style.backgroundColor = 'orange';
