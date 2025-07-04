@@ -42,7 +42,7 @@ const ContextMenu = ({ items, ...props }) => {
           title={item.tooltip}
           className={`hover:bg-primary-dark border-primary-dark flex cursor-pointer items-center border-b px-4 py-3 transition duration-300 last:border-b-0 ${item.disabled && 'cursor-not-allowed'}`}
         >
-          <Typography>alors ?</Typography>
+          <Typography>{item.label}</Typography>
           {item.iconRight && (
             <Icons.ByName
               name={item.iconRight}
