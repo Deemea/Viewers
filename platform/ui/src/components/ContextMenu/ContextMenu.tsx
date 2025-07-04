@@ -5,6 +5,7 @@ import { Icons } from '@ohif/ui-next';
 
 const ContextMenu = ({ items, ...props }) => {
   const contextMenuRef = useRef<HTMLDivElement>(null);
+  console.log('items : ', items);
   useEffect(() => {
     if (!contextMenuRef?.current) {
       return;
@@ -41,7 +42,7 @@ const ContextMenu = ({ items, ...props }) => {
           title={item.tooltip}
           className={`hover:bg-primary-dark border-primary-dark flex cursor-pointer items-center border-b px-4 py-3 transition duration-300 last:border-b-0 ${item.disabled && 'cursor-not-allowed'}`}
         >
-          <Typography>{item.label}</Typography>
+          <Typography>alors ?</Typography>
           {item.iconRight && (
             <Icons.ByName
               name={item.iconRight}

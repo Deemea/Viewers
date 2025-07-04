@@ -56,7 +56,6 @@ const commandsModule = ({ servicesManager }) => {
           }
         }
         if (event.data.type === OHIFMessageType.UPDATE_TOOLBAR) {
-          console.log('heyooo : ', event.data.type)
           const CalibrationLineButton = document.querySelector('[aria-label="Calibration"]');
           const ResetButton = document.querySelector('[aria-label="Reset predictions"]');
           if (CalibrationLineButton) {
