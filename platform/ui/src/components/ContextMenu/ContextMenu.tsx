@@ -14,11 +14,13 @@ const ContextMenu = ({ items, ...props }) => {
     const contextMenu = contextMenuRef.current;
 
     const boundingClientRect = contextMenu.getBoundingClientRect();
-    if (boundingClientRect.bottom > window.innerHeight) {
-      props.defaultPosition.y = props.defaultPosition.y - boundingClientRect.height;
-    }
-    if (boundingClientRect.right > window.innerWidth) {
-      props.defaultPosition.x = props.defaultPosition.x - boundingClientRect.width;
+    if (props.defaultPosition) {
+      if (boundingClientRect.bottom > window.innerHeight) {
+        props.defaultPosition.y = props.defaultPosition.y - boundingClientRect.height;
+      }
+      if (boundingClientRect.right > window.innerWidth) {
+        props.defaultPosition.x = props.defaultPosition.x - boundingClientRect.width;
+      }
     }
   }, [props.defaultPosition]);
 

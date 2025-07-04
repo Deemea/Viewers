@@ -5,7 +5,11 @@ export default {
       // Get the items from the UI Customization for the menu name (and have a custom name)
       {
         id: 'forExistingMeasurement',
-        selector: ({ nearbyToolData }) => !!nearbyToolData,
+        selector: ({ value, nearbyToolData }) =>
+          !!nearbyToolData &&
+          value.data.handles.points.length !== 4 &&
+          value.data.handles.name &&
+          !value.data.handles.name?.includes('custom_point'),
         items: [
           {
             id: 'disabledDeletePrediction',
