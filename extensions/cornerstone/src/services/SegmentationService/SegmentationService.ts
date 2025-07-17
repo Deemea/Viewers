@@ -1016,6 +1016,8 @@ class SegmentationService extends PubSubService {
     }
 
     const { volumeId } = labelmapData;
+    console.log('ICI', volumeId, labelmapData);
+
     const labelmapVolume = cache.getVolume(volumeId);
 
     return labelmapVolume;
@@ -1806,6 +1808,8 @@ class SegmentationService extends PubSubService {
 
     segments[segmentIndex].label = segmentLabel;
 
+    console.log('updatr seg');
+
     cstSegmentation.updateSegmentations([
       {
         segmentationId,
@@ -1818,6 +1822,7 @@ class SegmentationService extends PubSubService {
 
   private _onSegmentationDataModifiedFromSource = evt => {
     const { segmentationId } = evt.detail;
+    console.log('SEGMENTATION_DATA_MODIFIED', evt);
     this._broadcastEvent(this.EVENTS.SEGMENTATION_DATA_MODIFIED, {
       segmentationId,
     });
@@ -1825,6 +1830,7 @@ class SegmentationService extends PubSubService {
 
   private _onSegmentationRepresentationModifiedFromSource = evt => {
     const { segmentationId, viewportId } = evt.detail;
+    console.log('SEGMENTATION_REPRESENTATION_MODIFIED');
     this._broadcastEvent(this.EVENTS.SEGMENTATION_REPRESENTATION_MODIFIED, {
       segmentationId,
       viewportId,
@@ -1835,7 +1841,7 @@ class SegmentationService extends PubSubService {
     evt: cstTypes.EventTypes.SegmentationModifiedEventType
   ) => {
     const { segmentationId } = evt.detail;
-
+    console.log('SEGMENTATION_MODIFIED');
     this._broadcastEvent(this.EVENTS.SEGMENTATION_MODIFIED, {
       segmentationId,
     });
@@ -1845,6 +1851,7 @@ class SegmentationService extends PubSubService {
     evt: cstTypes.EventTypes.SegmentationAddedEventType
   ) => {
     const { segmentationId } = evt.detail;
+    console.log('SEGMENTATION_ADDED1');
 
     this._broadcastEvent(this.EVENTS.SEGMENTATION_ADDED, {
       segmentationId,
