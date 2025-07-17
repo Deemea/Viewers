@@ -1,27 +1,30 @@
-import { hotkeys } from '@ohif/core';
-import toolbarButtons from '../src/toolbarButtons3d';
-import segmentationButtons from '../src/segmentationButtons';
-import initToolGroups from '../src/initToolGroups3d';
 import { id } from './id';
+import toolbarButtons from './toolbarButtons3d';
+import segmentationButtons from './segmentationButtons';
+import initToolGroups from './initToolGroups3d';
 
 const ohif = {
   layout: '@ohif/extension-default.layoutTemplateModule.viewerLayout',
   sopClassHandler: '@ohif/extension-default.sopClassHandlerModule.stack',
   hangingProtocol: '@ohif/extension-default.hangingProtocolModule.default',
+  leftPanel: '@ohif/extension-default.panelModule.seriesList',
 };
 
 const cornerstone = {
   viewport: '@ohif/extension-cornerstone.viewportModule.cornerstone',
   panelTool: '@ohif/extension-cornerstone.panelModule.panelSegmentationWithTools',
+  measurements: '@ohif/extension-cornerstone.panelModule.panelMeasurement',
 };
 
 const segmentation = {
-  panel: '@ohif/extension-cornerstone-dicom-seg.panelModule.panelSegmentation',
-  panelTool: '@ohif/extension-cornerstone-dicom-seg.panelModule.panelSegmentationWithTools',
   sopClassHandler: '@ohif/extension-cornerstone-dicom-seg.sopClassHandlerModule.dicom-seg',
   viewport: '@ohif/extension-cornerstone-dicom-seg.viewportModule.dicom-seg',
 };
 
+const dicomRT = {
+  viewport: '@ohif/extension-cornerstone-dicom-rt.viewportModule.dicom-rt',
+  sopClassHandler: '@ohif/extension-cornerstone-dicom-rt.sopClassHandlerModule.dicom-rt',
+};
 /**
  * Just two dependencies to be able to render a viewport with panels in order
  * to make sure that the mode is working.
@@ -31,6 +34,7 @@ const extensionDependencies = {
   '@ohif/extension-cornerstone': '^3.0.0',
   '@ohif/extension-cornerstone-dicom-seg': '^3.0.0',
   'deemea-extension-3d': '^0.0.1',
+  '@ohif/extension-cornerstone-dicom-rt': '^3.0.0',
 };
 
 function modeFactory({ modeConfiguration }) {
@@ -55,7 +59,6 @@ function modeFactory({ modeConfiguration }) {
         servicesManager.services;
 
       measurementService.clearMeasurements();
-
       // Initialiser le CornerstoneViewportService si nécessaire
       if (cornerstoneViewportService && typeof cornerstoneViewportService.init === 'function') {
         await cornerstoneViewportService.init();
@@ -66,17 +69,33 @@ function modeFactory({ modeConfiguration }) {
 
       toolbarService?.addButtons(toolbarButtons);
       toolbarService?.addButtons(segmentationButtons);
+
       toolbarService?.createButtonSection('primary', [
         'Layout',
         'Pan',
         'Zoom',
+        'Capture',
         'Reset',
         'WindowLevel',
-        'MeasurementTools',
+        'Crosshairs',
       ]);
-      toolbarService?.createButtonSection('segmentationToolbox', ['SegmentationTools']);
-      toolbarService?.createButtonSection('segmentationToolboxToolsSection', ['BrushTools']);
-      toolbarService?.createButtonSection('brushToolsSection', ['Brush', 'Eraser']);
+
+      toolbarService?.createButtonSection('segmentationToolbox', [
+        'SegmentationUtilities',
+        'SegmentationTools',
+      ]);
+      toolbarService?.createButtonSection('segmentationToolboxUtilitySection', [
+        'LabelmapSlicePropagation',
+        'InterpolateLabelmap',
+        'SegmentBidirectional',
+      ]);
+      toolbarService?.createButtonSection('segmentationToolboxToolsSection', [
+        'BrushTools',
+        'MarkerLabelmap',
+        'RegionSegmentPlus',
+        'Shapes',
+      ]);
+      toolbarService?.createButtonSection('brushToolsSection', ['Brush', 'Eraser', 'Threshold']);
     },
     onModeExit: ({ servicesManager }: withAppTypes) => {
       const {
@@ -102,10 +121,21 @@ function modeFactory({ modeConfiguration }) {
     },
     /**
      * A boolean return value that indicates whether the mode is valid for the
-     * modalities of the selected studies. For instance a PET/CT mode should be
+     * modalities of the selected studies. Currently we don't have stack viewport
+     * segmentations and we should exclude them
      */
     isValidMode: ({ modalities }) => {
-      return { valid: true };
+      // Don't show the mode if the selected studies have only one modality
+      // that is not supported by the mode
+      const modalitiesArray = modalities.split('\\');
+      return {
+        valid:
+          modalitiesArray.length === 1
+            ? !['SM', 'ECG', 'OT', 'DOC'].includes(modalitiesArray[0])
+            : true,
+        description:
+          'The mode does not support studies that ONLY include the following modalities: SM, OT, DOC',
+      };
     },
     /**
      * Mode Routes are used to define the mode's behavior. A list of Mode Route
@@ -126,10 +156,11 @@ function modeFactory({ modeConfiguration }) {
           return {
             id: ohif.layout,
             props: {
-              leftPanels: [],
-              rightPanels: [cornerstone.panelTool],
+              leftPanels: [ohif.leftPanel],
+              leftPanelResizable: true,
+              rightPanels: [cornerstone.panelTool, cornerstone.measurements],
               leftPanelClosed: true,
-              rightPanelClosed: true,
+              rightPanelResizable: true,
               viewports: [
                 {
                   namespace: cornerstone.viewport,
@@ -138,6 +169,10 @@ function modeFactory({ modeConfiguration }) {
                 {
                   namespace: segmentation.viewport,
                   displaySetsToDisplay: [segmentation.sopClassHandler],
+                },
+                {
+                  namespace: dicomRT.viewport,
+                  displaySetsToDisplay: [dicomRT.sopClassHandler],
                 },
               ],
             },
@@ -148,13 +183,15 @@ function modeFactory({ modeConfiguration }) {
     /** List of extensions that are used by the mode */
     extensions: extensionDependencies,
     /** HangingProtocol used by the mode */
-    // hangingProtocol: [''],
+    // Commented out to just use the most applicable registered hanging protocol
+    // The example is used for a grid layout to specify that as a preferred layout
+    hangingProtocol: ['@ohif/mnGrid'],
     /** SopClassHandlers used by the mode */
-    sopClassHandlers: [ohif.sopClassHandler, segmentation.sopClassHandler],
-    hangingProtocol: 'default',
+    sopClassHandlers: [ohif.sopClassHandler, segmentation.sopClassHandler, dicomRT.sopClassHandler],
+    // hangingProtocol: 'default',
 
     /** hotkeys for mode */
-    hotkeys: [...hotkeys.defaults.hotkeyBindings],
+    // hotkeys: [...hotkeys.defaults.hotkeyBindings],
   };
 }
 
