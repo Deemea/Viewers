@@ -1271,6 +1271,7 @@ function commandsModule({
      * @param props.segmentationId - The ID of the segmentation to set as active
      */
     setActiveSegmentation: ({ segmentationId }) => {
+      console.log('2');
       const { viewportGridService, segmentationService } = servicesManager.services;
       segmentationService.setActiveSegmentation(
         viewportGridService.getActiveViewportId(),
@@ -1283,6 +1284,8 @@ function commandsModule({
      * @param props.segmentationId - The ID of the segmentation to add the segment to
      */
     addSegmentCommand: ({ segmentationId }) => {
+      console.log('1');
+
       const { segmentationService } = servicesManager.services;
       segmentationService.addSegment(segmentationId);
     },
@@ -1293,6 +1296,7 @@ function commandsModule({
      * @param props.segmentIndex - The index of the segment to activate
      */
     setActiveSegmentAndCenterCommand: ({ segmentationId, segmentIndex }) => {
+      console.log('3');
       const { segmentationService, viewportGridService } = servicesManager.services;
       // set both active segmentation and active segment
       segmentationService.setActiveSegmentation(
@@ -1310,6 +1314,7 @@ function commandsModule({
      * @param props.type - The type of visibility to toggle
      */
     toggleSegmentVisibilityCommand: ({ segmentationId, segmentIndex, type }) => {
+      console.log('4');
       const { segmentationService, viewportGridService } = servicesManager.services;
       segmentationService.toggleSegmentVisibility(
         viewportGridService.getActiveViewportId(),
@@ -1695,6 +1700,8 @@ function commandsModule({
       }
     },
     setBrushSize: ({ value, toolNames }) => {
+      console.log('BRUSH SIZE', value);
+
       const brushSize = Number(value);
 
       toolGroupService.getToolGroupIds()?.forEach(toolGroupId => {
