@@ -274,24 +274,6 @@ const toolbarButtons: Button[] = [
         toolNames: ['CircularBrush', 'SphereBrush'],
         disabledText: 'Create new segmentation to enable this tool.',
       },
-      listeners: {
-        [ViewportGridService.EVENTS.ACTIVE_VIEWPORT_ID_CHANGED]: [
-          {
-            commandName: 'setViewportForToolConfiguration',
-            commandOptions: {
-              toolName: 'CircularBrush',
-            },
-          },
-        ],
-        [ViewportGridService.EVENTS.VIEWPORTS_READY]: [
-          {
-            commandName: 'setViewportForToolConfiguration',
-            commandOptions: {
-              toolName: 'CircularBrush',
-            },
-          },
-        ],
-      },
       options: [
         {
           name: 'Radius (mm)',
