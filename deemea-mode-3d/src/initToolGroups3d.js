@@ -184,7 +184,6 @@ function initVolume3DToolGroup(extensionManager, toolGroupService) {
         toolName: toolNames.Pan,
         bindings: [{ mouseButton: Enums.MouseBindings.Auxiliary }],
       },
-      { toolName: toolNames.WindowLevel, bindings: [{ mouseButton: Enums.MouseBindings.Primary }] },
     ],
   };
 

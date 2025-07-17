@@ -1,6 +1,5 @@
 import { id } from './id';
 import toolbarButtons from './toolbarButtons3d';
-import segmentationButtons from './segmentationButtons';
 import initToolGroups from './initToolGroups3d';
 
 const ohif = {
@@ -68,34 +67,47 @@ function modeFactory({ modeConfiguration }) {
       initToolGroups(extensionManager, toolGroupService, commandsManager);
 
       toolbarService?.addButtons(toolbarButtons);
-      toolbarService?.addButtons(segmentationButtons);
 
-      toolbarService?.createButtonSection('primary', [
-        'Layout',
+      toolbarService.createButtonSection('primary', [
+        'WindowLevel',
         'Pan',
         'Zoom',
+        'TrackballRotate',
         'Capture',
-        'Reset',
-        'WindowLevel',
+        'Layout',
         'Crosshairs',
+        'MoreTools',
       ]);
 
-      toolbarService?.createButtonSection('segmentationToolbox', [
+      toolbarService.createButtonSection('moreToolsSection', [
+        'Reset',
+        'rotate-right',
+        'flipHorizontal',
+        'ReferenceLines',
+        'ImageOverlayViewer',
+        'StackScroll',
+        'invert',
+        'Cine',
+        'Magnify',
+        'TagBrowser',
+      ]);
+
+      toolbarService.createButtonSection('segmentationToolbox', [
         'SegmentationUtilities',
         'SegmentationTools',
       ]);
-      toolbarService?.createButtonSection('segmentationToolboxUtilitySection', [
+      toolbarService.createButtonSection('segmentationToolboxUtilitySection', [
         'LabelmapSlicePropagation',
         'InterpolateLabelmap',
         'SegmentBidirectional',
       ]);
-      toolbarService?.createButtonSection('segmentationToolboxToolsSection', [
+      toolbarService.createButtonSection('segmentationToolboxToolsSection', [
         'BrushTools',
         'MarkerLabelmap',
         'RegionSegmentPlus',
         'Shapes',
       ]);
-      toolbarService?.createButtonSection('brushToolsSection', ['Brush', 'Eraser', 'Threshold']);
+      toolbarService.createButtonSection('brushToolsSection', ['Brush', 'Eraser', 'Threshold']);
     },
     onModeExit: ({ servicesManager }: withAppTypes) => {
       const {
@@ -160,6 +172,7 @@ function modeFactory({ modeConfiguration }) {
               leftPanelResizable: true,
               rightPanels: [cornerstone.panelTool, cornerstone.measurements],
               leftPanelClosed: true,
+              rightPanelClosed: false,
               rightPanelResizable: true,
               viewports: [
                 {
@@ -188,10 +201,6 @@ function modeFactory({ modeConfiguration }) {
     hangingProtocol: ['@ohif/mnGrid'],
     /** SopClassHandlers used by the mode */
     sopClassHandlers: [ohif.sopClassHandler, segmentation.sopClassHandler, dicomRT.sopClassHandler],
-    // hangingProtocol: 'default',
-
-    /** hotkeys for mode */
-    // hotkeys: [...hotkeys.defaults.hotkeyBindings],
   };
 }
 
