@@ -13,10 +13,16 @@ const commandsModule = ({ servicesManager }) => {
         measurementService,
         ViewportGridService,
         CornerstoneViewportService,
+        userAuthenticationService,
         toolbarService,
       } = servicesManager.services;
 
-      if (!measurementService || !ViewportGridService || !CornerstoneViewportService) {
+      if (
+        !measurementService ||
+        !ViewportGridService ||
+        !CornerstoneViewportService ||
+        !userAuthenticationService
+      ) {
         console.error('Required services are not available');
         return;
       }
@@ -34,6 +40,21 @@ const commandsModule = ({ servicesManager }) => {
       );
 
       window.addEventListener('message', event => {
+        if (event.data.type === OHIFMessageType.VALIDATE_TOKEN) {
+          const token = event.data.message.token;
+          console.log('here token', token);
+          if (!token) {
+            return;
+          }
+
+          // if a token is passed in, set the userAuthenticationService to use it
+          // for the Authorization header for all requests
+          userAuthenticationService.setServiceImplementation({
+            getAuthorizationHeader: () => ({
+              Authorization: 'Bearer ' + token,
+            }),
+          });
+        }
         if (event.data.type === OHIFMessageType.IMAGE_STATUS) {
           if (event.data.message.status === 'Validated') {
             if (event.data.message.imageType === '2D') {
