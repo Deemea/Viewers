@@ -108,6 +108,8 @@ class SegmentationService extends PubSubService {
   }
 
   public onModeEnter(): void {
+    console.log('segmentationService ENTER');
+
     this._initSegmentationService();
   }
 
@@ -439,6 +441,8 @@ class SegmentationService extends PubSubService {
     // For now, we use the volume returned from the library and chop it here.
     let firstSegmentedSliceImageId = null;
     for (let i = 0; i < derivedImages.length; i++) {
+      console.log('HERE', derivedImages);
+
       const voxelManager = derivedImages[i].voxelManager as csTypes.IVoxelManager<number>;
       const scalarData = voxelManager.getScalarData();
       voxelManager.setScalarData(scalarData);
