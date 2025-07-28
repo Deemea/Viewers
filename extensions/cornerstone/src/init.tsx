@@ -83,6 +83,8 @@ export default async function init({
     cornerstone.cache.setMaxCacheSize(maxCacheSize);
   }
 
+  console.log('Registered volumes:', cornerstone.cache.getVolumes());
+
   initCornerstoneTools();
 
   Settings.getRuntimeSettings().set('useCursors', Boolean(appConfig.useCursors));

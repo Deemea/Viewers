@@ -53,7 +53,9 @@ const commandsModule = ({
      */
     loadSegmentationsForViewport: async ({ segmentations, viewportId }) => {
       // Todo: handle adding more than one segmentation
+
       const viewport = getTargetViewport({ viewportId, viewportGridService });
+      console.log('LOAD !!!', viewport);
       const displaySetInstanceUID = viewport.displaySetInstanceUIDs[0];
 
       const segmentation = segmentations[0];

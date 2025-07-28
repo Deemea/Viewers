@@ -41,24 +41,28 @@ const commandsModule = ({ servicesManager }) => {
 
       window.addEventListener('message', event => {
         if (event.data.type === OHIFMessageType.IMAGE_STATUS) {
+          console.log('ici', event.data.message.status, event.data.message.imageType);
+
           if (event.data.message.status === 'Validated') {
-            // if (event.data.message.imageType === '2D') {
-            // toolbarService?.setButtons(toolbarButtonsValidated);
-            // toolbarService?.refreshToolbarState();
-            // } else {
-            //   toolbarService?.setButtons(toolbarButtonsValidated3d);
-            //   toolbarService?.addButtons(segmentationButtons);
-            //   toolbarService?.refreshToolbarState();
-            // }
+            if (event.data.message.imageType === '2D') {
+              toolbarService?.setButtons(toolbarButtonsValidated);
+              toolbarService?.refreshToolbarState();
+            } else {
+              toolbarService?.setButtons(toolbarButtonsValidated3d);
+              toolbarService?.addButtons(segmentationButtons);
+              toolbarService?.refreshToolbarState();
+            }
           } else {
-            // if (event.data.message.imageType === '2D') {
-            // toolbarService?.setButtons(toolbarButtons);
-            // toolbarService?.refreshToolbarState();
-            // } else {
-            //   toolbarService?.setButtons(toolbarButtons3d);
-            //   toolbarService?.addButtons(segmentationButtons);
-            //   toolbarService?.refreshToolbarState();
-            // }
+            if (event.data.message.imageType === '2D') {
+              toolbarService?.setButtons(toolbarButtons);
+              toolbarService?.refreshToolbarState();
+            } else {
+              console.log('TOOOOLBAR');
+
+              toolbarService?.setButtons(toolbarButtons3d);
+              toolbarService?.addButtons(segmentationButtons);
+              toolbarService?.refreshToolbarState();
+            }
           }
         }
         if (event.data.type === OHIFMessageType.UPDATE_TOOLBAR) {
