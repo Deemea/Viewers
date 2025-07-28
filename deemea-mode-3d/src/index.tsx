@@ -21,10 +21,6 @@ const segmentation = {
   viewport: '@ohif/extension-cornerstone-dicom-seg.viewportModule.dicom-seg',
 };
 
-const dicomRT = {
-  viewport: '@ohif/extension-cornerstone-dicom-rt.viewportModule.dicom-rt',
-  sopClassHandler: '@ohif/extension-cornerstone-dicom-rt.sopClassHandlerModule.dicom-rt',
-};
 /**
  * Just two dependencies to be able to render a viewport with panels in order
  * to make sure that the mode is working.
@@ -35,7 +31,6 @@ const extensionDependencies = {
   '@ohif/extension-cornerstone-dicom-seg': '^3.0.0',
   '@ohif/extension-measurement-tracking': '^3.0.0',
   'deemea-extension-3d': '^0.0.1',
-  '@ohif/extension-cornerstone-dicom-rt': '^3.0.0',
 };
 
 function modeFactory({ modeConfiguration }) {
@@ -68,7 +63,7 @@ function modeFactory({ modeConfiguration }) {
       // Init Default and SR ToolGroups
       initToolGroups(extensionManager, toolGroupService, commandsManager);
 
-      toolbarService?.addButtons(toolbarButtons);
+      toolbarService.addButtons(toolbarButtons);
 
       toolbarService.createButtonSection('primary', [
         'WindowLevel',
@@ -185,10 +180,6 @@ function modeFactory({ modeConfiguration }) {
                 {
                   namespace: segmentation.viewport,
                   displaySetsToDisplay: [segmentation.sopClassHandler],
-                },
-                {
-                  namespace: dicomRT.viewport,
-                  displaySetsToDisplay: [dicomRT.sopClassHandler],
                 },
               ],
             },
