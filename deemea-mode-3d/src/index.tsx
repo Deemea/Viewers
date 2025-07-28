@@ -1,5 +1,6 @@
 import { id } from './id';
 import toolbarButtons from './toolbarButtons3d';
+// import segmentationButtons from './segmentationButtons3d';
 import initToolGroups from './initToolGroups3d';
 
 const ohif = {
@@ -20,10 +21,6 @@ const segmentation = {
   viewport: '@ohif/extension-cornerstone-dicom-seg.viewportModule.dicom-seg',
 };
 
-const dicomRT = {
-  viewport: '@ohif/extension-cornerstone-dicom-rt.viewportModule.dicom-rt',
-  sopClassHandler: '@ohif/extension-cornerstone-dicom-rt.sopClassHandlerModule.dicom-rt',
-};
 /**
  * Just two dependencies to be able to render a viewport with panels in order
  * to make sure that the mode is working.
@@ -32,8 +29,8 @@ const extensionDependencies = {
   '@ohif/extension-default': '^3.0.0',
   '@ohif/extension-cornerstone': '^3.0.0',
   '@ohif/extension-cornerstone-dicom-seg': '^3.0.0',
+  '@ohif/extension-measurement-tracking': '^3.0.0',
   'deemea-extension-3d': '^0.0.1',
-  '@ohif/extension-cornerstone-dicom-rt': '^3.0.0',
 };
 
 function modeFactory({ modeConfiguration }) {
@@ -66,7 +63,7 @@ function modeFactory({ modeConfiguration }) {
       // Init Default and SR ToolGroups
       initToolGroups(extensionManager, toolGroupService, commandsManager);
 
-      toolbarService?.addButtons(toolbarButtons);
+      toolbarService.addButtons(toolbarButtons);
 
       toolbarService.createButtonSection('primary', [
         'WindowLevel',
@@ -108,6 +105,7 @@ function modeFactory({ modeConfiguration }) {
         'Shapes',
       ]);
       toolbarService.createButtonSection('brushToolsSection', ['Brush', 'Eraser', 'Threshold']);
+      // toolbarService?.addButtons(segmentationButtons);
     },
     onModeExit: ({ servicesManager }: withAppTypes) => {
       const {
@@ -170,7 +168,7 @@ function modeFactory({ modeConfiguration }) {
             props: {
               leftPanels: [ohif.leftPanel],
               leftPanelResizable: true,
-              rightPanels: [cornerstone.panelTool, cornerstone.measurements],
+              rightPanels: [cornerstone.panelTool],
               leftPanelClosed: true,
               rightPanelClosed: false,
               rightPanelResizable: true,
@@ -183,10 +181,6 @@ function modeFactory({ modeConfiguration }) {
                   namespace: segmentation.viewport,
                   displaySetsToDisplay: [segmentation.sopClassHandler],
                 },
-                {
-                  namespace: dicomRT.viewport,
-                  displaySetsToDisplay: [dicomRT.sopClassHandler],
-                },
               ],
             },
           };
@@ -198,9 +192,9 @@ function modeFactory({ modeConfiguration }) {
     /** HangingProtocol used by the mode */
     // Commented out to just use the most applicable registered hanging protocol
     // The example is used for a grid layout to specify that as a preferred layout
-    hangingProtocol: ['@ohif/mnGrid'],
+    hangingProtocol: 'default',
     /** SopClassHandlers used by the mode */
-    sopClassHandlers: [ohif.sopClassHandler, segmentation.sopClassHandler, dicomRT.sopClassHandler],
+    sopClassHandlers: [ohif.sopClassHandler, segmentation.sopClassHandler],
   };
 }
 

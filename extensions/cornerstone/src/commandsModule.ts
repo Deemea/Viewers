@@ -1707,9 +1707,12 @@ function commandsModule({
 
       toolGroupService.getToolGroupIds()?.forEach(toolGroupId => {
         if (toolNames?.length === 0) {
+          console.log('ici', brushSize);
+
           segmentationUtils.setBrushSizeForToolGroup(toolGroupId, brushSize);
         } else {
           toolNames?.forEach(toolName => {
+            console.log('ici', toolName, brushSize);
             segmentationUtils.setBrushSizeForToolGroup(toolGroupId, brushSize, toolName);
           });
         }
@@ -1728,6 +1731,8 @@ function commandsModule({
       if (!toolGroupIds?.length) {
         return;
       }
+
+      console.log('toooool', toolGroupIds);
 
       for (const toolGroupId of toolGroupIds) {
         const toolGroup = toolGroupService.getToolGroup(toolGroupId);

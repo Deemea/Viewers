@@ -20,14 +20,6 @@ const callbacks = (toolName: string) => [
 const toolbarButtons: Button[] = [
   // sections
   {
-    id: 'MoreTools',
-    uiType: 'ohif.toolButtonList',
-    props: {
-      buttonSection: 'moreToolsSection',
-      groupId: 'MoreTools',
-    },
-  },
-  {
     id: 'BrushTools',
     uiType: 'ohif.toolBoxButtonGroup',
     props: {

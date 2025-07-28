@@ -19,12 +19,13 @@ window.config = {
   useSharedArrayBuffer: 'FALSE',
   groupEnabledModesFirst: true,
   allowMultiSelectExport: false,
+  dicomUploadEnabled: true,
   maxNumRequests: {
-    interaction: 100,
-    thumbnail: 75,
+    interaction: 150,
+    thumbnail: 100,
     // Prefetch number is dependent on the http protocol. For http 2 or
     // above, the number of requests can be go a lot higher.
-    prefetch: 25,
+    prefetch: 50,
   },
   studyPrefetcher: {
     enabled: false,
@@ -122,6 +123,13 @@ window.config = {
         supportsWildcard: false,
         staticWado: true,
         singlepart: 'bulkdata,video',
+        requestOptions: {
+          headers: {
+            'Cache-Control': 'public, max-age=31536000', // 1 year cache
+          },
+          timeout: 30000, // 30 second timeout
+          retry: 3,
+        },
         // whether the data source should use retrieveBulkData to grab metadata,
         // and in case of relative path, what would it be relative to, options
         // are in the series level or study level (some servers like series some study)
@@ -133,15 +141,16 @@ window.config = {
         omitQuotationForMultipartRequest: true,
       },
     },
+
     {
       namespace: '@ohif/extension-default.dataSourcesModule.dicomweb',
-      sourceName: 'DEV_F4C',
+      sourceName: 'SANDBOX',
       configuration: {
-        friendlyName: 'dev-didier',
-        name: 'dev-didier',
-        wadoUriRoot: 'https://dev-f4c.deemea.com/didier',
-        qidoRoot: 'https://dev-f4c.deemea.com/didier',
-        wadoRoot: 'https://dev-f4c.deemea.com/didier',
+        friendlyName: 'sandbox-didier',
+        name: 'sandbox-didier',
+        wadoUriRoot: 'https://sandbox.deemea.com/api/v1/didier',
+        qidoRoot: 'https://sandbox.deemea.com/api/v1/didier',
+        wadoRoot: 'https://sandbox.deemea.com/api/v1/didier',
         qidoSupportsIncludeField: false,
         imageRendering: 'wadors',
         thumbnailRendering: 'wadors',
@@ -150,6 +159,13 @@ window.config = {
         supportsWildcard: false,
         staticWado: true,
         singlepart: 'bulkdata,video',
+        requestOptions: {
+          headers: {
+            'Cache-Control': 'public, max-age=31536000', // 1 year cache
+          },
+          timeout: 30000, // 30 second timeout
+          retry: 3,
+        },
         // whether the data source should use retrieveBulkData to grab metadata,
         // and in case of relative path, what would it be relative to, options
         // are in the series level or study level (some servers like series some study)
@@ -219,118 +235,7 @@ window.config = {
         omitQuotationForMultipartRequest: true,
       },
     },
-    {
-      namespace: '@ohif/extension-default.dataSourcesModule.dicomweb',
-      sourceName: 'QA_SMALL_F4C',
-      configuration: {
-        friendlyName: 'qa-didier',
-        name: 'qa-didier',
-        wadoUriRoot: 'https://qa-small-f4c.deemea.com/didier',
-        qidoRoot: 'https://qa-small-f4c.deemea.com/didier',
-        wadoRoot: 'https://qa-small-f4c.deemea.com/didier',
-        qidoSupportsIncludeField: false,
-        imageRendering: 'wadors',
-        thumbnailRendering: 'wadors',
-        enableStudyLazyLoad: true,
-        supportsFuzzyMatching: true,
-        supportsWildcard: false,
-        staticWado: true,
-        singlepart: 'bulkdata,video',
-        // whether the data source should use retrieveBulkData to grab metadata,
-        // and in case of relative path, what would it be relative to, options
-        // are in the series level or study level (some servers like series some study)
-        bulkDataURI: {
-          enabled: true,
-          relativeResolution: 'studies',
-          transform: url => url.replace('/pixeldata.mp4', '/rendered'),
-        },
-        omitQuotationForMultipartRequest: true,
-      },
-    },
-    {
-      namespace: '@ohif/extension-default.dataSourcesModule.dicomweb',
-      sourceName: 'SMALL_F4C',
-      configuration: {
-        friendlyName: 'qa-didier',
-        name: 'qa-didier',
-        wadoUriRoot: 'https://qa-small-f4c.deemea.com/didier',
-        qidoRoot: 'https://qa-small-f4c.deemea.com/didier',
-        wadoRoot: 'https://qa-small-f4c.deemea.com/didier',
-        qidoSupportsIncludeField: false,
-        imageRendering: 'wadors',
-        thumbnailRendering: 'wadors',
-        enableStudyLazyLoad: true,
-        supportsFuzzyMatching: true,
-        supportsWildcard: false,
-        staticWado: true,
-        singlepart: 'bulkdata,video',
-        // whether the data source should use retrieveBulkData to grab metadata,
-        // and in case of relative path, what would it be relative to, options
-        // are in the series level or study level (some servers like series some study)
-        bulkDataURI: {
-          enabled: true,
-          relativeResolution: 'studies',
-          transform: url => url.replace('/pixeldata.mp4', '/rendered'),
-        },
-        omitQuotationForMultipartRequest: true,
-      },
-    },
-    {
-      namespace: '@ohif/extension-default.dataSourcesModule.dicomweb',
-      sourceName: 'SANDBOX',
-      configuration: {
-        friendlyName: 'sandbox-didier',
-        name: 'sandbox-didier',
-        wadoUriRoot: 'https://sandbox.deemea.com/api/v1/didier',
-        qidoRoot: 'https://sandbox.deemea.com/api/v1/didier',
-        wadoRoot: 'https://sandbox.deemea.com/api/v1/didier',
-        qidoSupportsIncludeField: false,
-        imageRendering: 'wadors',
-        thumbnailRendering: 'wadors',
-        enableStudyLazyLoad: true,
-        supportsFuzzyMatching: true,
-        supportsWildcard: false,
-        staticWado: true,
-        singlepart: 'bulkdata,video',
-        // whether the data source should use retrieveBulkData to grab metadata,
-        // and in case of relative path, what would it be relative to, options
-        // are in the series level or study level (some servers like series some study)
-        bulkDataURI: {
-          enabled: true,
-          relativeResolution: 'studies',
-          transform: url => url.replace('/pixeldata.mp4', '/rendered'),
-        },
-        omitQuotationForMultipartRequest: true,
-      },
-    },
-    {
-      namespace: '@ohif/extension-default.dataSourcesModule.dicomweb',
-      sourceName: 'PROD_F4C',
-      configuration: {
-        friendlyName: 'f4c-didier',
-        name: 'f4c-didier',
-        wadoUriRoot: 'https://f4c.deemea.com/didier',
-        qidoRoot: 'https://f4c.deemea.com/didier',
-        wadoRoot: 'https://f4c.deemea.com/didier',
-        qidoSupportsIncludeField: false,
-        imageRendering: 'wadors',
-        thumbnailRendering: 'wadors',
-        enableStudyLazyLoad: true,
-        supportsFuzzyMatching: true,
-        supportsWildcard: false,
-        staticWado: true,
-        singlepart: 'bulkdata,video',
-        // whether the data source should use retrieveBulkData to grab metadata,
-        // and in case of relative path, what would it be relative to, options
-        // are in the series level or study level (some servers like series some study)
-        bulkDataURI: {
-          enabled: true,
-          relativeResolution: 'studies',
-          transform: url => url.replace('/pixeldata.mp4', '/rendered'),
-        },
-        omitQuotationForMultipartRequest: true,
-      },
-    },
+
     {
       namespace: '@ohif/extension-default.dataSourcesModule.dicomweb',
       sourceName: 'STRAUBING',
