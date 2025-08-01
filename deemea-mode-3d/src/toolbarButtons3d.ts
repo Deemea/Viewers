@@ -353,22 +353,22 @@ const toolbarButtons: Button[] = [
       commands: 'runSegmentBidirectional',
     },
   },
-  {
-    id: 'RegionSegmentPlus',
-    uiType: 'ohif.toolBoxButton',
-    props: {
-      icon: 'icon-tool-click-segment',
-      label: 'One Click Segment',
-      tooltip:
-        'Detects segmentable regions with one click. Hover for visual feedback—click when a plus sign appears to auto-segment the lesion.',
-      evaluate: {
-        name: 'evaluate.cornerstone.segmentation',
-        toolNames: ['RegionSegmentPlus'],
-        disabledText: 'Create new segmentation to enable this tool.',
-      },
-      commands: 'setToolActiveToolbar',
-    },
-  },
+  // {
+  //   id: 'RegionSegmentPlus',
+  //   uiType: 'ohif.toolBoxButton',
+  //   props: {
+  //     icon: 'icon-tool-click-segment',
+  //     label: 'One Click Segment',
+  //     tooltip:
+  //       'Detects segmentable regions with one click. Hover for visual feedback—click when a plus sign appears to auto-segment the lesion.',
+  //     evaluate: {
+  //       name: 'evaluate.cornerstone.segmentation',
+  //       toolNames: ['RegionSegmentPlus'],
+  //       disabledText: 'Create new segmentation to enable this tool.',
+  //     },
+  //     commands: 'setToolActiveToolbar',
+  //   },
+  // },
   {
     id: 'LabelmapSlicePropagation',
     uiType: 'ohif.toolBoxButton',
@@ -392,57 +392,57 @@ const toolbarButtons: Button[] = [
       commands: 'toggleEnabledDisabledToolbar',
     },
   },
-  {
-    id: 'MarkerLabelmap',
-    uiType: 'ohif.toolBoxButton',
-    props: {
-      icon: 'icon-marker-labelmap',
-      label: 'Marker Guided Labelmap',
-      tooltip:
-        'Use include/exclude markers to guide AI (SAM) segmentation. Click to place markers, Enter to accept results, Esc to reject, and N to go to the next slice while keeping markers.',
-      evaluate: [
-        {
-          name: 'evaluate.cornerstone.segmentation',
-          toolNames: ['MarkerLabelmap', 'MarkerInclude', 'MarkerExclude'],
-        },
-      ],
-      commands: 'setToolActiveToolbar',
-      listeners: {
-        [ViewportGridService.EVENTS.ACTIVE_VIEWPORT_ID_CHANGED]: callbacks('MarkerLabelmap'),
-        [ViewportGridService.EVENTS.VIEWPORTS_READY]: callbacks('MarkerLabelmap'),
-      },
-      options: [
-        {
-          name: 'Marker Mode',
-          type: 'radio',
-          id: 'marker-mode',
-          value: 'markerInclude',
-          values: [
-            { value: 'markerInclude', label: 'Include' },
-            { value: 'markerExclude', label: 'Exclude' },
-          ],
-          commands: ({ commandsManager, options }) => {
-            const markerModeOption = options.find(option => option.id === 'marker-mode');
-            if (markerModeOption.value === 'markerInclude') {
-              commandsManager.run('setToolActive', {
-                toolName: 'MarkerInclude',
-              });
-            } else {
-              commandsManager.run('setToolActive', {
-                toolName: 'MarkerExclude',
-              });
-            }
-          },
-        },
-        {
-          name: 'Clear Markers',
-          type: 'button',
-          id: 'clear-markers',
-          commands: 'clearMarkersForMarkerLabelmap',
-        },
-      ],
-    },
-  },
+  // {
+  //   id: 'MarkerLabelmap',
+  //   uiType: 'ohif.toolBoxButton',
+  //   props: {
+  //     icon: 'icon-marker-labelmap',
+  //     label: 'Marker Guided Labelmap',
+  //     tooltip:
+  //       'Use include/exclude markers to guide AI (SAM) segmentation. Click to place markers, Enter to accept results, Esc to reject, and N to go to the next slice while keeping markers.',
+  //     evaluate: [
+  //       {
+  //         name: 'evaluate.cornerstone.segmentation',
+  //         toolNames: ['MarkerLabelmap', 'MarkerInclude', 'MarkerExclude'],
+  //       },
+  //     ],
+  //     commands: 'setToolActiveToolbar',
+  //     listeners: {
+  //       [ViewportGridService.EVENTS.ACTIVE_VIEWPORT_ID_CHANGED]: callbacks('MarkerLabelmap'),
+  //       [ViewportGridService.EVENTS.VIEWPORTS_READY]: callbacks('MarkerLabelmap'),
+  //     },
+  //     options: [
+  //       {
+  //         name: 'Marker Mode',
+  //         type: 'radio',
+  //         id: 'marker-mode',
+  //         value: 'markerInclude',
+  //         values: [
+  //           { value: 'markerInclude', label: 'Include' },
+  //           { value: 'markerExclude', label: 'Exclude' },
+  //         ],
+  //         commands: ({ commandsManager, options }) => {
+  //           const markerModeOption = options.find(option => option.id === 'marker-mode');
+  //           if (markerModeOption.value === 'markerInclude') {
+  //             commandsManager.run('setToolActive', {
+  //               toolName: 'MarkerInclude',
+  //             });
+  //           } else {
+  //             commandsManager.run('setToolActive', {
+  //               toolName: 'MarkerExclude',
+  //             });
+  //           }
+  //         },
+  //       },
+  //       {
+  //         name: 'Clear Markers',
+  //         type: 'button',
+  //         id: 'clear-markers',
+  //         commands: 'clearMarkersForMarkerLabelmap',
+  //       },
+  //     ],
+  //   },
+  // },
   {
     id: 'Eraser',
     uiType: 'ohif.toolBoxButton',

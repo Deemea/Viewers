@@ -30,12 +30,12 @@ function createTools(utilityModule) {
       {
         toolName: toolNames.LabelmapSlicePropagation,
       },
-      {
-        toolName: toolNames.MarkerLabelmap,
-      },
-      {
-        toolName: toolNames.RegionSegmentPlus,
-      },
+      // {
+      //   toolName: toolNames.MarkerLabelmap,
+      // },
+      // {
+      //   toolName: toolNames.RegionSegmentPlus,
+      // },
       {
         toolName: 'CircularEraser',
         parentTool: 'Brush',

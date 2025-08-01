@@ -89,6 +89,10 @@ module.exports = (env, argv) => {
         path.resolve(__dirname, 'deemea-extension-3d/node_modules'),
         path.resolve(__dirname, 'deemea-mode-3d/node_modules'),
         path.resolve(__dirname, 'deemea-mode/node_modules'),
+        path.resolve(__dirname, 'deemea-extension/node_modules'),
+        path.resolve(__dirname, 'deemea-extension-3d/node_modules'),
+        path.resolve(__dirname, 'deemea-mode-3d/node_modules'),
+        path.resolve(__dirname, 'deemea-mode/node_modules'),
       ],
     },
     plugins: [

@@ -100,9 +100,9 @@ function modeFactory({ modeConfiguration }) {
       ]);
       toolbarService.createButtonSection('segmentationToolboxToolsSection', [
         'BrushTools',
-        'MarkerLabelmap',
-        'RegionSegmentPlus',
-        'Shapes',
+        // 'MarkerLabelmap',
+        // 'RegionSegmentPlus',
+        // 'Shapes',
       ]);
       toolbarService.createButtonSection('brushToolsSection', ['Brush', 'Eraser', 'Threshold']);
       // toolbarService?.addButtons(segmentationButtons);
