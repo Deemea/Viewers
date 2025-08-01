@@ -127,8 +127,6 @@ class SegmentationService extends PubSubService {
    * or perform operations on a particular segmentation.
    */
   public getSegmentation(segmentationId: string): cstTypes.Segmentation | undefined {
-    console.log('1', segmentationId);
-
     return cstSegmentation.state.getSegmentation(segmentationId);
   }
 
@@ -143,7 +141,6 @@ class SegmentationService extends PubSubService {
    * segmentation objects without any additional processing or filtering.
    */
   public getSegmentations(): cstTypes.Segmentation[] | [] {
-    console.log('2 getSegmentations');
     return cstSegmentation.state.getSegmentations();
   }
 
@@ -192,7 +189,6 @@ class SegmentationService extends PubSubService {
   public getRepresentationsForSegmentation(
     segmentationId: string
   ): { viewportId: string; representations: any[] }[] {
-    console.log('3 getRepresentationsForSegmentation');
     const representations =
       cstSegmentation.state.getSegmentationRepresentationsBySegmentationId(segmentationId);
 
@@ -220,7 +216,6 @@ class SegmentationService extends PubSubService {
       type?: SegmentationRepresentations;
     } = {}
   ): SegmentationRepresentation[] {
-    console.log('4 getRepresentationsForSegmentation');
     // Get all representations for the viewportId
     const representations = cstSegmentation.state.getSegmentationRepresentations(
       viewportId,
@@ -280,7 +275,6 @@ class SegmentationService extends PubSubService {
       suppressEvents?: boolean;
     }
   ): Promise<void> {
-    console.log('addSegmentationRepresentation');
     const segmentation = this.getSegmentation(segmentationId);
     const csViewport = this.getAndValidateViewport(viewportId);
 
@@ -344,7 +338,6 @@ class SegmentationService extends PubSubService {
       label?: string;
     }
   ): Promise<string> {
-    console.log('createLabelmapForDisplaySet');
     // Todo: random does not makes sense, make this better, like
     // labelmap 1, 2, 3 etc
     const segmentationId = options?.segmentationId ?? `${csUtils.uuidv4()}`;
@@ -406,7 +399,6 @@ class SegmentationService extends PubSubService {
       type: LABELMAP,
     }
   ): Promise<string> {
-    console.log('createSegmentationForSEGDisplaySet');
     const { type } = options;
     let { segmentationId } = options;
     const { labelMapImages } = segDisplaySet;
@@ -823,7 +815,6 @@ class SegmentationService extends PubSubService {
       visibility?: boolean; // Add visibility option
     } = {}
   ): void {
-    console.log('addSegment', segmentationId);
     if (config?.segmentIndex === 0) {
       throw new Error(i18n.t('Segment') + ' index 0 is reserved for "no label"');
     }
@@ -1015,7 +1006,6 @@ class SegmentationService extends PubSubService {
    * Returns null if the segmentation does not have valid labelmap volume data.
    */
   public getLabelmapVolume(segmentationId: string) {
-    console.log('getLabelmapVolume', segmentationId);
     const csSegmentation = cstSegmentation.state.getSegmentation(segmentationId);
     const labelmapData = csSegmentation.representationData[
       SegmentationRepresentations.Labelmap
