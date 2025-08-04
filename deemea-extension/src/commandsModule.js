@@ -13,10 +13,16 @@ const commandsModule = ({ servicesManager }) => {
         measurementService,
         ViewportGridService,
         CornerstoneViewportService,
+        SegmentationService,
         toolbarService,
       } = servicesManager.services;
 
-      if (!measurementService || !ViewportGridService || !CornerstoneViewportService) {
+      if (
+        !measurementService ||
+        !ViewportGridService ||
+        !CornerstoneViewportService ||
+        !SegmentationService
+      ) {
         console.error('Required services are not available');
         return;
       }
@@ -35,6 +41,8 @@ const commandsModule = ({ servicesManager }) => {
 
       window.addEventListener('message', event => {
         if (event.data.type === OHIFMessageType.IMAGE_STATUS) {
+          console.log('ici', event.data.message.status, event.data.message.imageType);
+
           if (event.data.message.status === 'Validated') {
             if (event.data.message.imageType === '2D') {
               toolbarService?.setButtons(toolbarButtonsValidated);
@@ -49,6 +57,8 @@ const commandsModule = ({ servicesManager }) => {
               toolbarService?.setButtons(toolbarButtons);
               toolbarService?.refreshToolbarState();
             } else {
+              console.log('TOOOOLBAR');
+
               toolbarService?.setButtons(toolbarButtons3d);
               toolbarService?.addButtons(segmentationButtons);
               toolbarService?.refreshToolbarState();
