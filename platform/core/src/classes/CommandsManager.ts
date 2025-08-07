@@ -211,8 +211,6 @@ export class CommandsManager {
       return [];
     }
 
-    console.log('convertedconverted', converted);
-
     return converted.map(command => ({
       commandName: command.commandName,
       commandOptions: { ...options, ...command.commandOptions },
