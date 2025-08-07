@@ -201,6 +201,7 @@ export default async function init({
       segmentationService,
       customizationService,
       commandsManager,
+      extensionManager,
     });
 
   const { unsubscribe: unsubscribeSegmentationModifiedHandler } = setupSegmentationModifiedHandler({

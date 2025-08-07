@@ -179,6 +179,7 @@ function createDicomJSONApi(dicomJsonConfig) {
 
           const study = findStudies('StudyInstanceUID', StudyInstanceUID)[0];
           let series;
+          console.log('MEATADATDA', study);
 
           if (customSort) {
             series = customSort(study.series);
@@ -209,6 +210,8 @@ function createDicomJSONApi(dicomJsonConfig) {
 
           // Async load series, store as retrieved
           function storeInstances(naturalizedInstances) {
+            console.log('LAAAAAAA,');
+
             DicomMetadataStore.addInstances(naturalizedInstances, madeInClient);
           }
 

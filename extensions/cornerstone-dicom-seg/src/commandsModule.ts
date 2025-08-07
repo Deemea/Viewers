@@ -5,6 +5,7 @@ import { segmentation as cornerstoneToolsSegmentation } from '@cornerstonejs/too
 import { adaptersRT, helpers, adaptersSEG } from '@cornerstonejs/adapters';
 import { createReportDialogPrompt } from '@ohif/extension-default';
 import { DicomMetadataStore } from '@ohif/core';
+import { OHIFMessageType } from '../../../deemea-extension/src/utils/enums';
 
 import PROMPT_RESPONSES from '../../default/src/utils/_shared/PROMPT_RESPONSES';
 
@@ -52,6 +53,8 @@ const commandsModule = ({
      *
      */
     loadSegmentationsForViewport: async ({ segmentations, viewportId }) => {
+      console.log('LOAD SEGMENTATIONS FOR VIEWPORT');
+
       // Todo: handle adding more than one segmentation
       const viewport = getTargetViewport({ viewportId, viewportGridService });
       const displaySetInstanceUID = viewport.displaySetInstanceUIDs[0];
@@ -215,6 +218,9 @@ const commandsModule = ({
     storeSegmentation: async ({ segmentationId, dataSource }) => {
       const segmentation = segmentationService.getSegmentation(segmentationId);
 
+      const currentSegmentation = segmentationService.getSegmentations();
+      console.log('CORNERSTONE DICOM SEG', currentSegmentation, segmentationId);
+
       if (!segmentation) {
         throw new Error('No segmentation found');
       }
@@ -249,14 +255,35 @@ const commandsModule = ({
             throw new Error('Error during segmentation generation');
           }
 
-          const { dataset: naturalizedReport } = generatedData;
+          console.log('GENERATED DATA', generatedData);
 
-          await selectedDataSourceConfig.store.dicom(naturalizedReport);
+          const { dataset: naturalizedReport } = generatedData;
+          console.log('CREATED', naturalizedReport);
+
+          console.log('selectedDataSourceConfig', selectedDataSourceConfig[0]);
+          console.log(
+            'selectedDataSourceConfiggetConfig()',
+            await selectedDataSourceConfig[0].getConfig()
+          );
+
+          await selectedDataSourceConfig[0].store.dicom(naturalizedReport);
 
           // add the information for where we stored it to the instance as well
-          naturalizedReport.wadoRoot = selectedDataSourceConfig.getConfig().wadoRoot;
+          naturalizedReport.wadoRoot = selectedDataSourceConfig[0].getConfig().wadoRoot;
 
           DicomMetadataStore.addInstances([naturalizedReport], true);
+
+          window.parent.postMessage(
+            {
+              type: OHIFMessageType.SAVE_SEGMENTATION,
+              message: {
+                studyInstanceUID: naturalizedReport.StudyInstanceUID,
+                SOPInstanceUID: naturalizedReport.SOPInstanceUID,
+                seriesInstanceUID: naturalizedReport.SeriesInstanceUID,
+              },
+            },
+            '*'
+          );
 
           return naturalizedReport;
         } catch (error) {

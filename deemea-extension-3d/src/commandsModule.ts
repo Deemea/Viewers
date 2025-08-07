@@ -215,6 +215,8 @@ const commandsModule = ({
      * otherwise throws an error.
      */
     storeSegmentation: async ({ segmentationId, dataSource }) => {
+      console.log('OUIO UO OUI');
+
       const segmentation = segmentationService.getSegmentation(segmentationId);
 
       if (!segmentation) {

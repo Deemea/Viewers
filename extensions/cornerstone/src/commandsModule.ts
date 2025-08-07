@@ -197,6 +197,8 @@ function commandsModule({
           annotation,
         });
 
+        console.log('LPOOOO');
+
         // Save changes if needed
         if (updatedSegmentation) {
           segmentationService.addOrUpdateSegmentation({

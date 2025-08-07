@@ -6,7 +6,7 @@ import toolbarButtons from '../../deemea-mode/src/toolbarButtons';
 import toolbarButtons3d from '../../deemea-mode-3d/src/toolbarButtons3d';
 import segmentationButtons from '../../deemea-mode-3d/src/segmentationButtons';
 
-const commandsModule = ({ servicesManager }) => {
+const commandsModule = ({ servicesManager, commandsManager }) => {
   const actions = {
     demonstrateMeasurementService: () => {
       const {
@@ -112,6 +112,14 @@ const commandsModule = ({ servicesManager }) => {
             },
             '*'
           );
+        }
+        if (event.data.type === OHIFMessageType.LOAD_SEGMENTATION) {
+          const viewportId = ViewportGridService.getActiveViewportId();
+          commandsManager.run({
+            commandName: 'loadSegmentationsForViewport',
+            commandOptions: { viewportId },
+            context: 'CORNERSTONE',
+          });
         }
       });
     },

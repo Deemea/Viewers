@@ -292,12 +292,16 @@ function createDicomWebApi(dicomWebConfig: DicomWebConfig, servicesManager) {
 
     store: {
       dicom: async (dataset, request, dicomDict) => {
+        console.log('request', request);
+
         wadoDicomWebClient.headers = getAuthorizationHeader();
         if (dataset instanceof ArrayBuffer) {
           const options = {
             datasets: [dataset],
             request,
           };
+          console.log('BUFFFER', dataset);
+
           await wadoDicomWebClient.storeInstances(options);
         } else {
           let effectiveDicomDict = dicomDict;
@@ -325,7 +329,7 @@ function createDicomWebApi(dicomWebConfig: DicomWebConfig, servicesManager) {
             datasets: [part10Buffer],
             request,
           };
-
+          console.log('BUFFwadoDicomWebClientFER', options, wadoDicomWebClient);
           await wadoDicomWebClient.storeInstances(options);
         }
       },

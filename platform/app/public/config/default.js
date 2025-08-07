@@ -6,8 +6,11 @@ window.config = {
   // whiteLabeling: {},
   extensions: [],
   modes: [],
-  customizationService: {},
-  showStudyList: false,
+  customizationService: {
+    dicomUploadComponent:
+      '@ohif/extension-cornerstone.customizationModule.cornerstoneDicomUploadComponent',
+  },
+  showStudyList: true,
   // some windows systems have issues with more than 3 web workers
   maxNumberOfWebWorkers: 3,
   // below flag is for performance reasons, but it might not work for all servers
@@ -151,9 +154,13 @@ window.config = {
       configuration: {
         friendlyName: 'sandbox-didier',
         name: 'sandbox-didier',
-        wadoUriRoot: 'https://sandbox.deemea.com/api/v1/didier',
-        qidoRoot: 'https://sandbox.deemea.com/api/v1/didier',
-        wadoRoot: 'https://sandbox.deemea.com/api/v1/didier',
+        // wadoUriRoot: 'https://sandbox.deemea.com/didier',
+        // qidoRoot: 'https://sandbox.deemea.com/didier',
+        // wadoRoot: 'https://sandbox.deemea.com/didier',
+        wadoUriRoot: 'http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs',
+        qidoRoot: 'http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs',
+        wadoRoot: 'http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs',
+        // uploadSegFile: 'http://localhost:5020/v1/didier',
         qidoSupportsIncludeField: false,
         imageRendering: 'wadors',
         thumbnailRendering: 'wadors',
