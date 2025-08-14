@@ -14,6 +14,7 @@ const commandsModule = ({ servicesManager }) => {
         ViewportGridService,
         CornerstoneViewportService,
         toolbarService,
+        segmentationService,
       } = servicesManager.services;
 
       if (!measurementService || !ViewportGridService || !CornerstoneViewportService) {
@@ -32,6 +33,36 @@ const commandsModule = ({ servicesManager }) => {
           );
         }
       );
+
+      segmentationService?.subscribe(segmentationService.EVENTS.SEGMENTATION_ADDED, event => {
+        console.log('SEGMENTATION_ADDED event:', event);
+        console.log(window.services);
+        console.log('test');
+        const segService = window.services?.SegmentationService;
+        console.log(segService);
+        console.log(segService?.segmentations?.[0]?.id);
+        console.log(Object.keys(segService.segmentations)[0]);
+        console.log(segService?.getLabelmapVolume(Object.keys(segService.segmentations)[0]));
+        console.log(
+          segService?.getSegmentationRepresentationsForToolGroup(
+            Object.keys(segService.segmentations)[0]
+          )
+        );
+        // const seg = window?.store.state.extensions.segmentation.segmentations[0];
+        // console.log('seg', seg);
+        // const labelmap = seg.representationData.LABELMAP.labelmapData;
+        // const voxelData = labelmap.scalarData;
+        // console.log(labelmap);
+        // console.log(voxelData);
+      });
+
+      segmentationService?.subscribe(segmentationService.EVENTS.SEGMENTATION_REMOVED, event => {
+        console.log('SEGMENTATION_REMOVED event:', event);
+      });
+
+      segmentationService?.subscribe(segmentationService.EVENTS.SEGMENT_LOADING_COMPLETE, event => {
+        console.log('SEGMENT LOADING COMPLETE event:', event);
+      });
 
       window.addEventListener('message', event => {
         if (event.data.type === OHIFMessageType.IMAGE_STATUS) {
