@@ -15,6 +15,8 @@ function ViewportSegmentationMenu({
       const active = segmentationService.getSegmentationRepresentations(viewportId);
       setActiveSegmentations(active);
 
+      console.log('UPDAAAATE SEGGG');
+
       const all = segmentationService.getSegmentations();
       const available = all.filter(
         seg => !active.some(activeSeg => activeSeg.segmentationId === seg.segmentationId)

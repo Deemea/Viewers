@@ -98,6 +98,7 @@ export default async function init({
     hangingProtocolService,
     viewportGridService,
     segmentationService,
+    displaySetService,
     measurementService,
   } = servicesManager.services;
 
@@ -200,6 +201,7 @@ export default async function init({
     setupSegmentationDataModifiedHandler({
       segmentationService,
       customizationService,
+      displaySetService,
       commandsManager,
       extensionManager,
     });
