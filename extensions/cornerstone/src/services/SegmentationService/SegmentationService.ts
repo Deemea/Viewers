@@ -703,6 +703,8 @@ class SegmentationService extends PubSubService {
       console.log('allSegm', this.getSegmentations());
 
       const viewportIds = this.getViewportIdsWithSegmentation(segmentationId);
+      // const volume = this.getLabelmapVolume(segmentationId);
+      // console.log('VOLUUUUME', volume);
 
       viewportIds.forEach(viewportId => {
         console.log(
