@@ -23,6 +23,7 @@ window.config = {
   groupEnabledModesFirst: true,
   allowMultiSelectExport: false,
   dicomUploadEnabled: true,
+  disableConfirmationPrompts: true,
   maxNumRequests: {
     interaction: 150,
     thumbnail: 100,
