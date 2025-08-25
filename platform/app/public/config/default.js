@@ -26,6 +26,7 @@ window.config = {
   investigationalUseDialog: {
     option: 'never',
   },
+  disableConfirmationPrompts: true,
   maxNumRequests: {
     interaction: 150,
     thumbnail: 100,

@@ -7,6 +7,7 @@ import toolbarButtons3d from '../../deemea-mode-3d/src/toolbarButtons3d';
 import segmentationButtons from '../../deemea-mode-3d/src/segmentationButtons';
 
 const commandsModule = ({ servicesManager, commandsManager }) => {
+  let segmentationLoaded = false;
   const actions = {
     demonstrateMeasurementService: () => {
       const {
@@ -15,13 +16,15 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
         CornerstoneViewportService,
         SegmentationService,
         toolbarService,
+        displaySetService,
       } = servicesManager.services;
 
       if (
         !measurementService ||
         !ViewportGridService ||
         !CornerstoneViewportService ||
-        !SegmentationService
+        !SegmentationService ||
+        !displaySetService
       ) {
         console.error('Required services are not available');
         return;
@@ -30,6 +33,35 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
       CornerstoneViewportService.subscribe(
         CornerstoneViewportService.EVENTS.VIEWPORT_DATA_CHANGED,
         () => {
+          if (segmentationLoaded) {
+            return;
+          }
+          setTimeout(() => {
+            const displaySets = displaySetService.getActiveDisplaySets();
+
+            if (displaySets.length) {
+              const segmentationDisplaySet = displaySets.filter(
+                display => display.Modality === 'SEG'
+              );
+
+              if (segmentationDisplaySet.length === 1) {
+                const currentViewport = ViewportGridService.getState().viewports['default'];
+
+                const currentDisplaySetUID = currentViewport?.displaySetInstanceUIDs?.[0];
+
+                if (currentDisplaySetUID !== segmentationDisplaySet[0].displaySetInstanceUID) {
+                  segmentationLoaded = true;
+                  const updatedViewports = [
+                    {
+                      viewportId: 'default',
+                      displaySetInstanceUIDs: [segmentationDisplaySet[0].displaySetInstanceUID],
+                    },
+                  ];
+                  ViewportGridService.setDisplaySetsForViewports(updatedViewports);
+                }
+              }
+            }
+          }, 2000);
           window.parent.postMessage(
             {
               type: OHIFMessageType.IMAGE_READY,
@@ -41,8 +73,6 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
 
       window.addEventListener('message', event => {
         if (event.data.type === OHIFMessageType.IMAGE_STATUS) {
-          console.log('ici', event.data.message.status, event.data.message.imageType);
-
           if (event.data.message.status === 'Validated') {
             if (event.data.message.imageType === '2D') {
               toolbarService?.setButtons(toolbarButtonsValidated);
@@ -57,8 +87,6 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
               toolbarService?.setButtons(toolbarButtons);
               toolbarService?.refreshToolbarState();
             } else {
-              console.log('TOOOOLBAR');
-
               toolbarService?.setButtons(toolbarButtons3d);
               toolbarService?.addButtons(segmentationButtons);
               toolbarService?.refreshToolbarState();
