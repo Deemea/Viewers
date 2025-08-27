@@ -58,65 +58,71 @@ export function setupSegmentationDataModifiedHandler({
           segmentationId,
           segments: updatedSegmentation.segments,
         });
-      }
 
-      // SAVE AUTO SEGMENTATION
-      try {
-        const displaySets = displaySetService.getActiveDisplaySets();
-        const segDisplaySets = displaySets.filter(ds => ds.Modality === 'SEG');
-        const segmentations = segmentationService.getSegmentations();
+        // Rollback to handle if user refresh just after the deletion
+        let deletedDisplaySet = null;
 
-        const defaultDataSource = extensionManager.getActiveDataSource();
-        const generatedData = await commandsManager.run('generateSegmentation', {
-          segmentationId,
-          options: {
-            SeriesDescription: 'TEST SAVE AUTO Description',
-          },
-        });
+        // SAVE AUTO SEGMENTATION
+        try {
+          const displaySets = displaySetService.getActiveDisplaySets();
+          const segDisplaySets = displaySets.filter(ds => ds.Modality === 'SEG');
 
-        if (!generatedData || !generatedData.dataset) {
-          throw new Error('Error during segmentation generation');
-        }
+          const defaultDataSource = extensionManager.getActiveDataSource();
+          const generatedData = await commandsManager.run('generateSegmentation', {
+            segmentationId,
+          });
 
-        // Suppression avant ajout pour modification
-        console.log('segDisplaySets', segDisplaySets);
+          if (!generatedData || !generatedData.dataset) {
+            throw new Error('Error during segmentation generation');
+          }
 
-        if (segDisplaySets.length > 0) {
-          const sop = segDisplaySets[0].SOPInstanceUID;
-          const series = segDisplaySets[0].SeriesInstanceUID;
-          const study = segDisplaySets[0].StudyInstanceUID;
-          console.log('SOP TO DELETE', sop);
-          const deleteUrl = `http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs/studies/${study}/series/${series}/reject/113039%5EDCM`;
-          await axios.post(deleteUrl);
-          displaySetService.deleteDisplaySet(segDisplaySets[0].displaySetInstanceUID);
-        }
+          if (segDisplaySets.length === 1) {
+            const series = segDisplaySets[0].SeriesInstanceUID;
+            const study = segDisplaySets[0].StudyInstanceUID;
+            deletedDisplaySet = segDisplaySets[0];
+            // wadoUriRoot of the datasource
+            const deleteUrl = `http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs/studies/${study}/series/${series}/reject/113039%5EDCM`;
+            await axios.post(deleteUrl);
+            displaySetService.deleteDisplaySet(segDisplaySets[0].displaySetInstanceUID);
+          }
 
-        const { dataset: naturalizedReport } = generatedData;
-        console.log('naturalizedReport', naturalizedReport);
+          const { dataset: naturalizedReport } = generatedData;
 
-        naturalizedReport.SeriesDescription = 'TEST SAVE AUTO new3';
+          naturalizedReport.SeriesDescription = 'Deemea custom segmentation';
 
-        await defaultDataSource[0].store.dicom(naturalizedReport);
+          await defaultDataSource[0].store.dicom(naturalizedReport);
+          // add the information for where we stored it to the instance as well
+          naturalizedReport.wadoRoot = defaultDataSource[0].getConfig().wadoRoot;
+          DicomMetadataStore.addInstances([naturalizedReport], true);
+          deletedDisplaySet = null;
 
-        // add the information for where we stored it to the instance as well
-        naturalizedReport.wadoRoot = defaultDataSource[0].getConfig().wadoRoot;
-
-        DicomMetadataStore.addInstances([naturalizedReport], true);
-
-        window.parent.postMessage(
-          {
-            type: OHIFMessageType.SAVE_SEGMENTATION,
-            message: {
-              seriesInstanceUID: naturalizedReport.SeriesInstanceUID,
+          window.parent.postMessage(
+            {
+              type: OHIFMessageType.SAVE_SEGMENTATION,
+              message: {
+                seriesInstanceUID: naturalizedReport.SeriesInstanceUID,
+              },
             },
-          },
-          '*'
-        );
+            '*'
+          );
 
-        return naturalizedReport;
-      } catch (error) {
-        console.debug('Error storing segmentation:', error);
-        throw error;
+          return naturalizedReport;
+        } catch (error) {
+          try {
+            if (deletedDisplaySet) {
+              const defaultDataSource = extensionManager.getActiveDataSource();
+              displaySetService.addDisplaySet(deletedDisplaySet);
+              await defaultDataSource[0].store.dicom(deletedDisplaySet);
+              // add the information for where we stored it to the instance as well
+              DicomMetadataStore.addInstances([deletedDisplaySet], true);
+            }
+          } catch (rollbackError) {
+            console.error('Rollback failed:', rollbackError);
+            // Ici, vous pourriez notifier l'utilisateur que l'état est incohérent
+          }
+          console.debug('Error storing segmentation:', error);
+          throw error;
+        }
       }
     },
     2000
@@ -132,6 +138,8 @@ export function setupSegmentationModifiedHandler({ segmentationService }) {
   const { unsubscribe } = segmentationService.subscribe(
     segmentationService.EVENTS.SEGMENTATION_MODIFIED,
     async ({ segmentationId }) => {
+      console.log('MODIFIEEEEEED');
+
       const segmentation = segmentationService.getSegmentation(segmentationId);
 
       if (!segmentation) {
