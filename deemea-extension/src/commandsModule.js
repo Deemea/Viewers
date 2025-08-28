@@ -75,6 +75,12 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
         if (event.data.type === OHIFMessageType.IMAGE_STATUS) {
           if (event.data.message.status === 'Validated') {
             if (event.data.message.imageType === '2D') {
+              const style = document.createElement('style');
+              style.textContent = `#svg-layer-default circle {
+                stroke-width: 4px !important;
+                r: 2px !important;
+              }`;
+              document.head.appendChild(style);
               toolbarService?.setButtons(toolbarButtonsValidated);
               toolbarService?.refreshToolbarState();
             } else {
@@ -84,6 +90,12 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
             }
           } else {
             if (event.data.message.imageType === '2D') {
+              const style = document.createElement('style');
+              style.textContent = `#svg-layer-default circle {
+                stroke-width: 4px !important;
+                r: 2px !important;
+              }`;
+              document.head.appendChild(style);
               toolbarService?.setButtons(toolbarButtons);
               toolbarService?.refreshToolbarState();
             } else {
