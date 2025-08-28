@@ -156,15 +156,17 @@ async function setMeasurementStyle() {
 }
 
 function lockMeasurementIfNeeded(data, imageStatus: boolean): void {
-  const annotations = cs3dTools.annotation.state.getAllAnnotations()
+  const annotations = cs3dTools.annotation.state.getAllAnnotations();
   annotations?.forEach(annotation => {
-    if ((annotation.data.label! as unknown as { measurementId: string }).measurementId === data.measurementId && 
-    (data.locked === true || imageStatus)
-  ) {
+    if (
+      (annotation.data.label! as unknown as { measurementId: string }).measurementId ===
+        data.measurementId &&
+      (data.locked === true || imageStatus)
+    ) {
       cs3dTools.annotation.locking.setAnnotationLocked(annotation.annotationUID!, true);
     }
-    })
-  }
+  });
+}
 
 export async function demonstrateMeasurementService(
   servicesManager,
@@ -192,9 +194,8 @@ export async function demonstrateMeasurementService(
 
   relatedPoints?.forEach(data => {
     if (data.forceHide || data.hide) {
-      return
-    }
-    else if (data.points.length === 1) {
+      return;
+    } else if (data.points.length === 1) {
       createPoint(viewport, imageMetadata, data, imageId);
     } else if (data.points.length === 2) {
       createLength(viewport, imageMetadata, data, imageId);
@@ -203,9 +204,9 @@ export async function demonstrateMeasurementService(
     } else if (data.points.length === 4) {
       createRectangleROI(viewport, imageMetadata, data);
     }
-    lockMeasurementIfNeeded(data, imageStatus)
+    lockMeasurementIfNeeded(data, imageStatus);
     setMeasurementStyle();
-  })
+  });
 }
 
 export function createRectangleROI(viewport, imageMetadata, data: RelatedPoint) {
@@ -250,7 +251,7 @@ export function createRectangleROI(viewport, imageMetadata, data: RelatedPoint) 
           activeHandleIndex: null,
         },
       },
-  })
+    });
   } catch (error) {
     console.error('Error adding measurement:', error);
   }

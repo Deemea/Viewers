@@ -254,8 +254,3 @@ input[type='number']::-webkit-outer-spin-button {
 input[type='number'] {
   -moz-appearance: textfield; /* For Firefox */
 }
-
-#svg-layer-default circle {
-  stroke-width: 4px !important;
-  r: 2px !important;
-}
