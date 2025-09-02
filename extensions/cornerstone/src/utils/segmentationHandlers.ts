@@ -17,15 +17,10 @@ export function setupSegmentationDataModifiedHandler({
     segmentationService.EVENTS.SEGMENTATION_DATA_MODIFIED,
     async ({ segmentationId }) => {
       const segmentation = segmentationService.getSegmentation(segmentationId);
-      const representations = segmentationService.getRepresentationsForSegmentation(segmentationId);
-
-      console.log('representations', representations);
 
       if (!segmentation) {
         return;
       }
-
-      console.log('segmentation', segmentation);
 
       const readableText = customizationService.getCustomization('panelSegmentation.readableText');
 
@@ -80,8 +75,7 @@ export function setupSegmentationDataModifiedHandler({
             const series = segDisplaySets[0].SeriesInstanceUID;
             const study = segDisplaySets[0].StudyInstanceUID;
             deletedDisplaySet = segDisplaySets[0];
-            // wadoUriRoot of the datasource
-            const deleteUrl = `http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs/studies/${study}/series/${series}/reject/113039%5EDCM`;
+            const deleteUrl = `${defaultDataSource[0].getConfig().wadoRoot}/studies/${study}/series/${series}/reject/113039%5EDCM`;
             await axios.post(deleteUrl);
             displaySetService.deleteDisplaySet(segDisplaySets[0].displaySetInstanceUID);
           }
@@ -118,14 +112,13 @@ export function setupSegmentationDataModifiedHandler({
             }
           } catch (rollbackError) {
             console.error('Rollback failed:', rollbackError);
-            // Ici, vous pourriez notifier l'utilisateur que l'état est incohérent
           }
           console.debug('Error storing segmentation:', error);
           throw error;
         }
       }
     },
-    2000
+    1200
   );
 
   return { unsubscribe };
@@ -138,7 +131,6 @@ export function setupSegmentationModifiedHandler({ segmentationService }) {
   const { unsubscribe } = segmentationService.subscribe(
     segmentationService.EVENTS.SEGMENTATION_MODIFIED,
     async ({ segmentationId }) => {
-      console.log('MODIFIEEEEEED');
 
       const segmentation = segmentationService.getSegmentation(segmentationId);
 

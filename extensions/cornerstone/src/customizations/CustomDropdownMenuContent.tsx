@@ -78,16 +78,16 @@ export const CustomDropdownMenuContent = () => {
 
   return (
     <DropdownMenuContent align="start">
-      <DropdownMenuItem onClick={() => onSegmentationAdd(segmentationId)}>
+      {/* <DropdownMenuItem onClick={() => onSegmentationAdd(segmentationId)}>
         <Icons.Add className="text-foreground" />
         <span className="pl-2">{t('Create New Segmentation')}</span>
       </DropdownMenuItem>
-      <DropdownMenuSeparator />
+      <DropdownMenuSeparator /> */}
       <DropdownMenuLabel>{t('Manage Current Segmentation')}</DropdownMenuLabel>
-      <DropdownMenuItem onClick={() => onSegmentationRemoveFromViewport(segmentationId)}>
+      {/* <DropdownMenuItem onClick={() => onSegmentationRemoveFromViewport(segmentationId)}>
         <Icons.Series className="text-foreground" />
         <span className="pl-2">{t('Remove from Viewport')}</span>
-      </DropdownMenuItem>
+      </DropdownMenuItem> */}
       <DropdownMenuItem onClick={() => onSegmentationEdit(segmentationId)}>
         <Icons.Rename className="text-foreground" />
         <span className="pl-2">{t('Rename')}</span>
@@ -95,7 +95,7 @@ export const CustomDropdownMenuContent = () => {
       <DropdownMenuSub>
         <DropdownMenuSubTrigger className="pl-1">
           <Icons.Export className="text-foreground" />
-          <span className="pl-2">{t('Download & Export')}</span>
+          <span className="pl-2">{t('Download')}</span>
         </DropdownMenuSubTrigger>
         <DropdownMenuPortal>
           <DropdownMenuSubContent>
@@ -120,7 +120,7 @@ export const CustomDropdownMenuContent = () => {
             >
               {t('DICOM SEG')}
             </DropdownMenuItem>
-            <DropdownMenuItem
+            {/* <DropdownMenuItem
               onClick={e => {
                 e.preventDefault();
                 actions.onSegmentationDownloadRTSS(segmentationId);
@@ -128,8 +128,8 @@ export const CustomDropdownMenuContent = () => {
               disabled={!allowExport}
             >
               {t('DICOM RTSS')}
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
+            </DropdownMenuItem> */}
+            {/* <DropdownMenuSeparator />
             <DropdownMenuLabel className="flex items-center pl-0">
               <Icons.Export className="h-5 w-5" />
               <span className="pl-1 pt-1">{t('Export')}</span>
@@ -142,15 +142,15 @@ export const CustomDropdownMenuContent = () => {
               disabled={!allowExport}
             >
               {t('DICOM SEG')}
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
           </DropdownMenuSubContent>
         </DropdownMenuPortal>
       </DropdownMenuSub>
       <DropdownMenuSeparator />
-      <DropdownMenuItem onClick={() => onSegmentationDelete(segmentationId)}>
+      {/* <DropdownMenuItem onClick={() => onSegmentationDelete(segmentationId)}>
         <Icons.Delete className="text-red-600" />
         <span className="pl-2 text-red-600">{t('Delete')}</span>
-      </DropdownMenuItem>
+      </DropdownMenuItem> */}
     </DropdownMenuContent>
   );
 };
