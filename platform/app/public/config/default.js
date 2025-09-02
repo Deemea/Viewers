@@ -168,9 +168,9 @@ window.config = {
       configuration: {
         friendlyName: 'santy-didier',
         name: 'santy-didier',
-        wadoUriRoot: 'https://santy.deemea.com/api/v1/didier',
-        qidoRoot: 'https://santy.deemea.com/api/v1/didier',
-        wadoRoot: 'https://santy.deemea.com/api/v1/didier',
+        wadoUriRoot: 'https://santy-qa.deemea.com/api/v1/didier',
+        qidoRoot: 'https://santy-qa.deemea.com/api/v1/didier',
+        wadoRoot: 'https://santy-qa.deemea.com/api/v1/didier',
         qidoSupportsIncludeField: true,
         supportsReject: true,
         imageRendering: 'wadors',
