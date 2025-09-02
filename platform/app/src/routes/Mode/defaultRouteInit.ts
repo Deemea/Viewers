@@ -59,14 +59,16 @@ export async function defaultRouteInit(
         !isSeriesFilterUsed(seriesMetadata.instances, filters) &&
         !issuedWarningSeries.includes(seriesInstanceUIDs[0])
       ) {
+        // Hide error message, OHIF think that the new segId is from an other study because we didn't refresh the viewer to load the updated seg
+        //
         // stores the series instance filter so it shows only once the warning
-        issuedWarningSeries.push(seriesInstanceUIDs[0]);
-        uiNotificationService.show({
-          title: 'Series filter',
-          message: `Each of the series in filter: ${seriesInstanceUIDs} are not part of the current study. The entire study is being displayed`,
-          type: 'error',
-          duration: 7000,
-        });
+        // issuedWarningSeries.push(seriesInstanceUIDs[0]);
+        // uiNotificationService.show({
+        //   title: 'Series filter',
+        //   message: `Each of the series in filter: ${seriesInstanceUIDs} are not part of the current study. The entire study is being displayed`,
+        //   type: 'error',
+        //   duration: 7000,
+        // });
       }
 
       displaySetService.makeDisplaySets(seriesMetadata.instances, { madeInClient });
