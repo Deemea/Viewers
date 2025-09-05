@@ -137,7 +137,7 @@ const commandsModule = ({
       const segmentationInOHIF = segmentationService.getSegmentation(segmentationId);
       const representations = segmentationService.getRepresentationsForSegmentation(segmentationId);
 
-      Object.entries(segmentationInOHIF.segments).forEach(([segmentIndex, segment]) => {
+      Object.entries(segmentationInOHIF?.segments).forEach(([segmentIndex, segment]) => {
         // segmentation service already has a color for each segment
         if (!segment) {
           return;
