@@ -173,10 +173,6 @@ function initVolume3DToolGroup(extensionManager, toolGroupService) {
   const tools = {
     active: [
       {
-        toolName: toolNames.TrackballRotateTool,
-        bindings: [{ mouseButton: Enums.MouseBindings.Primary }],
-      },
-      {
         toolName: toolNames.Zoom,
         bindings: [{ mouseButton: Enums.MouseBindings.Secondary }],
       },

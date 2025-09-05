@@ -202,6 +202,7 @@ export default async function init({
       segmentationService,
       customizationService,
       displaySetService,
+      uiNotificationService,
       commandsManager,
       extensionManager,
     });

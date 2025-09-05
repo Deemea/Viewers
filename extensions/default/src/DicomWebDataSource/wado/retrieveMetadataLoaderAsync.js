@@ -69,7 +69,6 @@ function makeSeriesAsyncLoader(client, studyInstanceUID, seriesInstanceUIDList) 
     },
     next() {
       const { seriesInstanceUID, metadata } = seriesInstanceUIDList.shift();
-      console.log('LAAAA', seriesInstanceUID, metadata);
 
       const promise = new DeferredPromise();
       promise.setMetadata(metadata);
@@ -146,7 +145,6 @@ export default class RetrieveMetadataLoaderAsync extends RetrieveMetadataLoader 
       promises.push(promise);
     }
 
-    console.log('MEATADATDAMEATADATDA', seriesAsyncLoader);
     return {
       preLoadData,
       promises,
