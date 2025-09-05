@@ -83,16 +83,41 @@ export const CustomDropdownMenuContent = () => {
         <span className="pl-2">{t('Create New Segmentation')}</span>
       </DropdownMenuItem>
       <DropdownMenuSeparator /> */}
-      <DropdownMenuLabel>{t('Manage Current Segmentation')}</DropdownMenuLabel>
+      {/* <DropdownMenuLabel>{t('Manage Current Segmentation')}</DropdownMenuLabel> */}
       {/* <DropdownMenuItem onClick={() => onSegmentationRemoveFromViewport(segmentationId)}>
         <Icons.Series className="text-foreground" />
         <span className="pl-2">{t('Remove from Viewport')}</span>
       </DropdownMenuItem> */}
-      <DropdownMenuItem onClick={() => onSegmentationEdit(segmentationId)}>
+      {/* <DropdownMenuItem onClick={() => onSegmentationEdit(segmentationId)}>
         <Icons.Rename className="text-foreground" />
         <span className="pl-2">{t('Rename')}</span>
+      </DropdownMenuItem> */}
+      {/* <DropdownMenuLabel className="flex items-center pl-0">
+        <Icons.Export className="h-5 w-5" />
+        <span className="pl-1 pt-1">{t('Download')}</span>
+      </DropdownMenuLabel> */}
+      <DropdownMenuLabel className="flex items-center pl-0">
+        <Icons.Download className="h-5 w-5" />
+        <span className="pl-1">{t('Download')}</span>
+      </DropdownMenuLabel>
+      <DropdownMenuItem
+        onClick={e => {
+          e.preventDefault();
+          actions.downloadCSVSegmentationReport(segmentationId);
+        }}
+      >
+        {t('CSV Report')}
       </DropdownMenuItem>
-      <DropdownMenuSub>
+      <DropdownMenuItem
+        onClick={e => {
+          e.preventDefault();
+          actions.onSegmentationDownload(segmentationId);
+        }}
+        disabled={!allowExport}
+      >
+        {t('DICOM SEG')}
+      </DropdownMenuItem>
+      {/* <DropdownMenuSub>
         <DropdownMenuSubTrigger className="pl-1">
           <Icons.Export className="text-foreground" />
           <span className="pl-2">{t('Download')}</span>
@@ -128,8 +153,8 @@ export const CustomDropdownMenuContent = () => {
               disabled={!allowExport}
             >
               {t('DICOM RTSS')}
-            </DropdownMenuItem> */}
-            {/* <DropdownMenuSeparator />
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuLabel className="flex items-center pl-0">
               <Icons.Export className="h-5 w-5" />
               <span className="pl-1 pt-1">{t('Export')}</span>
@@ -142,10 +167,10 @@ export const CustomDropdownMenuContent = () => {
               disabled={!allowExport}
             >
               {t('DICOM SEG')}
-            </DropdownMenuItem> */}
+            </DropdownMenuItem>
           </DropdownMenuSubContent>
         </DropdownMenuPortal>
-      </DropdownMenuSub>
+      </DropdownMenuSub> */}
       <DropdownMenuSeparator />
       {/* <DropdownMenuItem onClick={() => onSegmentationDelete(segmentationId)}>
         <Icons.Delete className="text-red-600" />

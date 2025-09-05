@@ -10,12 +10,13 @@ export function setupSegmentationDataModifiedHandler({
   segmentationService,
   customizationService,
   displaySetService,
+  uiNotificationService,
   commandsManager,
   extensionManager,
 }) {
   const { unsubscribe } = segmentationService.subscribeDebounced(
     segmentationService.EVENTS.SEGMENTATION_DATA_MODIFIED,
-    async ({ segmentationId }) => {
+    async ({ segmentationId, action }) => {
       const segmentation = segmentationService.getSegmentation(segmentationId);
 
       if (!segmentation) {
@@ -48,7 +49,20 @@ export function setupSegmentationDataModifiedHandler({
 
       console.log('updatedSegmentation', updatedSegmentation);
 
-      if (updatedSegmentation) {
+      if (updatedSegmentation || action === 'RENAME') {
+
+        console.log('updatedSegmentation.segments', updatedSegmentation?.segments);
+
+        if (!updatedSegmentation?.segments) {
+          console.log('GO WARNING');
+          uiNotificationService.show({
+            title: 'Segmentation not updated, make sure you have all the slices loaded by browsing them',
+            type: 'warning',
+            duration: 3000,
+          });
+
+          return;
+        }
         segmentationService.addOrUpdateSegmentation({
           segmentationId,
           segments: updatedSegmentation.segments,
@@ -99,6 +113,12 @@ export function setupSegmentationDataModifiedHandler({
             },
             '*'
           );
+
+          uiNotificationService.show({
+            title: segDisplaySets.length === 1 ? 'Segmentation updated' : 'Segmentation created',
+            type: 'success',
+            duration: 3000,
+          });
 
           return naturalizedReport;
         } catch (error) {
