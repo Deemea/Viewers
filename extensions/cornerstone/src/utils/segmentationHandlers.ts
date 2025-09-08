@@ -18,8 +18,6 @@ export function setupSegmentationDataModifiedHandler({
         return;
       }
 
-      console.log('segmentation', segmentation);
-
       const readableText = customizationService.getCustomization('panelSegmentation.readableText');
 
       // Check for segments with bidirectional measurements and update them

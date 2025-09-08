@@ -267,7 +267,6 @@ function commandsModule({
     },
     updateStoredSegmentationPresentation: ({ displaySet, type }) => {
       const { addSegmentationPresentationItem } = useSegmentationPresentationStore.getState();
-      console.log('6');
       const referencedDisplaySetInstanceUID = displaySet.referencedDisplaySetInstanceUID;
       addSegmentationPresentationItem(referencedDisplaySetInstanceUID, {
         segmentationId: displaySet.displaySetInstanceUID,
@@ -1272,7 +1271,6 @@ function commandsModule({
      * @param props.segmentationId - The ID of the segmentation to set as active
      */
     setActiveSegmentation: ({ segmentationId }) => {
-      console.log('2');
       const { viewportGridService, segmentationService } = servicesManager.services;
       segmentationService.setActiveSegmentation(
         viewportGridService.getActiveViewportId(),
@@ -1285,8 +1283,6 @@ function commandsModule({
      * @param props.segmentationId - The ID of the segmentation to add the segment to
      */
     addSegmentCommand: ({ segmentationId }) => {
-      console.log('1');
-
       const { segmentationService } = servicesManager.services;
       segmentationService.addSegment(segmentationId);
     },
@@ -1297,7 +1293,6 @@ function commandsModule({
      * @param props.segmentIndex - The index of the segment to activate
      */
     setActiveSegmentAndCenterCommand: ({ segmentationId, segmentIndex }) => {
-      console.log('3');
       const { segmentationService, viewportGridService } = servicesManager.services;
       // set both active segmentation and active segment
       segmentationService.setActiveSegmentation(
@@ -1315,7 +1310,6 @@ function commandsModule({
      * @param props.type - The type of visibility to toggle
      */
     toggleSegmentVisibilityCommand: ({ segmentationId, segmentIndex, type }) => {
-      console.log('4');
       const { segmentationService, viewportGridService } = servicesManager.services;
       segmentationService.toggleSegmentVisibility(
         viewportGridService.getActiveViewportId(),
@@ -1701,18 +1695,13 @@ function commandsModule({
       }
     },
     setBrushSize: ({ value, toolNames }) => {
-      console.log('BRUSH SIZE', value);
-
       const brushSize = Number(value);
 
       toolGroupService.getToolGroupIds()?.forEach(toolGroupId => {
         if (toolNames?.length === 0) {
-          console.log('ici', brushSize);
-
           segmentationUtils.setBrushSizeForToolGroup(toolGroupId, brushSize);
         } else {
           toolNames?.forEach(toolName => {
-            console.log('ici', toolName, brushSize);
             segmentationUtils.setBrushSizeForToolGroup(toolGroupId, brushSize, toolName);
           });
         }
@@ -1731,8 +1720,6 @@ function commandsModule({
       if (!toolGroupIds?.length) {
         return;
       }
-
-      console.log('toooool', toolGroupIds);
 
       for (const toolGroupId of toolGroupIds) {
         const toolGroup = toolGroupService.getToolGroup(toolGroupId);
@@ -1771,7 +1758,6 @@ function commandsModule({
       const { segmentationService } = servicesManager.services;
       const { activeViewportId } = viewportGridService.getState();
       const activeSegmentation = segmentationService.getActiveSegmentation(activeViewportId);
-      console.log('ADDD', activeSegmentation);
 
       segmentationService.addSegment(activeSegmentation.segmentationId);
     },

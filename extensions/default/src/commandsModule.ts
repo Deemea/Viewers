@@ -290,8 +290,6 @@ const commandsModule = ({
     },
 
     toggleHangingProtocol: ({ protocolId, stageIndex }: HangingProtocolParams): boolean => {
-      console.log('TOOOOGLE');
-
       const {
         protocol,
         stageIndex: desiredStageIndex,
