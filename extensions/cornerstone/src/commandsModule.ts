@@ -437,7 +437,6 @@ function commandsModule({
     },
     updateStoredSegmentationPresentation: ({ displaySet, type }) => {
       const { addSegmentationPresentationItem } = useSegmentationPresentationStore.getState();
-
       const referencedDisplaySetInstanceUID = displaySet.referencedDisplaySetInstanceUID;
       addSegmentationPresentationItem(referencedDisplaySetInstanceUID, {
         segmentationId: displaySet.displaySetInstanceUID,
