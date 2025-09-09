@@ -20,6 +20,9 @@ window.config = {
   groupEnabledModesFirst: true,
   allowMultiSelectExport: false,
   dicomUploadEnabled: true,
+  investigationalUseDialog: {
+    option: 'never',
+  },
   maxNumRequests: {
     interaction: 150,
     thumbnail: 100,
@@ -148,9 +151,12 @@ window.config = {
       configuration: {
         friendlyName: 'sandbox-didier',
         name: 'sandbox-didier',
-        wadoUriRoot: 'https://sandbox.deemea.com/api/v1/didier',
-        qidoRoot: 'https://sandbox.deemea.com/api/v1/didier',
-        wadoRoot: 'https://sandbox.deemea.com/api/v1/didier',
+        // wadoUriRoot: 'https://sandbox.deemea.com/api/v1/didier',
+        // qidoRoot: 'https://sandbox.deemea.com/api/v1/didier',
+        // wadoRoot: 'https://sandbox.deemea.com/api/v1/didier',
+        wadoUriRoot: 'http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs',
+        qidoRoot: 'http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs',
+        wadoRoot: 'http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs',
         qidoSupportsIncludeField: false,
         imageRendering: 'wadors',
         thumbnailRendering: 'wadors',
