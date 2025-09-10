@@ -1,17 +1,22 @@
 import * as cornerstoneTools from '@cornerstonejs/tools';
 import { updateSegmentationStats } from './updateSegmentationStats';
-
+import { DicomMetadataStore } from '@ohif/core';
+import { OHIFMessageType } from 'deemea-extension/src/utils/enums';
+import axios from 'axios';
 /**
  * Sets up the handler for segmentation data modification events
  */
 export function setupSegmentationDataModifiedHandler({
   segmentationService,
   customizationService,
+  displaySetService,
+  uiNotificationService,
   commandsManager,
+  extensionManager,
 }) {
   const { unsubscribe } = segmentationService.subscribeDebounced(
     segmentationService.EVENTS.SEGMENTATION_DATA_MODIFIED,
-    async ({ segmentationId }) => {
+    async ({ segmentationId, action }) => {
       const segmentation = segmentationService.getSegmentation(segmentationId);
 
       if (!segmentation) {
@@ -42,14 +47,92 @@ export function setupSegmentationDataModifiedHandler({
         readableText,
       });
 
-      if (updatedSegmentation) {
+      if (updatedSegmentation || action === 'RENAME') {
+        if (!updatedSegmentation?.segments) {
+          uiNotificationService.show({
+            title:
+              'Segmentation not updated, make sure you have all the slices loaded by browsing them',
+            type: 'warning',
+            duration: 8000,
+          });
+
+          return;
+        }
         segmentationService.addOrUpdateSegmentation({
           segmentationId,
           segments: updatedSegmentation.segments,
         });
+
+        // Rollback to handle if user refresh just after the deletion
+        let deletedDisplaySet = null;
+
+        // SAVE AUTO SEGMENTATION
+        try {
+          const displaySets = displaySetService.getActiveDisplaySets();
+          const segDisplaySets = displaySets.filter(ds => ds.Modality === 'SEG');
+
+          const defaultDataSource = extensionManager.getActiveDataSource();
+          const generatedData = await commandsManager.run('generateSegmentation', {
+            segmentationId,
+          });
+
+          if (!generatedData || !generatedData.dataset) {
+            throw new Error('Error during segmentation generation');
+          }
+
+          if (segDisplaySets.length === 1) {
+            const series = segDisplaySets[0].SeriesInstanceUID;
+            const study = segDisplaySets[0].StudyInstanceUID;
+            deletedDisplaySet = segDisplaySets[0];
+            const deleteUrl = `${defaultDataSource[0].getConfig().wadoRoot}/studies/${study}/series/${series}/reject/113039%5EDCM`;
+            await axios.post(deleteUrl);
+            displaySetService.deleteDisplaySet(segDisplaySets[0].displaySetInstanceUID);
+          }
+
+          const { dataset: naturalizedReport } = generatedData;
+
+          naturalizedReport.SeriesDescription = 'Deemea custom segmentation';
+
+          await defaultDataSource[0].store.dicom(naturalizedReport);
+          naturalizedReport.wadoRoot = defaultDataSource[0].getConfig().wadoRoot;
+          DicomMetadataStore.addInstances([naturalizedReport], true);
+          deletedDisplaySet = null;
+
+          window.parent.postMessage(
+            {
+              type: OHIFMessageType.SAVE_SEGMENTATION,
+              message: {
+                seriesInstanceUID: naturalizedReport.SeriesInstanceUID,
+              },
+            },
+            '*'
+          );
+
+          uiNotificationService.show({
+            title: segDisplaySets.length === 1 ? 'Segmentation updated' : 'Segmentation created',
+            type: 'success',
+            duration: 4000,
+          });
+
+          return naturalizedReport;
+        } catch (error) {
+          try {
+            if (deletedDisplaySet) {
+              const defaultDataSource = extensionManager.getActiveDataSource();
+              displaySetService.addDisplaySet(deletedDisplaySet);
+              await defaultDataSource[0].store.dicom(deletedDisplaySet);
+              // add the information for where we stored it to the instance as well
+              DicomMetadataStore.addInstances([deletedDisplaySet], true);
+            }
+          } catch (rollbackError) {
+            console.error('Rollback failed:', rollbackError);
+          }
+          console.debug('Error storing segmentation:', error);
+          throw error;
+        }
       }
     },
-    1000
+    500
   );
 
   return { unsubscribe };
