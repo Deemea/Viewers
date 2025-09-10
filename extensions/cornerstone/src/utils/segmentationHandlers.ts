@@ -50,8 +50,7 @@ export function setupSegmentationDataModifiedHandler({
       if (updatedSegmentation || action === 'RENAME') {
         if (!updatedSegmentation?.segments) {
           uiNotificationService.show({
-            title:
-              'Segmentation not updated, make sure you have all the slices loaded by browsing them',
+            title: 'Browse all the slices to update the segmentation name',
             type: 'warning',
             duration: 8000,
           });
