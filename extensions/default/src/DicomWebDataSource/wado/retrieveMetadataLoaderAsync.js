@@ -69,7 +69,6 @@ function makeSeriesAsyncLoader(client, studyInstanceUID, seriesInstanceUIDList) 
     },
     next() {
       const { seriesInstanceUID, metadata } = seriesInstanceUIDList.shift();
-
       const promise = new DeferredPromise();
       promise.setMetadata(metadata);
       promise.setProcessFunction(() => {

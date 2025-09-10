@@ -17,7 +17,6 @@ function hydrateStructuredReport(
 
     const StudyInstanceUID = hydrationResult.StudyInstanceUID;
     const SeriesInstanceUIDs = hydrationResult.SeriesInstanceUIDs;
-    console.log('zdad', SeriesInstanceUIDs);
 
     resolve({
       displaySetInstanceUID: evt.displaySetInstanceUID,
