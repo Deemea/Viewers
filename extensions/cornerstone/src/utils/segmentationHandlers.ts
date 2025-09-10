@@ -47,18 +47,13 @@ export function setupSegmentationDataModifiedHandler({
         readableText,
       });
 
-      console.log('updatedSegmentation', updatedSegmentation);
-
       if (updatedSegmentation || action === 'RENAME') {
-
-        console.log('updatedSegmentation.segments', updatedSegmentation?.segments);
-
         if (!updatedSegmentation?.segments) {
-          console.log('GO WARNING');
           uiNotificationService.show({
-            title: 'Segmentation not updated, make sure you have all the slices loaded by browsing them',
+            title:
+              'Segmentation not updated, make sure you have all the slices loaded by browsing them',
             type: 'warning',
-            duration: 3000,
+            duration: 8000,
           });
 
           return;
@@ -99,7 +94,6 @@ export function setupSegmentationDataModifiedHandler({
           naturalizedReport.SeriesDescription = 'Deemea custom segmentation';
 
           await defaultDataSource[0].store.dicom(naturalizedReport);
-          // add the information for where we stored it to the instance as well
           naturalizedReport.wadoRoot = defaultDataSource[0].getConfig().wadoRoot;
           DicomMetadataStore.addInstances([naturalizedReport], true);
           deletedDisplaySet = null;
@@ -117,7 +111,7 @@ export function setupSegmentationDataModifiedHandler({
           uiNotificationService.show({
             title: segDisplaySets.length === 1 ? 'Segmentation updated' : 'Segmentation created',
             type: 'success',
-            duration: 3000,
+            duration: 4000,
           });
 
           return naturalizedReport;
@@ -138,7 +132,7 @@ export function setupSegmentationDataModifiedHandler({
         }
       }
     },
-    1200
+    500
   );
 
   return { unsubscribe };
@@ -151,7 +145,6 @@ export function setupSegmentationModifiedHandler({ segmentationService }) {
   const { unsubscribe } = segmentationService.subscribe(
     segmentationService.EVENTS.SEGMENTATION_MODIFIED,
     async ({ segmentationId }) => {
-
       const segmentation = segmentationService.getSegmentation(segmentationId);
 
       if (!segmentation) {

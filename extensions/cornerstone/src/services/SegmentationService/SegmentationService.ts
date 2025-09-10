@@ -699,22 +699,6 @@ class SegmentationService extends PubSubService {
     const existingSegmentation = cstSegmentation.state.getSegmentation(segmentationId);
     if (existingSegmentation) {
       // Update the existing segmentation
-      console.log('existingSegmentation', existingSegmentation);
-      console.log('allSegm', this.getSegmentations());
-
-      const viewportIds = this.getViewportIdsWithSegmentation(segmentationId);
-      // const volume = this.getLabelmapVolume(segmentationId);
-      // console.log('VOLUUUUME', volume);
-
-      viewportIds.forEach(viewportId => {
-        console.log(
-          'SEEEEEG',
-          this.getSegmentationRepresentations(viewportId, {
-            segmentationId,
-          })
-        );
-      });
-
       this.updateSegmentationInSource(segmentationId, data as Partial<cstTypes.Segmentation>);
     } else {
       // Add a new segmentation
@@ -1243,8 +1227,6 @@ class SegmentationService extends PubSubService {
       const segmentationRepresentation = this.getSegmentationRepresentations(viewportId, {
         segmentationId,
       });
-
-      console.log('segmentationRepresentation', segmentationRepresentation);
 
       const representation = segmentationRepresentation[0];
       const { type } = representation;
@@ -1823,7 +1805,6 @@ class SegmentationService extends PubSubService {
     const { segments } = segmentation;
 
     segments[segmentIndex].label = segmentLabel;
-    console.log('ICI CALL DATA MODIFIED ?');
     this._broadcastEvent(this.EVENTS.SEGMENTATION_DATA_MODIFIED, {
       segmentationId,
       action: 'RENAME',

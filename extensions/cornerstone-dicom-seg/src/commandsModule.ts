@@ -53,8 +53,6 @@ const commandsModule = ({
      *
      */
     loadSegmentationsForViewport: async ({ segmentations, viewportId }) => {
-      console.log('LOAD SEGMENTATIONS FOR VIEWPORT');
-
       // Todo: handle adding more than one segmentation
       const viewport = getTargetViewport({ viewportId, viewportGridService });
       const displaySetInstanceUID = viewport.displaySetInstanceUIDs[0];
@@ -137,7 +135,7 @@ const commandsModule = ({
       const segmentationInOHIF = segmentationService.getSegmentation(segmentationId);
       const representations = segmentationService.getRepresentationsForSegmentation(segmentationId);
 
-      Object.entries(segmentationInOHIF?.segments).forEach(([segmentIndex, segment]) => {
+      Object.entries(segmentationInOHIF.segments).forEach(([segmentIndex, segment]) => {
         // segmentation service already has a color for each segment
         if (!segment) {
           return;
@@ -218,9 +216,6 @@ const commandsModule = ({
     storeSegmentation: async ({ segmentationId, dataSource }) => {
       const segmentation = segmentationService.getSegmentation(segmentationId);
 
-      const currentSegmentation = segmentationService.getSegmentations();
-      console.log('CORNERSTONE DICOM SEG', currentSegmentation, segmentationId);
-
       if (!segmentation) {
         throw new Error('No segmentation found');
       }
@@ -255,16 +250,7 @@ const commandsModule = ({
             throw new Error('Error during segmentation generation');
           }
 
-          console.log('GENERATED DATA', generatedData);
-
           const { dataset: naturalizedReport } = generatedData;
-          console.log('CREATED', naturalizedReport);
-
-          console.log('selectedDataSourceConfig', selectedDataSourceConfig[0]);
-          console.log(
-            'selectedDataSourceConfiggetConfig()',
-            await selectedDataSourceConfig[0].getConfig()
-          );
 
           await selectedDataSourceConfig[0].store.dicom(naturalizedReport);
 
