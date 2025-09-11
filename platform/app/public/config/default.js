@@ -25,16 +25,14 @@ window.config = {
   },
   disableConfirmationPrompts: true,
   maxNumRequests: {
-    interaction: 150,
-    thumbnail: 100,
-    // Prefetch number is dependent on the http protocol. For http 2 or
-    // above, the number of requests can be go a lot higher.
-    prefetch: 50,
+    interaction: 100,
+    thumbnail: 2,
+    prefetch: 300,
   },
   studyPrefetcher: {
     enabled: true,
     displaySetsCount: 2,
-    maxNumPrefetchRequests: 2,
+    maxNumPrefetchRequests: 10,
     order: 'closest',
   },
   defaultDataSourceName: 'dicomweb',
@@ -152,9 +150,13 @@ window.config = {
       configuration: {
         friendlyName: 'sandbox-didier',
         name: 'sandbox-didier',
-        wadoUriRoot: 'https://sandbox.deemea.com/didier',
-        qidoRoot: 'https://sandbox.deemea.com/didier',
-        wadoRoot: 'https://sandbox.deemea.com/didier',
+        // wadoUriRoot: 'https://sandbox.deemea.com/didier',
+        // qidoRoot: 'https://sandbox.deemea.com/didier',
+        // wadoRoot: 'https://sandbox.deemea.com/didier',
+        wadoUriRoot: 'http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs',
+        qidoRoot: 'http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs',
+        wadoRoot: 'http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs',
+        // uploadSegFile: 'http://localhost:5020/v1/didier',
         qidoSupportsIncludeField: false,
         imageRendering: 'wadors',
         thumbnailRendering: 'wadors',
