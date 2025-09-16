@@ -23,6 +23,7 @@ window.config = {
   investigationalUseDialog: {
     option: 'never',
   },
+  disableConfirmationPrompts: true,
   maxNumRequests: {
     interaction: 150,
     thumbnail: 100,
@@ -31,9 +32,9 @@ window.config = {
     prefetch: 50,
   },
   studyPrefetcher: {
-    enabled: false,
-    displaySetsCount: 1,
-    maxNumPrefetchRequests: 1,
+    enabled: true,
+    displaySetsCount: 2,
+    maxNumPrefetchRequests: 2,
     order: 'closest',
   },
   defaultDataSourceName: 'dicomweb',
@@ -151,9 +152,9 @@ window.config = {
       configuration: {
         friendlyName: 'sandbox-didier',
         name: 'sandbox-didier',
-        wadoUriRoot: 'https://sandbox.deemea.com/api/v1/didier',
-        qidoRoot: 'https://sandbox.deemea.com/api/v1/didier',
-        wadoRoot: 'https://sandbox.deemea.com/api/v1/didier',
+        wadoUriRoot: 'https://sandbox.deemea.com/didier',
+        qidoRoot: 'https://sandbox.deemea.com/didier',
+        wadoRoot: 'https://sandbox.deemea.com/didier',
         qidoSupportsIncludeField: false,
         imageRendering: 'wadors',
         thumbnailRendering: 'wadors',
