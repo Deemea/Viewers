@@ -1771,7 +1771,7 @@ class SegmentationService extends PubSubService {
 
     if (!center) {
       return {
-        world: cachedStats.namedStats.center.value,
+        world: cachedStats?.namedStats?.center?.value,
       };
     }
 
