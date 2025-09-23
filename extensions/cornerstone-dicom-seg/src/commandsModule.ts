@@ -259,18 +259,6 @@ const commandsModule = ({
 
           DicomMetadataStore.addInstances([naturalizedReport], true);
 
-          window.parent.postMessage(
-            {
-              type: OHIFMessageType.SAVE_SEGMENTATION,
-              message: {
-                studyInstanceUID: naturalizedReport.StudyInstanceUID,
-                SOPInstanceUID: naturalizedReport.SOPInstanceUID,
-                seriesInstanceUID: naturalizedReport.SeriesInstanceUID,
-              },
-            },
-            '*'
-          );
-
           return naturalizedReport;
         } catch (error) {
           console.debug('Error storing segmentation:', error);
