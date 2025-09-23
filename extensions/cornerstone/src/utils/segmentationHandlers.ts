@@ -17,6 +17,12 @@ export function setupSegmentationDataModifiedHandler({
   const { unsubscribe } = segmentationService.subscribeDebounced(
     segmentationService.EVENTS.SEGMENTATION_DATA_MODIFIED,
     async ({ segmentationId, action }) => {
+      const waitingMessage = uiNotificationService.show({
+        title: 'Updating the segmentations...',
+        type: 'loading',
+        duration: 8000,
+      });
+
       const segmentation = segmentationService.getSegmentation(segmentationId);
 
       if (!segmentation) {
@@ -62,9 +68,6 @@ export function setupSegmentationDataModifiedHandler({
           segments: updatedSegmentation.segments,
         });
 
-        // Rollback to handle if user refresh just after the deletion
-        let deletedDisplaySet = null;
-
         // SAVE AUTO SEGMENTATION
         try {
           const displaySets = displaySetService.getActiveDisplaySets();
@@ -79,23 +82,12 @@ export function setupSegmentationDataModifiedHandler({
             throw new Error('Error during segmentation generation');
           }
 
-          if (segDisplaySets.length === 1) {
-            const series = segDisplaySets[0].SeriesInstanceUID;
-            const study = segDisplaySets[0].StudyInstanceUID;
-            deletedDisplaySet = segDisplaySets[0];
-            const deleteUrl = `${defaultDataSource[0].getConfig().wadoRoot}/studies/${study}/series/${series}/reject/113039%5EDCM`;
-            await axios.post(deleteUrl);
-            displaySetService.deleteDisplaySet(segDisplaySets[0].displaySetInstanceUID);
-          }
-
           const { dataset: naturalizedReport } = generatedData;
-
           naturalizedReport.SeriesDescription = 'Deemea custom segmentation';
 
           await defaultDataSource[0].store.dicom(naturalizedReport);
           naturalizedReport.wadoRoot = defaultDataSource[0].getConfig().wadoRoot;
           DicomMetadataStore.addInstances([naturalizedReport], true);
-          deletedDisplaySet = null;
 
           window.parent.postMessage(
             {
@@ -107,6 +99,15 @@ export function setupSegmentationDataModifiedHandler({
             '*'
           );
 
+          if (segDisplaySets.length === 1) {
+            const series = segDisplaySets[0].SeriesInstanceUID;
+            const study = segDisplaySets[0].StudyInstanceUID;
+            const deleteUrl = `${defaultDataSource[0].getConfig().wadoRoot}/studies/${study}/series/${series}/reject/113039%5EDCM`;
+            await axios.post(deleteUrl);
+            displaySetService.deleteDisplaySet(segDisplaySets[0].displaySetInstanceUID);
+          }
+
+          uiNotificationService.hide(waitingMessage);
           uiNotificationService.show({
             title: segDisplaySets.length === 1 ? 'Segmentation updated' : 'Segmentation created',
             type: 'success',
@@ -115,17 +116,6 @@ export function setupSegmentationDataModifiedHandler({
 
           return naturalizedReport;
         } catch (error) {
-          try {
-            if (deletedDisplaySet) {
-              const defaultDataSource = extensionManager.getActiveDataSource();
-              displaySetService.addDisplaySet(deletedDisplaySet);
-              await defaultDataSource[0].store.dicom(deletedDisplaySet);
-              // add the information for where we stored it to the instance as well
-              DicomMetadataStore.addInstances([deletedDisplaySet], true);
-            }
-          } catch (rollbackError) {
-            console.error('Rollback failed:', rollbackError);
-          }
           console.debug('Error storing segmentation:', error);
           throw error;
         }
