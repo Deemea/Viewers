@@ -153,14 +153,6 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
             '*'
           );
         }
-        if (event.data.type === OHIFMessageType.LOAD_SEGMENTATION) {
-          const viewportId = ViewportGridService.getActiveViewportId();
-          commandsManager.run({
-            commandName: 'loadSegmentationsForViewport',
-            commandOptions: { viewportId },
-            context: 'CORNERSTONE',
-          });
-        }
       });
     },
     linkMeasurement: info => {

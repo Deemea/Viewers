@@ -11,5 +11,4 @@ export enum OHIFMessageType {
   IMAGE_STATUS = 'image_status',
   UPDATE_TOOLBAR = 'update_toolbar',
   SAVE_SEGMENTATION = 'save_segmentation',
-  LOAD_SEGMENTATION = 'load_segmentation',
 }
