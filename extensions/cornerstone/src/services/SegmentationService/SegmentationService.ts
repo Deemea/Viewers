@@ -1190,7 +1190,9 @@ class SegmentationService extends PubSubService {
 
     viewportIds.forEach(viewportId => {
       const { viewport } = getEnabledElementByViewportId(viewportId);
-      viewport.jumpToWorld(world);
+      if (world) {
+        viewport.jumpToWorld(world);
+      }
 
       highlightSegment &&
         this.highlightSegment(
