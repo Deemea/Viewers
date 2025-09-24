@@ -150,9 +150,9 @@ window.config = {
       configuration: {
         friendlyName: 'sandbox-didier',
         name: 'sandbox-didier',
-        wadoUriRoot: 'https://sandbox.deemea.com/didier',
-        qidoRoot: 'https://sandbox.deemea.com/didier',
-        wadoRoot: 'https://sandbox.deemea.com/didier',
+        wadoUriRoot: 'https://sandbox.deemea.com/api/v1/didier',
+        qidoRoot: 'https://sandbox.deemea.com/api/v1/didier',
+        wadoRoot: 'https://sandbox.deemea.com/api/v1/didier',
         qidoSupportsIncludeField: false,
         imageRendering: 'wadors',
         thumbnailRendering: 'wadors',
