@@ -102,13 +102,9 @@ function createTools(utilityModule) {
       { toolName: toolNames.CircleScissors },
       { toolName: toolNames.RectangleScissors },
       { toolName: toolNames.SphereScissors },
-      { toolName: toolNames.StackScroll },
-      { toolName: toolNames.Magnify },
       { toolName: toolNames.WindowLevelRegion },
-
-      { toolName: toolNames.UltrasoundDirectional },
     ],
-    disabled: [{ toolName: toolNames.ReferenceLines }, { toolName: toolNames.AdvancedMagnify }],
+    disabled: [],
   };
 }
 
