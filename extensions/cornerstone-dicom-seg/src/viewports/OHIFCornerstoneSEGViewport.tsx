@@ -5,6 +5,8 @@ import promptHydrateSEG from '../utils/promptHydrateSEG';
 import { usePositionPresentationStore, OHIFCornerstoneViewport } from '@ohif/extension-cornerstone';
 import { SegmentationRepresentations } from '@cornerstonejs/tools/enums';
 import { useSystem } from '@ohif/core/src/contextProviders/SystemProvider';
+import { utils } from '@ohif/extension-cornerstone';
+import { OHIFMessageType } from 'deemea-extension/src/utils/enums';
 
 const SEG_TOOLGROUP_BASE_NAME = 'SEGToolGroup';
 
@@ -148,6 +150,12 @@ function OHIFCornerstoneSEGViewport(props: withAppTypes) {
             },
           });
         }
+        window.parent.postMessage(
+          {
+            type: OHIFMessageType.SEGMENTATION_READY,
+          },
+          '*'
+        );
       }
     );
 
@@ -237,7 +245,7 @@ function OHIFCornerstoneSEGViewport(props: withAppTypes) {
   if (
     !referencedDisplaySetRef.current ||
     referencedDisplaySet.displaySetInstanceUID !==
-      referencedDisplaySetRef.current.displaySet.displaySetInstanceUID
+    referencedDisplaySetRef.current.displaySet.displaySetInstanceUID
   ) {
     return null;
   }

@@ -23,17 +23,16 @@ window.config = {
   investigationalUseDialog: {
     option: 'never',
   },
+  disableConfirmationPrompts: true,
   maxNumRequests: {
-    interaction: 150,
-    thumbnail: 100,
-    // Prefetch number is dependent on the http protocol. For http 2 or
-    // above, the number of requests can be go a lot higher.
-    prefetch: 50,
+    interaction: 100,
+    thumbnail: 2,
+    prefetch: 300,
   },
   studyPrefetcher: {
-    enabled: false,
-    displaySetsCount: 1,
-    maxNumPrefetchRequests: 1,
+    enabled: true,
+    displaySetsCount: 2,
+    maxNumPrefetchRequests: 10,
     order: 'closest',
   },
   showErrorDetails: 'always', // 'always', 'dev', 'production'

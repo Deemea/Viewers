@@ -102,13 +102,9 @@ function createTools(utilityModule) {
       { toolName: toolNames.CircleScissors },
       { toolName: toolNames.RectangleScissors },
       { toolName: toolNames.SphereScissors },
-      { toolName: toolNames.StackScroll },
-      { toolName: toolNames.Magnify },
       { toolName: toolNames.WindowLevelRegion },
-
-      { toolName: toolNames.UltrasoundDirectional },
     ],
-    disabled: [{ toolName: toolNames.ReferenceLines }, { toolName: toolNames.AdvancedMagnify }],
+    disabled: [],
   };
 }
 
@@ -172,10 +168,6 @@ function initVolume3DToolGroup(extensionManager, toolGroupService) {
 
   const tools = {
     active: [
-      {
-        toolName: toolNames.TrackballRotateTool,
-        bindings: [{ mouseButton: Enums.MouseBindings.Primary }],
-      },
       {
         toolName: toolNames.Zoom,
         bindings: [{ mouseButton: Enums.MouseBindings.Secondary }],

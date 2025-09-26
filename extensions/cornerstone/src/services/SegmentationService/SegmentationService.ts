@@ -1189,7 +1189,9 @@ class SegmentationService extends PubSubService {
 
     viewportIds.forEach(viewportId => {
       const { viewport } = getEnabledElementByViewportId(viewportId);
-      viewport.jumpToWorld(world);
+      if (world) {
+        viewport.jumpToWorld(world);
+      }
 
       highlightSegment &&
         this.highlightSegment(
@@ -1509,7 +1511,7 @@ class SegmentationService extends PubSubService {
       throw new Error(`Segmentation with ID ${segmentationId} not found.`);
     }
 
-    const segmentIds = Object.keys(segmentation.segments);
+    const segmentIds = Object.keys(segmentation?.segments);
 
     for (const segmentId of segmentIds) {
       const segmentIndex = parseInt(segmentId, 10);
@@ -1773,7 +1775,7 @@ class SegmentationService extends PubSubService {
 
     if (cachedStats?.namedStats?.center) {
       return {
-        world: cachedStats.namedStats.center.value,
+        world: cachedStats?.namedStats?.center?.value,
       };
     }
   }
@@ -1805,6 +1807,10 @@ class SegmentationService extends PubSubService {
     const { segments } = segmentation;
 
     segments[segmentIndex].label = segmentLabel;
+    this._broadcastEvent(this.EVENTS.SEGMENTATION_DATA_MODIFIED, {
+      segmentationId,
+      action: 'RENAME',
+    });
 
     cstSegmentation.updateSegmentations([
       {

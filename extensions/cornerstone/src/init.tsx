@@ -40,6 +40,7 @@ import { usePositionPresentationStore } from './stores/usePositionPresentationSt
 import { useSegmentationPresentationStore } from './stores/useSegmentationPresentationStore';
 import { imageRetrieveMetadataProvider } from '@cornerstonejs/core/utilities';
 import { initializeWebWorkerProgressHandler } from './utils/initWebWorkerProgressHandler';
+import { setupSegmentationDataModifiedHandler, setupSegmentationModifiedHandler } from './utils/segmentationHandlers';
 
 const { registerColormap } = csUtilities.colormap;
 
@@ -92,6 +93,7 @@ export default async function init({
     hangingProtocolService,
     viewportGridService,
     segmentationService,
+    displaySetService,
     measurementService,
     colorbarService,
     displaySetService,
@@ -189,10 +191,31 @@ export default async function init({
   initCineService(servicesManager);
   initStudyPrefetcherService(servicesManager);
 
-  measurementService.subscribe(measurementService.EVENTS.JUMP_TO_MEASUREMENT, evt => {
-    const { measurement } = evt;
-    const { uid: annotationUID } = measurement;
-    commandsManager.runCommand('jumpToMeasurementViewport', { measurement, annotationUID, evt });
+  [
+    measurementService.EVENTS.JUMP_TO_MEASUREMENT_LAYOUT,
+    measurementService.EVENTS.JUMP_TO_MEASUREMENT,
+    measurementService.EVENTS.JUMP_TO_MEASUREMENT_VIEWPORT,
+  ].forEach(event => {
+    measurementService.subscribe(event, evt => {
+      const { measurement } = evt;
+      const { uid: annotationUID } = measurement;
+      cornerstoneTools.annotation.selection.setAnnotationSelected(annotationUID, true);
+    });
+  });
+
+  // Setup segmentation event handlers
+  const { unsubscribe: unsubscribeSegmentationDataModifiedHandler } =
+    setupSegmentationDataModifiedHandler({
+      segmentationService,
+      customizationService,
+      displaySetService,
+      uiNotificationService,
+      commandsManager,
+      extensionManager,
+    });
+
+  const { unsubscribe: unsubscribeSegmentationModifiedHandler } = setupSegmentationModifiedHandler({
+    segmentationService,
   });
 
   // When a custom image load is performed, update the relevant viewports

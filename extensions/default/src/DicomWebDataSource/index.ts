@@ -369,6 +369,7 @@ function createDicomWebApi(dicomWebConfig: DicomWebConfig, servicesManager) {
             datasets: [dataset],
             request,
           };
+
           await wadoDicomWebClient.storeInstances(options);
         } else {
           let effectiveDicomDict = dicomDict;
@@ -396,7 +397,6 @@ function createDicomWebApi(dicomWebConfig: DicomWebConfig, servicesManager) {
             datasets: [part10Buffer],
             request,
           };
-
           await wadoDicomWebClient.storeInstances(options);
         }
       },

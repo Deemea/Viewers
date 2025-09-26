@@ -180,7 +180,7 @@ export default function PanelSegmentation({ children }: withAppTypes) {
               <CustomDropdownMenuContent />
             </SegmentationTable.Collapsed.DropdownMenu>
             <SegmentationTable.Collapsed.Selector />
-            <SegmentationTable.Collapsed.Info />
+            {/* <SegmentationTable.Collapsed.Info /> */}
           </SegmentationTable.Collapsed.Header>
           <SegmentationTable.Collapsed.Content>
             <SegmentationTable.AddSegmentRow />
@@ -198,7 +198,7 @@ export default function PanelSegmentation({ children }: withAppTypes) {
               <CustomDropdownMenuContent />
             </SegmentationTable.Expanded.DropdownMenu>
             <SegmentationTable.Expanded.Label />
-            <SegmentationTable.Expanded.Info />
+            {/* <SegmentationTable.Expanded.Info /> */}
           </SegmentationTable.Expanded.Header>
 
           <SegmentationTable.Expanded.Content>

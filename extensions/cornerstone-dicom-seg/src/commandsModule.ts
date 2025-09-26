@@ -5,6 +5,7 @@ import { segmentation as cornerstoneToolsSegmentation } from '@cornerstonejs/too
 import { adaptersRT, helpers, adaptersSEG } from '@cornerstonejs/adapters';
 import { createReportDialogPrompt } from '@ohif/extension-default';
 import { DicomMetadataStore } from '@ohif/core';
+import { OHIFMessageType } from '../../../deemea-extension/src/utils/enums';
 
 import PROMPT_RESPONSES from '../../default/src/utils/_shared/PROMPT_RESPONSES';
 
@@ -256,10 +257,10 @@ const commandsModule = ({
             naturalizedReport.StudyID = '';
           }
 
-          await selectedDataSourceConfig.store.dicom(naturalizedReport);
+          await selectedDataSourceConfig[0].store.dicom(naturalizedReport);
 
           // add the information for where we stored it to the instance as well
-          naturalizedReport.wadoRoot = selectedDataSourceConfig.getConfig().wadoRoot;
+          naturalizedReport.wadoRoot = selectedDataSourceConfig[0].getConfig().wadoRoot;
 
           DicomMetadataStore.addInstances([naturalizedReport], true);
 
