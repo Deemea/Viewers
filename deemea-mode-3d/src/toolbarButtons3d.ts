@@ -18,15 +18,6 @@ const callbacks = (toolName: string) => [
 ];
 
 const toolbarButtons: Button[] = [
-  // sections
-  {
-    id: 'MoreTools',
-    uiType: 'ohif.toolButtonList',
-    props: {
-      buttonSection: 'moreToolsSection',
-      groupId: 'MoreTools',
-    },
-  },
   {
     id: 'BrushTools',
     uiType: 'ohif.toolBoxButtonGroup',
@@ -84,36 +75,6 @@ const toolbarButtons: Button[] = [
     },
   },
   {
-    id: 'TrackballRotate',
-    uiType: 'ohif.toolButton',
-    props: {
-      type: 'tool',
-      icon: 'tool-3d-rotate',
-      label: '3D Rotate',
-      commands: setToolActiveToolbar,
-      evaluate: {
-        name: 'evaluate.cornerstoneTool',
-        disabledText: 'Select a 3D viewport to enable this tool',
-      },
-    },
-  },
-  {
-    id: 'Capture',
-    uiType: 'ohif.toolButton',
-    props: {
-      icon: 'tool-capture',
-      label: 'Capture',
-      commands: 'showDownloadViewportModal',
-      evaluate: [
-        'evaluate.action',
-        {
-          name: 'evaluate.viewport.supported',
-          unsupportedViewportTypes: ['video', 'wholeSlide'],
-        },
-      ],
-    },
-  },
-  {
     id: 'Layout',
     uiType: 'ohif.layoutSelector',
     props: {
@@ -139,127 +100,6 @@ const toolbarButtons: Button[] = [
         name: 'evaluate.cornerstoneTool',
         disabledText: 'Select an MPR viewport to enable this tool',
       },
-    },
-  },
-  {
-    id: 'Reset',
-    uiType: 'ohif.toolButton',
-    props: {
-      icon: 'tool-reset',
-      label: 'Reset View',
-      tooltip: 'Reset View',
-      commands: 'resetViewport',
-      evaluate: 'evaluate.action',
-    },
-  },
-  {
-    id: 'rotate-right',
-    uiType: 'ohif.toolButton',
-    props: {
-      icon: 'tool-rotate-right',
-      label: 'Rotate Right',
-      tooltip: 'Rotate +90',
-      commands: 'rotateViewportCW',
-      evaluate: 'evaluate.action',
-    },
-  },
-  {
-    id: 'flipHorizontal',
-    uiType: 'ohif.toolButton',
-    props: {
-      icon: 'tool-flip-horizontal',
-      label: 'Flip Horizontal',
-      tooltip: 'Flip Horizontally',
-      commands: 'flipViewportHorizontal',
-      evaluate: [
-        'evaluate.viewportProperties.toggle',
-        {
-          name: 'evaluate.viewport.supported',
-          unsupportedViewportTypes: ['volume3d'],
-        },
-      ],
-    },
-  },
-  {
-    id: 'ReferenceLines',
-    uiType: 'ohif.toolButton',
-    props: {
-      icon: 'tool-referenceLines',
-      label: 'Reference Lines',
-      tooltip: 'Show Reference Lines',
-      commands: 'toggleEnabledDisabledToolbar',
-      evaluate: 'evaluate.cornerstoneTool.toggle',
-    },
-  },
-  {
-    id: 'ImageOverlayViewer',
-    uiType: 'ohif.toolButton',
-    props: {
-      icon: 'toggle-dicom-overlay',
-      label: 'Image Overlay',
-      tooltip: 'Toggle Image Overlay',
-      commands: 'toggleEnabledDisabledToolbar',
-      evaluate: 'evaluate.cornerstoneTool.toggle',
-    },
-  },
-  {
-    id: 'StackScroll',
-    uiType: 'ohif.toolButton',
-    props: {
-      icon: 'tool-stack-scroll',
-      label: 'Stack Scroll',
-      tooltip: 'Stack Scroll',
-      commands: setToolActiveToolbar,
-      evaluate: 'evaluate.cornerstoneTool',
-    },
-  },
-  {
-    id: 'invert',
-    uiType: 'ohif.toolButton',
-    props: {
-      icon: 'tool-invert',
-      label: 'Invert',
-      tooltip: 'Invert Colors',
-      commands: 'invertViewport',
-      evaluate: 'evaluate.viewportProperties.toggle',
-    },
-  },
-  {
-    id: 'Cine',
-    uiType: 'ohif.toolButton',
-    props: {
-      icon: 'tool-cine',
-      label: 'Cine',
-      tooltip: 'Cine',
-      commands: 'toggleCine',
-      evaluate: [
-        'evaluate.cine',
-        {
-          name: 'evaluate.viewport.supported',
-          unsupportedViewportTypes: ['volume3d'],
-        },
-      ],
-    },
-  },
-  {
-    id: 'Magnify',
-    uiType: 'ohif.toolButton',
-    props: {
-      icon: 'tool-magnify',
-      label: 'Zoom-in',
-      tooltip: 'Zoom-in',
-      commands: setToolActiveToolbar,
-      evaluate: 'evaluate.cornerstoneTool',
-    },
-  },
-  {
-    id: 'TagBrowser',
-    uiType: 'ohif.toolButton',
-    props: {
-      icon: 'dicom-tag-browser',
-      label: 'Dicom Tag Browser',
-      tooltip: 'Dicom Tag Browser',
-      commands: 'openDICOMTagViewer',
     },
   },
 
