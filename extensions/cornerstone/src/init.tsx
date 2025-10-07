@@ -210,6 +210,7 @@ export default async function init({
       customizationService,
       displaySetService,
       uiNotificationService,
+      userAuthenticationService,
       commandsManager,
       extensionManager,
     });

@@ -11,6 +11,7 @@ export function setupSegmentationDataModifiedHandler({
   customizationService,
   displaySetService,
   uiNotificationService,
+  userAuthenticationService,
   commandsManager,
   extensionManager,
 }) {
@@ -111,8 +112,12 @@ export function setupSegmentationDataModifiedHandler({
             if (segDisplaySets.length === 1) {
               const series = segDisplaySets[0].SeriesInstanceUID;
               const study = segDisplaySets[0].StudyInstanceUID;
-              const deleteUrl = `${defaultDataSource[0].getConfig().wadoRoot}/studies/${study}/series/${series}/reject/113039%5EDCM`;
-              await axios.post(deleteUrl);
+              const deleteUrl = `${defaultDataSource[0].getConfig().wadoRoot}/studies/${study}/series/${series}`;
+              await axios.delete(deleteUrl, {
+                headers: {
+                  ...userAuthenticationService.getAuthorizationHeader(),
+                },
+              });
               displaySetService.deleteDisplaySet(segDisplaySets[0].displaySetInstanceUID);
             }
             uiNotificationService.hide(waitingMessage);
