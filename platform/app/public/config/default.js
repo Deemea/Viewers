@@ -25,14 +25,14 @@ window.config = {
   },
   disableConfirmationPrompts: true,
   maxNumRequests: {
-    interaction: 100,
+    interaction: 50,
     thumbnail: 2,
-    prefetch: 300,
+    prefetch: 200,
   },
   studyPrefetcher: {
     enabled: true,
-    displaySetsCount: 2,
-    maxNumPrefetchRequests: 10,
+    displaySetsCount: 4,
+    maxNumPrefetchRequests: 20,
     order: 'closest',
   },
   showErrorDetails: 'always', // 'always', 'dev', 'production'
