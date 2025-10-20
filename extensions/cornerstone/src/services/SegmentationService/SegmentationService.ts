@@ -306,6 +306,17 @@ class SegmentationService extends PubSubService {
       ));
     }
 
+    const readableText = this.servicesManager.services.customizationService.getCustomization(
+      'panelSegmentation.readableText'
+    );
+    const activeSegmentation = segmentation; // or get from segmentationService if needed
+
+    updateSegmentationStats({
+      segmentation: activeSegmentation,
+      segmentationId: segmentationId,
+      readableText,
+    });
+
     await this._addSegmentationRepresentation(
       viewportId,
       segmentationId,
@@ -1761,16 +1772,6 @@ class SegmentationService extends PubSubService {
     if (!segmentation) {
       return;
     }
-
-    const readableText = this.servicesManager.services.customizationService.getCustomization(
-      'panelSegmentation.readableText'
-    );
-
-    updateSegmentationStats({
-      segmentation,
-      segmentationId,
-      readableText,
-    });
 
     const { segments } = segmentation;
 
