@@ -309,7 +309,7 @@ class SegmentationService extends PubSubService {
     const readableText = this.servicesManager.services.customizationService.getCustomization(
       'panelSegmentation.readableText'
     );
-    const activeSegmentation = segmentation; // or get from segmentationService if needed
+    const activeSegmentation = segmentation;
 
     updateSegmentationStats({
       segmentation: activeSegmentation,
@@ -1772,6 +1772,16 @@ class SegmentationService extends PubSubService {
     if (!segmentation) {
       return;
     }
+
+    const readableText = this.servicesManager.services.customizationService.getCustomization(
+      'panelSegmentation.readableText'
+    );
+
+    updateSegmentationStats({
+      segmentation,
+      segmentationId,
+      readableText,
+    });
 
     const { segments } = segmentation;
 

@@ -25,9 +25,9 @@ window.config = {
   },
   disableConfirmationPrompts: true,
   maxNumRequests: {
-    interaction: 100,
+    interaction: 200,
     thumbnail: 2,
-    prefetch: 300,
+    prefetch: 50,
   },
   studyPrefetcher: {
     enabled: true,
@@ -153,6 +153,9 @@ window.config = {
         wadoUriRoot: 'https://sandbox.deemea.com/api/v1/didier',
         qidoRoot: 'https://sandbox.deemea.com/api/v1/didier',
         wadoRoot: 'https://sandbox.deemea.com/api/v1/didier',
+        // wadoUriRoot: 'http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs',
+        // qidoRoot: 'http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs',
+        // wadoRoot: 'http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs',
         qidoSupportsIncludeField: false,
         imageRendering: 'wadors',
         thumbnailRendering: 'wadors',
@@ -411,10 +414,9 @@ window.config = {
   ],
   httpErrorHandler: error => {
     // This is 429 when rejected from the public idc sandbox too often.
-    console.warn(error.status);
-
+    // console.warn(error.status);
     // Could use services manager here to bring up a dialog/modal if needed.
-    console.warn('test, navigate to https://ohif.org/');
+    // console.warn('test, navigate to https://ohif.org/');
   },
   // whiteLabeling: {
   //   createLogoComponentFn: function (React) {
