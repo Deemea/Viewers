@@ -1778,6 +1778,16 @@ class SegmentationService extends PubSubService {
       return;
     }
 
+    const readableText = this.servicesManager.services.customizationService.getCustomization(
+      'panelSegmentation.readableText'
+    );
+
+    updateSegmentationStats({
+      segmentation,
+      segmentationId,
+      readableText,
+    });
+
     const { segments } = segmentation;
 
     const { cachedStats } = segments[segmentIndex];
