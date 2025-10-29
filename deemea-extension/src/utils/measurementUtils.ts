@@ -89,7 +89,6 @@ async function matchNameWithAngle(
   pointName2,
   pointName3
 ): Promise<{ color: string; highlighted: string; dotted?: boolean } | null> {
-  console.log('ENCORE', pointName1, pointName2, pointName3);
 
   const matchedAngle = angles.find(
     angle =>
