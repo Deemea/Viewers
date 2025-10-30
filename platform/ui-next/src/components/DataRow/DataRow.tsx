@@ -62,7 +62,6 @@ interface DataRowProps {
   description: string;
   details?: { primary: string[]; secondary: string[] };
   //
-  hasStats?: boolean;
   isSelected?: boolean;
   onSelect?: (e) => void;
   //
@@ -73,7 +72,6 @@ interface DataRowProps {
   onToggleLocked: (e) => void;
   //
   title: string;
-  onClickDisplay: (n: number) => void;
   onRename: (e) => void;
   //
   onDelete: (e) => void;
@@ -87,12 +85,10 @@ export const DataRow: React.FC<DataRowProps> = ({
   number,
   title,
   colorHex,
-  hasStats,
   details,
   onSelect,
   isLocked,
   onToggleVisibility,
-  onClickDisplay,
   onToggleLocked,
   onRename,
   onDelete,
@@ -254,41 +250,6 @@ export const DataRow: React.FC<DataRowProps> = ({
             >
               {title}
             </span>
-          )}
-        </div>
-        <div className="relative ml-2 flex items-center space-x-1">
-          {!hasStats ? (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className={`h-6 w-6 opacity-50 transition-opacity`}
-                  aria-label="ListView"
-                >
-                  <Icons.ListView className="h-6 w-6" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent
-                side="top"
-                align="center"
-              >
-                Segmentation statistics are computing, retry later
-              </TooltipContent>
-            </Tooltip>
-          ) : (
-            <Button
-              size="icon"
-              variant="ghost"
-              className={`h-6 w-6 opacity-100 transition-opacity`}
-              aria-label="ListView"
-              onClick={e => {
-                e.stopPropagation();
-                onClickDisplay(number);
-              }}
-            >
-              <Icons.ListView className="h-6 w-6" />
-            </Button>
           )}
         </div>
 
