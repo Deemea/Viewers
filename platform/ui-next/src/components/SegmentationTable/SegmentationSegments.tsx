@@ -19,8 +19,6 @@ export const SegmentationSegments = ({ children = null }: { children?: React.Rea
     data,
   } = useSegmentationTableContext('SegmentationSegments');
 
-  const [hoverIndex, setHoverIndex] = React.useState<number | null>(null);
-
   // Try to get segmentation data from expanded context first, then fall back to table context
   let segmentation;
   let representation;
@@ -100,20 +98,12 @@ export const SegmentationSegments = ({ children = null }: { children?: React.Rea
               key={segmentIndex}
               number={segmentIndex}
               title={label}
-              hasStats={hasStats}
               // details={displayText}
               description={displayText}
               colorHex={cssColor}
               isSelected={active}
               isVisible={visible}
               isLocked={locked}
-              onClickDisplay={index => {
-                if (!hoverIndex || index !== hoverIndex) {
-                  setHoverIndex(index);
-                } else {
-                  setHoverIndex(null);
-                }
-              }}
               disableEditing={disableEditing}
               className={!isActiveSegmentation ? 'opacity-80' : ''}
               onColor={() => onSegmentColorClick(segmentation.segmentationId, segmentIndex)}
@@ -131,11 +121,10 @@ export const SegmentationSegments = ({ children = null }: { children?: React.Rea
             />
           );
 
-          return hasStats && hoverIndex === segmentIndex ? (
+          return hasStats ? (
             <HoverCard
-              open={hoverIndex === segmentIndex}
-              key={`hover-${hoverIndex || segmentIndex}`}
-              openDelay={100}
+              key={`hover-${segmentIndex}`}
+              openDelay={300}
             >
               <HoverCardTrigger asChild>
                 <div>{DataRowComponent}</div>
