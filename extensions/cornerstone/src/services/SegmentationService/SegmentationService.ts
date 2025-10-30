@@ -29,6 +29,7 @@ import { updateLabelmapSegmentationImageReferences } from '@cornerstonejs/tools/
 import { triggerSegmentationRepresentationModified } from '@cornerstonejs/tools/segmentation/triggerSegmentationEvents';
 import { convertStackToVolumeLabelmap } from '@cornerstonejs/tools/segmentation/helpers/convertStackToVolumeLabelmap';
 import { getLabelmapImageIds } from '@cornerstonejs/tools/segmentation';
+import { updateSegmentationStats } from '../../utils/updateSegmentationStats';
 
 const LABELMAP = csToolsEnums.SegmentationRepresentations.Labelmap;
 const CONTOUR = csToolsEnums.SegmentationRepresentations.Contour;
@@ -304,6 +305,17 @@ class SegmentationService extends PubSubService {
         representationTypeToUse
       ));
     }
+
+    const readableText = this.servicesManager.services.customizationService.getCustomization(
+      'panelSegmentation.readableText'
+    );
+    const activeSegmentation = segmentation;
+
+    updateSegmentationStats({
+      segmentation: activeSegmentation,
+      segmentationId: segmentationId,
+      readableText,
+    });
 
     await this._addSegmentationRepresentation(
       viewportId,
@@ -1760,6 +1772,16 @@ class SegmentationService extends PubSubService {
     if (!segmentation) {
       return;
     }
+
+    const readableText = this.servicesManager.services.customizationService.getCustomization(
+      'panelSegmentation.readableText'
+    );
+
+    updateSegmentationStats({
+      segmentation,
+      segmentationId,
+      readableText,
+    });
 
     const { segments } = segmentation;
 
