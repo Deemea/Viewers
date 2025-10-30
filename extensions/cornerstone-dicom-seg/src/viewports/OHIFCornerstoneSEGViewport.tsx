@@ -31,7 +31,6 @@ function OHIFCornerstoneSEGViewport(props: withAppTypes) {
     segmentationService,
     customizationService,
     viewportActionCornersService,
-    uiNotificationService,
   } = servicesManager.services;
 
   const LoadingIndicatorTotalPercent = customizationService.getCustomization(
@@ -48,8 +47,6 @@ function OHIFCornerstoneSEGViewport(props: withAppTypes) {
   const segDisplaySet = displaySets[0];
   const [viewportGrid, viewportGridService] = useViewportGrid();
 
-  console.log('segDisplaySet', segDisplaySet);
-
   // States
   const selectedSegmentObjectIndex: number = 0;
   const { setPositionPresentation } = usePositionPresentationStore();
@@ -62,7 +59,6 @@ function OHIFCornerstoneSEGViewport(props: withAppTypes) {
   const [isHydrated, setIsHydrated] = useState(segDisplaySet.isHydrated);
   const [segIsLoading, setSegIsLoading] = useState(!segDisplaySet.isLoaded);
   const [element, setElement] = useState(null);
-
   const [processingProgress, setProcessingProgress] = useState({
     percentComplete: null,
     totalSegments: null,
@@ -114,7 +110,7 @@ function OHIFCornerstoneSEGViewport(props: withAppTypes) {
       '@ohif/extension-cornerstone.viewportModule.cornerstone'
     );
 
-    // Always show the segDisplaySet to ensure it loads properly
+    // Todo: jump to the center of the first segment
     return (
       <Component
         {...props}
@@ -134,28 +130,6 @@ function OHIFCornerstoneSEGViewport(props: withAppTypes) {
       ></Component>
     );
   }, [viewportId, segDisplaySet, toolGroupId]);
-
-  const getReferencedImageViewport = useCallback(() => {
-    const { component: Component } = extensionManager.getModuleEntry(
-      '@ohif/extension-cornerstone.viewportModule.cornerstone'
-    );
-
-    // Display the referenced image as background during loading
-    return (
-      <Component
-        {...props}
-        displaySets={[referencedDisplaySet]}
-        viewportOptions={{
-          viewportType: viewportOptions.viewportType,
-          toolGroupId: `${toolGroupId}-reference`,
-          orientation: viewportOptions.orientation,
-          viewportId: `${viewportOptions.viewportId}-reference`,
-        }}
-        onElementEnabled={() => { }}
-        onElementDisabled={() => { }}
-      ></Component>
-    );
-  }, [viewportId, referencedDisplaySet, toolGroupId]);
 
   const onSegmentChange = useCallback(
     direction => {
@@ -327,42 +301,42 @@ function OHIFCornerstoneSEGViewport(props: withAppTypes) {
     hydrateSEG();
   }, [storePresentationState, hydrateSEG]);
 
-  // useEffect(() => {
-  //   viewportActionCornersService.addComponents([
-  //     {
-  //       viewportId,
-  //       id: 'viewportStatusComponent',
-  //       component: _getStatusComponent({
-  //         isHydrated,
-  //         onStatusClick,
-  //       }),
-  //       indexPriority: -100,
-  //       location: viewportActionCornersService.LOCATIONS.topLeft,
-  //     },
-  //     {
-  //       viewportId,
-  //       id: 'viewportActionArrowsComponent',
-  //       component: (
-  //         <ViewportActionArrows
-  //           key="actionArrows"
-  //           onArrowsClick={onSegmentChange}
-  //           className={
-  //             viewportId === activeViewportId ? 'visible' : 'invisible group-hover/pane:visible'
-  //           }
-  //         ></ViewportActionArrows>
-  //       ),
-  //       indexPriority: 0,
-  //       location: viewportActionCornersService.LOCATIONS.topRight,
-  //     },
-  //   ]);
-  // }, [
-  //   activeViewportId,
-  //   isHydrated,
-  //   onSegmentChange,
-  //   onStatusClick,
-  //   viewportActionCornersService,
-  //   viewportId,
-  // ]);
+  useEffect(() => {
+    viewportActionCornersService.addComponents([
+      {
+        viewportId,
+        id: 'viewportStatusComponent',
+        component: _getStatusComponent({
+          isHydrated,
+          onStatusClick,
+        }),
+        indexPriority: -100,
+        location: viewportActionCornersService.LOCATIONS.topLeft,
+      },
+      {
+        viewportId,
+        id: 'viewportActionArrowsComponent',
+        component: (
+          <ViewportActionArrows
+            key="actionArrows"
+            onArrowsClick={onSegmentChange}
+            className={
+              viewportId === activeViewportId ? 'visible' : 'invisible group-hover/pane:visible'
+            }
+          ></ViewportActionArrows>
+        ),
+        indexPriority: 0,
+        location: viewportActionCornersService.LOCATIONS.topRight,
+      },
+    ]);
+  }, [
+    activeViewportId,
+    isHydrated,
+    onSegmentChange,
+    onStatusClick,
+    viewportActionCornersService,
+    viewportId,
+  ]);
 
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   let childrenWithProps = null;
@@ -390,26 +364,15 @@ function OHIFCornerstoneSEGViewport(props: withAppTypes) {
   return (
     <>
       <div className="relative flex h-full w-full flex-row overflow-hidden">
-        {/* SEG viewport - always rendered */}
+        {segIsLoading && (
+          <LoadingIndicatorTotalPercent
+            className="h-full w-full"
+            totalNumbers={processingProgress.totalSegments}
+            percentComplete={processingProgress.percentComplete}
+            loadingText="Loading SEG..."
+          />
+        )}
         {getCornerstoneViewport()}
-
-        {/* Show referenced image as overlay during loading */}
-        {segIsLoading && (
-          <div className="absolute inset-0 z-40">{getReferencedImageViewport()}</div>
-        )}
-
-        {/* Loading indicator overlay */}
-        {segIsLoading && (
-          <div className="absolute inset-0 z-50 flex items-center justify-center">
-            <LoadingIndicatorTotalPercent
-              className="h-full w-full"
-              uiNotificationService={uiNotificationService}
-              totalNumbers={processingProgress.totalSegments}
-              percentComplete={processingProgress.percentComplete}
-              loadingText="Loading SEG..."
-            />
-          </div>
-        )}
         {childrenWithProps}
       </div>
     </>

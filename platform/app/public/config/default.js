@@ -25,9 +25,9 @@ window.config = {
   },
   disableConfirmationPrompts: true,
   maxNumRequests: {
-    interaction: 200,
+    interaction: 8,
     thumbnail: 2,
-    prefetch: 50,
+    prefetch: 200,
   },
   studyPrefetcher: {
     enabled: true,
@@ -153,9 +153,6 @@ window.config = {
         wadoUriRoot: 'https://sandbox.deemea.com/api/v1/didier',
         qidoRoot: 'https://sandbox.deemea.com/api/v1/didier',
         wadoRoot: 'https://sandbox.deemea.com/api/v1/didier',
-        // wadoUriRoot: 'http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs',
-        // qidoRoot: 'http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs',
-        // wadoRoot: 'http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs',
         qidoSupportsIncludeField: false,
         imageRendering: 'wadors',
         thumbnailRendering: 'wadors',

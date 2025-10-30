@@ -6,7 +6,6 @@ interface Props {
   className?: string;
   totalNumbers: number | null;
   percentComplete: number | null;
-  uiNotificationService: any;
   loadingText?: string;
   targetText?: string;
 }
@@ -19,10 +18,9 @@ function LoadingIndicatorTotalPercent({
   className,
   totalNumbers,
   percentComplete,
-  uiNotificationService,
   loadingText = 'Loading...',
   targetText = 'segments',
-}: Props): void {
+}: Props): JSX.Element {
   const progress = percentComplete;
   const totalNumbersText = totalNumbers !== null ? `${totalNumbers}` : '';
   const numTargetsLoadedText =
@@ -39,18 +37,13 @@ function LoadingIndicatorTotalPercent({
       </div>
     );
 
-  uiNotificationService.show({
-    title: textBlock,
-    type: 'info',
-    duration: 20000,
-  });
-  // return (
-  //   <LoadingIndicatorProgress
-  //     className={className}
-  //     progress={progress}
-  //     textBlock={textBlock}
-  //   />
-  // );
+  return (
+    <LoadingIndicatorProgress
+      className={className}
+      progress={progress}
+      textBlock={textBlock}
+    />
+  );
 }
 
 export default LoadingIndicatorTotalPercent;
