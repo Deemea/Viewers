@@ -276,7 +276,7 @@ class SegmentationService extends PubSubService {
       suppressEvents?: boolean;
     }
   ): Promise<void> {
-    let segmentation = this.getSegmentation(segmentationId);
+    const segmentation = this.getSegmentation(segmentationId);
     const csViewport = this.getAndValidateViewport(viewportId);
 
     if (!csViewport) {
@@ -305,19 +305,6 @@ class SegmentationService extends PubSubService {
         representationTypeToUse
       ));
     }
-
-    setTimeout(async () => {
-      const readableText = this.servicesManager.services.customizationService.getCustomization(
-        'panelSegmentation.readableText'
-      );
-
-      const activeSegmentation = segmentation;
-      segmentation = await updateSegmentationStats({
-        segmentation: activeSegmentation,
-        segmentationId: segmentationId,
-        readableText,
-      });
-    }, 1000);
 
     await this._addSegmentationRepresentation(
       viewportId,
@@ -1777,16 +1764,6 @@ class SegmentationService extends PubSubService {
     if (!segmentation) {
       return;
     }
-
-    const readableText = this.servicesManager.services.customizationService.getCustomization(
-      'panelSegmentation.readableText'
-    );
-
-    updateSegmentationStats({
-      segmentation,
-      segmentationId,
-      readableText,
-    });
 
     const { segments } = segmentation;
 

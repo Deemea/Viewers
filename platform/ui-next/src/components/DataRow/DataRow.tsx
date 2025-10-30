@@ -62,7 +62,6 @@ interface DataRowProps {
   description: string;
   details?: { primary: string[]; secondary: string[] };
   //
-  hasStats?: boolean;
   isSelected?: boolean;
   onSelect?: (e) => void;
   //
@@ -73,7 +72,6 @@ interface DataRowProps {
   onToggleLocked: (e) => void;
   //
   title: string;
-  onClickDisplay: (n: number) => void;
   onRename: (e) => void;
   //
   onDelete: (e) => void;
@@ -87,12 +85,10 @@ export const DataRow: React.FC<DataRowProps> = ({
   number,
   title,
   colorHex,
-  hasStats,
   details,
   onSelect,
   isLocked,
   onToggleVisibility,
-  onClickDisplay,
   onToggleLocked,
   onRename,
   onDelete,
