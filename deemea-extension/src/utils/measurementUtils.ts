@@ -1,5 +1,6 @@
 import * as cs3dTools from '@cornerstonejs/tools';
 import { axis } from './axisColors';
+import { angles } from './angleColors';
 import { points } from './pointsColors';
 import { Palette } from './palette';
 import { boxes } from './boxColors';
@@ -83,6 +84,25 @@ async function matchNameWithAxis(
   return matchedAxis ? matchedAxis : null;
 }
 
+async function matchNameWithAngle(
+  pointName1,
+  pointName2,
+  pointName3
+): Promise<{ color: string; highlighted: string; dotted?: boolean } | null> {
+
+  const matchedAngle = angles.find(
+    angle =>
+      (pointName1 === angle.head && pointName2 === angle.middle && pointName3 === angle.tail) ||
+      (pointName3 === angle.head && pointName2 === angle.middle && pointName1 === angle.tail) ||
+      (pointName2 === angle.head && pointName3 === angle.middle && pointName1 === angle.tail) ||
+      (pointName2 === angle.head && pointName1 === angle.middle && pointName3 === angle.tail) ||
+      (pointName3 === angle.head && pointName1 === angle.middle && pointName2 === angle.tail) ||
+      (pointName1 === angle.head && pointName3 === angle.middle && pointName2 === angle.tail)
+  );
+
+  return matchedAngle ? matchedAngle : null;
+}
+
 async function matchNameWithPoint(
   pointName
 ): Promise<{ color: string; highlighted: string } | null> {
@@ -127,6 +147,23 @@ async function setMeasurementStyle() {
 
     if (annotation.data.handles?.type === 'probe') {
       const pointColor = await matchNameWithPoint(annotation.data.handles.name);
+
+      if (pointColor) {
+        style = {
+          color: pointColor.color,
+          colorHighlighted: pointColor.highlighted,
+          colorSelected: pointColor.highlighted,
+          lineDash: '',
+        };
+      }
+    }
+
+    if (annotation.data.handles?.type === 'angle') {
+      const pointColor = await matchNameWithAngle(
+        annotation.data.handles?.headName,
+        annotation.data.handles?.middleName,
+        annotation.data.handles?.tailName
+      );
 
       if (pointColor) {
         style = {
@@ -424,7 +461,9 @@ export function createAngleROI(viewport, imageMetadata, data: RelatedPoint, imag
         handles: {
           points: normalizedPoints,
           headName: data.points[0].name,
-          tailName: data.points[1].name,
+          middleName: data.points[1].name,
+          tailName: data.points[2].name,
+          type: 'angle',
           name: data.points[0].name,
         },
         label: {

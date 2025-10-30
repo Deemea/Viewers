@@ -31,8 +31,8 @@ window.config = {
   },
   studyPrefetcher: {
     enabled: true,
-    displaySetsCount: 2,
-    maxNumPrefetchRequests: 10,
+    displaySetsCount: 4,
+    maxNumPrefetchRequests: 20,
     order: 'closest',
   },
   defaultDataSourceName: 'dicomweb',
