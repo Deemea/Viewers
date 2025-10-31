@@ -56,44 +56,48 @@ function Header({
       size="large"
       IconContainer={ToolButton}
     >
-      <div className="relative h-[48px] items-center">
-        <div className="absolute left-0 top-1/2 flex -translate-y-1/2 items-center">
-          <div
-            className={classNames(
-              'mr-3 inline-flex items-center',
-              isReturnEnabled && 'cursor-pointer'
-            )}
-            onClick={onClickReturn}
-            data-cy="return-to-work-list"
-          >
-            {isReturnEnabled && <Icons.ArrowLeft className="text-primary ml-1 h-7 w-7" />}
-            <div className="ml-1">
-              {/* {WhiteLabeling?.createLogoComponentFn?.(React, props) || <Icons.OHIFLogo />} */}
+      <NavBar
+        isSticky={isSticky}
+        {...props}
+      >
+        <div className="relative h-[48px] items-center">
+          <div className="absolute left-0 top-1/2 flex -translate-y-1/2 items-center">
+            <div
+              className={classNames(
+                'mr-3 inline-flex items-center',
+                isReturnEnabled && 'cursor-pointer'
+              )}
+              onClick={onClickReturn}
+              data-cy="return-to-work-list"
+            >
+              {isReturnEnabled && <Icons.ArrowLeft className="text-primary ml-1 h-7 w-7" />}
+              <div className="ml-1">
+                {/* {WhiteLabeling?.createLogoComponentFn?.(React, props) || <Icons.OHIFLogo />} */}
+              </div>
             </div>
           </div>
-        </div>
-        <div className="absolute top-1/2 left-[250px] h-8 -translate-y-1/2">{Secondary}</div>
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform">
-          <div className="flex items-center justify-center space-x-2">{children}</div>
-        </div>
-        <div className="absolute right-0 top-1/2 flex -translate-y-1/2 select-none items-center">
-          {UndoRedo}
-          <div className="border-primary-dark mx-1.5 h-[25px] border-r"></div>
-          {PatientInfo}
-          <div className="border-primary-dark mx-1.5 h-[25px] border-r"></div>
-          <div className="flex-shrink-0">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-primary hover:bg-primary-dark mt-2 h-full w-full"
-                  onClick={() => menuOptions[0].onClick()}
-                >
-                  <Icons.GearSettings />
-                </Button>
-              </DropdownMenuTrigger>
-              {/* <DropdownMenuContent align="end">
+          <div className="absolute top-1/2 left-[250px] h-8 -translate-y-1/2">{Secondary}</div>
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform">
+            <div className="flex items-center justify-center space-x-2">{children}</div>
+          </div>
+          <div className="absolute right-0 top-1/2 flex -translate-y-1/2 select-none items-center">
+            {UndoRedo}
+            <div className="border-primary-dark mx-1.5 h-[25px] border-r"></div>
+            {PatientInfo}
+            <div className="border-primary-dark mx-1.5 h-[25px] border-r"></div>
+            <div className="flex-shrink-0">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-primary hover:bg-primary-dark mt-2 h-full w-full"
+                    onClick={() => menuOptions[0].onClick()}
+                  >
+                    <Icons.GearSettings />
+                  </Button>
+                </DropdownMenuTrigger>
+                {/* <DropdownMenuContent align="end">
                 {menuOptions.map((option, index) => {
                   const IconComponent = option.icon
                     ? Icons[option.icon as keyof typeof Icons]
@@ -114,11 +118,12 @@ function Header({
                   );
                 })}
               </DropdownMenuContent> */}
-            </DropdownMenu>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
-      </div>
-    </NavBar>
+      </NavBar>
+    </IconPresentationProvider>
   );
 }
 

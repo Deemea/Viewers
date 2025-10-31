@@ -96,7 +96,6 @@ export default async function init({
     displaySetService,
     measurementService,
     colorbarService,
-    displaySetService,
     toolbarService,
   } = servicesManager.services;
 
