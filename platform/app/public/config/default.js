@@ -411,10 +411,9 @@ window.config = {
   ],
   httpErrorHandler: error => {
     // This is 429 when rejected from the public idc sandbox too often.
-    console.warn(error.status);
-
+    // console.warn(error.status);
     // Could use services manager here to bring up a dialog/modal if needed.
-    console.warn('test, navigate to https://ohif.org/');
+    // console.warn('test, navigate to https://ohif.org/');
   },
   // whiteLabeling: {
   //   createLogoComponentFn: function (React) {
