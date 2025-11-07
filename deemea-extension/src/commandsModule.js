@@ -153,6 +153,39 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
             '*'
           );
         }
+
+        if (event.data.type === OHIFMessageType.SAVE_SEGMENTATION_STATS) {
+          const segmentation = SegmentationService.getSegmentations();
+
+          const segments = segmentation[0].segments;
+          console.log(segmentation);
+
+          const stats = {};
+          Object.values(segments).forEach(segment => {
+            stats[segment.label] = [];
+            Object.values(segment?.cachedStats?.namedStats).forEach(stat => {
+              stats[segment.label].push({
+                label: stat.label,
+                value: stat.value,
+                unit: stat.unit,
+              });
+            });
+          });
+
+          console.log('stats', stats, Object.entries(stats).length);
+
+          if (stats && Object.entries(stats).length) {
+            window.parent.postMessage(
+              {
+                type: OHIFMessageType.SEND_SEGMENTATION_STATS,
+                message: {
+                  stats,
+                },
+              },
+              '*'
+            );
+          }
+        }
       });
     },
     linkMeasurement: info => {
