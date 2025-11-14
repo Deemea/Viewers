@@ -4,6 +4,7 @@ import { HoverCard, HoverCardTrigger, HoverCardContent } from '../../components/
 import { useSegmentationTableContext, useSegmentationExpanded } from './contexts';
 import { SegmentStatistics } from './SegmentStatistics';
 import { useDynamicMaxHeight } from '../../hooks/useDynamicMaxHeight';
+import { OHIFMessageType } from '../../../../../deemea-extension/src/utils/enums';
 
 export const SegmentationSegments = ({ children = null }: { children?: React.ReactNode }) => {
   const {
@@ -37,6 +38,20 @@ export const SegmentationSegments = ({ children = null }: { children?: React.Rea
     segmentation = segmentationInfo?.segmentation;
     representation = segmentationInfo?.representation;
   }
+
+  const messageRef = React.useRef(false);
+
+  const sendMessageToFront = () => {
+    if (!messageRef.current) {
+      window.parent.postMessage(
+        {
+          type: OHIFMessageType.EXPORT_AVAILABLE,
+        },
+        '*'
+      );
+      messageRef.current = true;
+    }
+  };
 
   const segments = Object.values(representation.segments);
   const isActiveSegmentation = segmentation.segmentationId === activeSegmentationId;
@@ -75,6 +90,11 @@ export const SegmentationSegments = ({ children = null }: { children?: React.Rea
           const cssColor = `rgb(${color[0]},${color[1]},${color[2]})`;
 
           const hasStats = segmentFromSegmentation.cachedStats?.namedStats;
+
+          if (hasStats) {
+            sendMessageToFront();
+          }
+
           const DataRowComponent = (
             <DataRow
               key={segmentIndex}
