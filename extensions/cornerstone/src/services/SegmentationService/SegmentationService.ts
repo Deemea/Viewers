@@ -276,7 +276,7 @@ class SegmentationService extends PubSubService {
       suppressEvents?: boolean;
     }
   ): Promise<void> {
-    const segmentation = this.getSegmentation(segmentationId);
+    let segmentation = this.getSegmentation(segmentationId);
     const csViewport = this.getAndValidateViewport(viewportId);
 
     if (!csViewport) {
@@ -306,16 +306,18 @@ class SegmentationService extends PubSubService {
       ));
     }
 
-    const readableText = this.servicesManager.services.customizationService.getCustomization(
-      'panelSegmentation.readableText'
-    );
-    const activeSegmentation = segmentation;
+    setTimeout(async () => {
+      const readableText = this.servicesManager.services.customizationService.getCustomization(
+        'panelSegmentation.readableText'
+      );
 
-    updateSegmentationStats({
-      segmentation: activeSegmentation,
-      segmentationId: segmentationId,
-      readableText,
-    });
+      const activeSegmentation = segmentation;
+      segmentation = await updateSegmentationStats({
+        segmentation: activeSegmentation,
+        segmentationId: segmentationId,
+        readableText,
+      });
+    }, 1000);
 
     await this._addSegmentationRepresentation(
       viewportId,
@@ -481,6 +483,7 @@ class SegmentationService extends PubSubService {
         SegmentLabel,
         SegmentAlgorithmType,
         SegmentAlgorithmName,
+        TrackingID,
         SegmentedPropertyTypeCodeSequence,
         rgba,
       } = segmentInfo;
@@ -512,6 +515,7 @@ class SegmentationService extends PubSubService {
             : '',
           algorithmType: SegmentAlgorithmType,
           algorithmName: SegmentAlgorithmName,
+          trackingId: TrackingID,
         },
       };
     });
@@ -661,6 +665,7 @@ class SegmentationService extends PubSubService {
         // Broadcast segment loading progress
         const numInitialized = Object.keys(segmentsCachedStats).length;
         const percentComplete = Math.round((numInitialized / allRTStructData.length) * 100);
+
         this._broadcastEvent(EVENTS.SEGMENT_LOADING_COMPLETE, {
           percentComplete,
           numSegments: allRTStructData.length,

@@ -27,7 +27,7 @@ window.config = {
   maxNumRequests: {
     interaction: 8,
     thumbnail: 2,
-    prefetch: 200,
+    prefetch: 300,
   },
   studyPrefetcher: {
     enabled: true,
