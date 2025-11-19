@@ -25,9 +25,9 @@ window.config = {
   },
   disableConfirmationPrompts: true,
   maxNumRequests: {
-    interaction: 8,
+    interaction: 300,
     thumbnail: 2,
-    prefetch: 300,
+    prefetch: 30,
   },
   studyPrefetcher: {
     enabled: true,
