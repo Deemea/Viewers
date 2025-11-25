@@ -8,7 +8,9 @@ import _getStatusComponent from './_getStatusComponent';
 import { usePositionPresentationStore } from '@ohif/extension-cornerstone';
 import { SegmentationRepresentations } from '@cornerstonejs/tools/enums';
 import { utils } from '@ohif/extension-cornerstone';
-import { OHIFMessageType } from 'deemea-extension/src/utils/enums';
+import { segmentation as cstSegmentation } from '@cornerstonejs/tools';
+import { updateSegmentationStats } from '../../../../extensions/cornerstone/src/utils/updateSegmentationStats';
+import * as cornerstone from '@cornerstonejs/core'; // si 3D
 
 const SEG_TOOLGROUP_BASE_NAME = 'SEGToolGroup';
 
@@ -192,6 +194,7 @@ function OHIFCornerstoneSEGViewport(props: withAppTypes) {
     const { unsubscribe } = segmentationService.subscribe(
       segmentationService.EVENTS.SEGMENTATION_LOADING_COMPLETE,
       evt => {
+        console.time('loadAllImagesAndGetStats');
         if (evt.segDisplaySet.displaySetInstanceUID === segDisplaySet.displaySetInstanceUID) {
           setSegIsLoading(false);
         }
@@ -206,12 +209,77 @@ function OHIFCornerstoneSEGViewport(props: withAppTypes) {
             },
           });
         }
-        window.parent.postMessage(
-          {
-            type: OHIFMessageType.SEGMENTATION_READY,
-          },
-          '*'
-        );
+
+        if (!segDisplaySet || !segDisplaySet.imageIds) {
+          console.warn('Impossible de récupérer le segDisplaySet des images.');
+          return;
+        }
+
+        const originalImageIds = referencedDisplaySet?.imageIds || [];
+        if (!originalImageIds.length) {
+          console.warn('Aucune image trouvée dans le displaySet référencé.');
+          return;
+        }
+
+        const loadedImageIds: string[] = [];
+        const unloadedImageIds: string[] = [];
+
+        const cache = (cornerstone as any).cache;
+        originalImageIds.forEach(id => {
+          const cachedImage = cache?.getImage?.(id);
+          if (cachedImage) {
+            loadedImageIds.push(id);
+          } else {
+            unloadedImageIds.push(id);
+          }
+        });
+
+        if (loadedImageIds.length) {
+          console.info(
+            `Images déjà chargées (${loadedImageIds.length}/${originalImageIds.length}) - elles ne seront pas rechargées.`
+          );
+        }
+        if (!unloadedImageIds.length) {
+          console.info(
+            'Toutes les images nécessaires sont déjà en cache, passage direct au calcul des statistiques.'
+          );
+        }
+
+        const loadImagesResult = cornerstone.imageLoader.loadAndCacheImages?.(unloadedImageIds);
+
+        const loadPromise: Promise<any> = Array.isArray(loadImagesResult)
+          ? Promise.all(loadImagesResult)
+          : (loadImagesResult ??
+            Promise.all(unloadedImageIds.map(id => cornerstone.imageLoader.loadAndCacheImage(id))));
+
+        // Once all referenced images are loaded, compute stats and update segmentation state
+        loadPromise
+          .then(async () => {
+            const readableText = servicesManager.services.customizationService.getCustomization(
+              'panelSegmentation.readableText'
+            );
+
+            const currentSegmentation = cstSegmentation.state.getSegmentation(evt.segmentationId);
+            const updatedSegmentation = await updateSegmentationStats({
+              segmentation: currentSegmentation,
+              segmentationId: evt.segmentationId as string,
+              readableText,
+            });
+
+            console.log('updatedSegmentation', updatedSegmentation);
+
+            // Persist the updated stats so UI (hasStats) becomes true and ListView button activates
+            if (updatedSegmentation?.segments) {
+              segmentationService.addOrUpdateSegmentation({
+                segmentationId: evt.segmentationId as string,
+                segments: updatedSegmentation.segments,
+              });
+            }
+            console.timeEnd('loadAllImagesAndGetStats');
+          })
+          .catch(error => {
+            console.warn('Erreur lors du chargement des images avant calcul des stats:', error);
+          });
       }
     );
 

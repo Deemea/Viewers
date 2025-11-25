@@ -263,7 +263,7 @@ export const DataRow: React.FC<DataRowProps> = ({
                 <Button
                   size="icon"
                   variant="ghost"
-                  className={`h-6 w-6 opacity-50 transition-opacity`}
+                  className={`h-6 w-6 opacity-30 transition-opacity`}
                   aria-label="ListView"
                 >
                   <Icons.ListView className="h-6 w-6" />
@@ -273,7 +273,7 @@ export const DataRow: React.FC<DataRowProps> = ({
                 side="top"
                 align="center"
               >
-                Segmentation statistics are computing, retry later
+                Segmentation statistics are being computed...
               </TooltipContent>
             </Tooltip>
           ) : (
