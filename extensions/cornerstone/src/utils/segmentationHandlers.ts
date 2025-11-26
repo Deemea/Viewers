@@ -58,12 +58,7 @@ export function setupSegmentationDataModifiedHandler({
           readableText,
         });
 
-        if (updatedSegmentation?.segments) {
-          segmentationService.addOrUpdateSegmentation({
-            segmentationId: segmentationId,
-            segments: updatedSegmentation.segments,
-          });
-        }
+
 
         if (updatedSegmentation || action === 'RENAME') {
           if (!updatedSegmentation?.segments) {

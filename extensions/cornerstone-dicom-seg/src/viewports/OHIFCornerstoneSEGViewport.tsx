@@ -211,13 +211,13 @@ function OHIFCornerstoneSEGViewport(props: withAppTypes) {
         }
 
         if (!segDisplaySet || !segDisplaySet.imageIds) {
-          console.warn('Impossible de récupérer le segDisplaySet des images.');
+          console.warn('Unable to retrieve the segDisplaySet for images.');
           return;
         }
 
         const originalImageIds = referencedDisplaySet?.imageIds || [];
         if (!originalImageIds.length) {
-          console.warn('Aucune image trouvée dans le displaySet référencé.');
+          console.warn('No images found in the referenced displaySet.');
           return;
         }
 
@@ -236,12 +236,12 @@ function OHIFCornerstoneSEGViewport(props: withAppTypes) {
 
         if (loadedImageIds.length) {
           console.info(
-            `Images déjà chargées (${loadedImageIds.length}/${originalImageIds.length}) - elles ne seront pas rechargées.`
+            `Images already loaded (${loadedImageIds.length}/${originalImageIds.length}) - they will not be reloaded.`
           );
         }
         if (!unloadedImageIds.length) {
           console.info(
-            'Toutes les images nécessaires sont déjà en cache, passage direct au calcul des statistiques.'
+            'All necessary images are already in cache, proceeding directly to statistics calculation.'
           );
         }
 
@@ -278,7 +278,7 @@ function OHIFCornerstoneSEGViewport(props: withAppTypes) {
             console.timeEnd('loadAllImagesAndGetStats');
           })
           .catch(error => {
-            console.warn('Erreur lors du chargement des images avant calcul des stats:', error);
+            console.warn('Error loading images before statistics calculation:', error);
           });
       }
     );
