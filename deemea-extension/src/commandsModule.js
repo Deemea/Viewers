@@ -4,6 +4,7 @@ import toolbarButtonsValidated from '../../deemea-mode/src/toolbarButtonsValidat
 import toolbarButtonsValidated3d from '../../deemea-mode-3d/src/toolbarButtonsValidated3d';
 import toolbarButtons from '../../deemea-mode/src/toolbarButtons';
 import toolbarButtons3d from '../../deemea-mode-3d/src/toolbarButtons3d';
+import segmentationButtonsValidated from '../../deemea-mode-3d/src/segmentationButtonsValidated';
 import segmentationButtons from '../../deemea-mode-3d/src/segmentationButtons';
 
 const commandsModule = ({ servicesManager, commandsManager }) => {
@@ -17,6 +18,7 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
         SegmentationService,
         toolbarService,
         displaySetService,
+        customizationService,
       } = servicesManager.services;
 
       if (
@@ -24,7 +26,8 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
         !ViewportGridService ||
         !CornerstoneViewportService ||
         !SegmentationService ||
-        !displaySetService
+        !displaySetService ||
+        !customizationService
       ) {
         console.error('Required services are not available');
         return;
@@ -85,7 +88,14 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
               toolbarService?.refreshToolbarState();
             } else {
               toolbarService?.setButtons(toolbarButtonsValidated3d);
-              toolbarService?.addButtons(segmentationButtons);
+              toolbarService?.addButtons(segmentationButtonsValidated);
+              customizationService.setCustomizations([
+                {
+                  'panelSegmentation.disableEditing': {
+                    $set: true,
+                  },
+                },
+              ]);
               toolbarService?.refreshToolbarState();
             }
           } else {
@@ -101,6 +111,13 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
             } else {
               toolbarService?.setButtons(toolbarButtons3d);
               toolbarService?.addButtons(segmentationButtons);
+              customizationService.setCustomizations([
+                {
+                  'panelSegmentation.disableEditing': {
+                    $set: false,
+                  },
+                },
+              ]);
               toolbarService?.refreshToolbarState();
             }
           }
