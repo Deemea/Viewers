@@ -103,7 +103,7 @@ export const DataRow: React.FC<DataRowProps> = ({
   className,
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const isTitleLong = title?.length > 25;
+  const isTitleLong = title?.length > 15;
   const rowRef = useRef<HTMLDivElement>(null);
 
   // useEffect(() => {
@@ -234,10 +234,9 @@ export const DataRow: React.FC<DataRowProps> = ({
             <Tooltip>
               <TooltipTrigger asChild>
                 <span
-                  className={`cursor-default text-base ${isSelected ? 'text-highlight' : 'text-muted-foreground'
-                    } [overflow:hidden] [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]`}
+                  className={`cursor-default text-base ${isSelected ? 'text-highlight' : 'text-muted-foreground'} block w-full`}
                 >
-                  {title}
+                  {title.slice(0, 15)}…
                 </span>
               </TooltipTrigger>
               <TooltipContent
