@@ -58,6 +58,8 @@ export function setupSegmentationDataModifiedHandler({
           readableText,
         });
 
+
+
         if (updatedSegmentation || action === 'RENAME') {
           if (!updatedSegmentation?.segments) {
             uiNotificationService.show({

@@ -18,12 +18,8 @@ export default function getSegmentationPanelCustomization({ commandsManager, ser
     'panelSegmentation.readableText': {
       // the values will appear in this order
       min: 'Min Value',
-      minLPS: 'Min Coord',
       max: 'Max Value',
-      maxLPS: 'Max Coord',
       mean: 'Mean Value',
-      stdDev: 'Standard Deviation',
-      count: 'Voxel Count',
       median: 'Median',
       skewness: 'Skewness',
       kurtosis: 'Kurtosis',
@@ -31,7 +27,6 @@ export default function getSegmentationPanelCustomization({ commandsManager, ser
       peakLPS: 'Peak Coord',
       volume: 'Volume',
       lesionGlycolysis: 'Lesion Glycolysis',
-      center: 'Center',
     },
     'segmentationToolbox.config': () => {
       // Get initial states based on current configuration

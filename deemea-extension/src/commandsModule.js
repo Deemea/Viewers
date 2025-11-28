@@ -158,7 +158,6 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
           const segmentation = SegmentationService.getSegmentations();
 
           const segments = segmentation[0].segments;
-          console.log(segmentation);
 
           const stats = {};
           Object.values(segments).forEach(segment => {
@@ -171,8 +170,6 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
               });
             });
           });
-
-          console.log('stats', stats, Object.entries(stats).length);
 
           if (stats && Object.entries(stats).length) {
             window.parent.postMessage(

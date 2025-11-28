@@ -103,7 +103,7 @@ export const DataRow: React.FC<DataRowProps> = ({
   className,
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const isTitleLong = title?.length > 25;
+  const isTitleLong = title?.length > 15;
   const rowRef = useRef<HTMLDivElement>(null);
 
   // useEffect(() => {
@@ -234,10 +234,9 @@ export const DataRow: React.FC<DataRowProps> = ({
             <Tooltip>
               <TooltipTrigger asChild>
                 <span
-                  className={`cursor-default text-base ${isSelected ? 'text-highlight' : 'text-muted-foreground'
-                    } [overflow:hidden] [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]`}
+                  className={`cursor-default text-base ${isSelected ? 'text-highlight' : 'text-muted-foreground'} block w-full`}
                 >
-                  {title}
+                  {title.slice(0, 15)}…
                 </span>
               </TooltipTrigger>
               <TooltipContent
@@ -263,7 +262,7 @@ export const DataRow: React.FC<DataRowProps> = ({
                 <Button
                   size="icon"
                   variant="ghost"
-                  className={`h-6 w-6 opacity-50 transition-opacity`}
+                  className={`h-6 w-6 opacity-30 transition-opacity`}
                   aria-label="ListView"
                 >
                   <Icons.ListView className="h-6 w-6" />
@@ -273,7 +272,7 @@ export const DataRow: React.FC<DataRowProps> = ({
                 side="top"
                 align="center"
               >
-                Segmentation statistics are computing, retry later
+                Segmentation statistics are being computed...
               </TooltipContent>
             </Tooltip>
           ) : (
