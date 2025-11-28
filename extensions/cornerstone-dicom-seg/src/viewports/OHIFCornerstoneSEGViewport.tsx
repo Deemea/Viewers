@@ -10,7 +10,8 @@ import { SegmentationRepresentations } from '@cornerstonejs/tools/enums';
 import { utils } from '@ohif/extension-cornerstone';
 import { segmentation as cstSegmentation } from '@cornerstonejs/tools';
 import { updateSegmentationStats } from '../../../../extensions/cornerstone/src/utils/updateSegmentationStats';
-import * as cornerstone from '@cornerstonejs/core'; // si 3D
+import * as cornerstone from '@cornerstonejs/core'; // for 3D
+import { cache } from '@cornerstonejs/core';
 
 const SEG_TOOLGROUP_BASE_NAME = 'SEGToolGroup';
 
@@ -220,11 +221,9 @@ function OHIFCornerstoneSEGViewport(props: withAppTypes) {
           console.warn('No images found in the referenced displaySet.');
           return;
         }
-
         const loadedImageIds: string[] = [];
         const unloadedImageIds: string[] = [];
 
-        const cache = (cornerstone as any).cache;
         originalImageIds.forEach(id => {
           const cachedImage = cache?.getImage?.(id);
           if (cachedImage) {
@@ -245,7 +244,10 @@ function OHIFCornerstoneSEGViewport(props: withAppTypes) {
           );
         }
 
-        const loadImagesResult = cornerstone.imageLoader.loadAndCacheImages?.(unloadedImageIds);
+        const loadImagesResult =
+          typeof cornerstone.imageLoader.loadAndCacheImages === 'function'
+            ? cornerstone.imageLoader.loadAndCacheImages(unloadedImageIds)
+            : undefined;
 
         const loadPromise: Promise<any> = Array.isArray(loadImagesResult)
           ? Promise.all(loadImagesResult)
