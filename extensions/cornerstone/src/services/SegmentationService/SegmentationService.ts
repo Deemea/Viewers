@@ -1850,10 +1850,12 @@ class SegmentationService extends PubSubService {
   }
 
   private _onSegmentationDataModifiedFromSource = evt => {
-    const { segmentationId } = evt.detail;
-    this._broadcastEvent(this.EVENTS.SEGMENTATION_DATA_MODIFIED, {
-      segmentationId,
-    });
+    const { segmentationId, segmentIndex } = evt.detail;
+    if (segmentIndex !== undefined) {
+      this._broadcastEvent(this.EVENTS.SEGMENTATION_DATA_MODIFIED, {
+        segmentationId,
+      });
+    }
   };
 
   private _onSegmentationRepresentationModifiedFromSource = evt => {
