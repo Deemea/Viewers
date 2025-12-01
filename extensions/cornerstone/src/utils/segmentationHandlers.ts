@@ -65,7 +65,7 @@ export function setupSegmentationDataModifiedHandler({
 
           return;
         }
-
+        uiNotificationService.hide(waitingMessage);
         segmentationService.addOrUpdateSegmentation({
           segmentationId,
           segments: updatedSegmentation.segments,
