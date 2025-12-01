@@ -73,7 +73,6 @@ interface DataRowProps {
   onToggleLocked: (e) => void;
   //
   title: string;
-  onClickDisplay: (n: number) => void;
   onRename: (e) => void;
   //
   onDelete: (e) => void;
@@ -92,7 +91,6 @@ export const DataRow: React.FC<DataRowProps> = ({
   onSelect,
   isLocked,
   onToggleVisibility,
-  onClickDisplay,
   onToggleLocked,
   onRename,
   onDelete,
