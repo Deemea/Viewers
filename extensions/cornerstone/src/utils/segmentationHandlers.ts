@@ -27,6 +27,7 @@ export function setupSegmentationDataModifiedHandler({
       const segmentation = segmentationService.getSegmentation(segmentationId);
 
       if (!segmentation) {
+        uiNotificationService.hide(waitingMessage);
         return;
       }
 
