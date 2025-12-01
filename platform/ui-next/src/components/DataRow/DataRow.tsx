@@ -62,6 +62,7 @@ interface DataRowProps {
   description: string;
   details?: { primary: string[]; secondary: string[] };
   //
+  hasStats?: boolean;
   isSelected?: boolean;
   onSelect?: (e) => void;
   //
@@ -85,6 +86,7 @@ export const DataRow: React.FC<DataRowProps> = ({
   number,
   title,
   colorHex,
+  hasStats,
   details,
   onSelect,
   isLocked,

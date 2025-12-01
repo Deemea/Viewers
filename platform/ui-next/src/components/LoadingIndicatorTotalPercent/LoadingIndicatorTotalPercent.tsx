@@ -32,18 +32,23 @@ function LoadingIndicatorTotalPercent({
     !totalNumbers && percentComplete === null ? (
       <div className="text-sm text-white">{loadingText}</div>
     ) : !totalNumbers && percentComplete !== null ? (
-      <div className="text-sm text-white">Loaded {percentComplete}%</div>
+      <div className="text-sm text-white">Loaded {progress}%</div>
     ) : (
       <div className="text-sm text-white">
         Loaded {numTargetsLoadedText} of {totalNumbersText} {targetText}
       </div>
     );
 
-  uiNotificationService.show({
+  const loadingNotification = uiNotificationService.show({
     title: textBlock,
     type: 'info',
-    duration: 20000,
+    duration: 6000,
   });
+
+  if (progress >= 80) {
+    uiNotificationService.hide(loadingNotification);
+  }
+
   // return (
   //   <LoadingIndicatorProgress
   //     className={className}
