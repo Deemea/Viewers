@@ -1,6 +1,6 @@
 import { id } from './id';
 import toolbarButtons from './toolbarButtons3d';
-// import segmentationButtons from './segmentationButtons3d';
+import segmentationButtons from './segmentationButtons';
 import initToolGroups from './initToolGroups3d';
 
 const ohif = {
@@ -105,7 +105,7 @@ function modeFactory({ modeConfiguration }) {
         // 'Shapes',
       ]);
       toolbarService.createButtonSection('brushToolsSection', ['Brush', 'Eraser', 'Threshold']);
-      // toolbarService?.addButtons(segmentationButtons);
+      toolbarService?.addButtons(segmentationButtons);
     },
     onModeExit: ({ servicesManager }: withAppTypes) => {
       const {
