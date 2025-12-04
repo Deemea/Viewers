@@ -55,7 +55,7 @@ export function setupSegmentationDataModifiedHandler({
         readableText,
       });
 
-      if (updatedSegmentation || action === 'RENAME') {
+      if (updatedSegmentation || action === 'RENAME' || action === 'REMOVE') {
         if (!updatedSegmentation?.segments) {
           uiNotificationService.show({
             title: 'Browse all the slices to update the segmentation name',
@@ -65,12 +65,10 @@ export function setupSegmentationDataModifiedHandler({
 
           return;
         }
-        uiNotificationService.hide(waitingMessage);
         segmentationService.addOrUpdateSegmentation({
           segmentationId,
           segments: updatedSegmentation.segments,
         });
-
         // SAVE AUTO SEGMENTATION
         try {
           const displaySets = displaySetService.getActiveDisplaySets();
@@ -86,7 +84,7 @@ export function setupSegmentationDataModifiedHandler({
           }
 
           const { dataset: naturalizedReport } = generatedData;
-          naturalizedReport.SeriesDescription = 'Deemea custom segmentation';
+          naturalizedReport.SeriesDescription = 'Deemea segmentation';
 
           await defaultDataSource[0].store.dicom(naturalizedReport);
           naturalizedReport.wadoRoot = defaultDataSource[0].getConfig().wadoRoot;
