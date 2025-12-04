@@ -907,8 +907,13 @@ class SegmentationService extends PubSubService {
    * 3. If the removed segment was the active segment, it updates the active segment index.
    *
    */
-  public removeSegment(segmentationId: string, segmentIndex: number): void {
-    cstSegmentation.removeSegment(segmentationId, segmentIndex);
+  public async removeSegment(segmentationId: string, segmentIndex: number): Promise<void> {
+    await cstSegmentation.removeSegment(segmentationId, segmentIndex);
+
+    this._broadcastEvent(this.EVENTS.SEGMENTATION_DATA_MODIFIED, {
+      segmentationId,
+      action: 'REMOVE',
+    });
   }
 
   public setSegmentVisibility(
