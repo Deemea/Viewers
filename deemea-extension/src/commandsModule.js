@@ -52,7 +52,7 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
               const currentDisplaySetUID = currentViewport?.displaySetInstanceUIDs?.[0];
 
               if (currentDisplaySetUID !== segmentationDisplaySet[0].displaySetInstanceUID) {
-                const checkSegmentationReady = () => {
+                const checkSegmentationReady = (retryCount = 0, maxRetries = 50) => {
                   const displaySet = displaySetService.getDisplaySetByUID(
                     segmentationDisplaySet[0].displaySetInstanceUID
                   );
@@ -66,8 +66,10 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
                       },
                     ];
                     ViewportGridService.setDisplaySetsForViewports(updatedViewports);
+                  } else if (retryCount < maxRetries) {
+                    setTimeout(() => checkSegmentationReady(retryCount + 1, maxRetries), 100);
                   } else {
-                    setTimeout(checkSegmentationReady, 100);
+                    console.warn('Segmentation loading timed out after', maxRetries * 100, 'ms');
                   }
                 };
                 checkSegmentationReady();
