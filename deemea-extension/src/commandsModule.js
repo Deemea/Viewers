@@ -39,32 +39,44 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
           if (segmentationLoaded) {
             return;
           }
-          setTimeout(() => {
-            const displaySets = displaySetService.getActiveDisplaySets();
 
-            if (displaySets.length) {
-              const segmentationDisplaySet = displaySets.filter(
-                display => display.Modality === 'SEG'
-              );
+          const displaySets = displaySetService.getActiveDisplaySets();
+          if (displaySets.length) {
+            const segmentationDisplaySet = displaySets.filter(
+              display => display.Modality === 'SEG'
+            );
 
-              if (segmentationDisplaySet.length === 1) {
-                const currentViewport = ViewportGridService.getState().viewports['default'];
+            if (segmentationDisplaySet.length === 1) {
+              const currentViewport = ViewportGridService.getState().viewports['default'];
 
-                const currentDisplaySetUID = currentViewport?.displaySetInstanceUIDs?.[0];
+              const currentDisplaySetUID = currentViewport?.displaySetInstanceUIDs?.[0];
 
-                if (currentDisplaySetUID !== segmentationDisplaySet[0].displaySetInstanceUID) {
-                  segmentationLoaded = true;
-                  const updatedViewports = [
-                    {
-                      viewportId: 'default',
-                      displaySetInstanceUIDs: [segmentationDisplaySet[0].displaySetInstanceUID],
-                    },
-                  ];
-                  ViewportGridService.setDisplaySetsForViewports(updatedViewports);
-                }
+              if (currentDisplaySetUID !== segmentationDisplaySet[0].displaySetInstanceUID) {
+                const checkSegmentationReady = (retryCount = 0, maxRetries = 50) => {
+                  const displaySet = displaySetService.getDisplaySetByUID(
+                    segmentationDisplaySet[0].displaySetInstanceUID
+                  );
+
+                  if (displaySet?.isLoaded || displaySet?.instances?.length > 0) {
+                    segmentationLoaded = true;
+                    const updatedViewports = [
+                      {
+                        viewportId: 'default',
+                        displaySetInstanceUIDs: [segmentationDisplaySet[0].displaySetInstanceUID],
+                      },
+                    ];
+                    ViewportGridService.setDisplaySetsForViewports(updatedViewports);
+                  } else if (retryCount < maxRetries) {
+                    setTimeout(() => checkSegmentationReady(retryCount + 1, maxRetries), 100);
+                  } else {
+                    console.warn('Segmentation loading timed out after', maxRetries * 100, 'ms');
+                  }
+                };
+                checkSegmentationReady();
               }
             }
-          }, 1000);
+          }
+
           window.parent.postMessage(
             {
               type: OHIFMessageType.IMAGE_READY,
