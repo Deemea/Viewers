@@ -9,6 +9,7 @@ export default function getSegmentationPanelCustomization({ commandsManager, ser
     'panelSegmentation.customSegmentStatisticsHeader': CustomSegmentStatisticsHeader,
     'panelSegmentation.disableEditing': false,
     'panelSegmentation.showAddSegment': true,
+    'panelSegmentation.disableAddSegmentation': false,
     'panelSegmentation.onSegmentationAdd': () => {
       const { viewportGridService } = servicesManager.services;
       const viewportId = viewportGridService.getState().activeViewportId;

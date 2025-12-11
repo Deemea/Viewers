@@ -47,6 +47,13 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
             );
 
             if (segmentationDisplaySet.length === 1) {
+              customizationService.setCustomizations([
+                {
+                  'panelSegmentation.disableAddSegmentation': {
+                    $set: true,
+                  },
+                },
+              ]);
               const currentViewport = ViewportGridService.getState().viewports['default'];
 
               const currentDisplaySetUID = currentViewport?.displaySetInstanceUIDs?.[0];
@@ -274,7 +281,7 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
           points: matchedPoints,
           elementType: event.measurement.toolName,
           uid: event.measurement.uid,
-          measurementId: event?.measurement?.label.measurementId,
+          measurementId: event?.measurement?.label?.measurementId || '',
           hide: event?.measurement?.label?.hide || false,
           forceHide: event?.measurement?.label?.forceHide || false,
           locked: event?.measurement?.label?.locked || false,

@@ -62,6 +62,7 @@ export interface SegmentationTableContextType {
   activeSegmentation?: Segmentation;
   disableEditing: boolean;
   showAddSegment?: boolean;
+  disableAddSegmentation?: boolean;
   renderInactiveSegmentations?: boolean;
 
   // Function handlers
