@@ -22,6 +22,9 @@ export default function PanelSegmentation({ children }: withAppTypes) {
   );
   const disableEditing = customizationService.getCustomization('panelSegmentation.disableEditing');
   const showAddSegment = customizationService.getCustomization('panelSegmentation.showAddSegment');
+  const disableAddSegmentation = customizationService.getCustomization(
+    'panelSegmentation.disableAddSegmentation'
+  );
   const CustomDropdownMenuContent = customizationService.getCustomization(
     'panelSegmentation.customDropdownMenuContent'
   );
@@ -137,6 +140,7 @@ export default function PanelSegmentation({ children }: withAppTypes) {
     disableEditing,
     onSegmentationAdd,
     showAddSegment,
+    disableAddSegmentation,
     renderInactiveSegmentations: handlers.getRenderInactiveSegmentations(),
     ...handlers,
   };
@@ -157,13 +161,6 @@ export default function PanelSegmentation({ children }: withAppTypes) {
     if (tableProps.mode === 'collapsed') {
       return (
         <SegmentationTable.Collapsed>
-          <SegmentationTable.Collapsed.Header>
-            <SegmentationTable.Collapsed.DropdownMenu>
-              <CustomDropdownMenuContent />
-            </SegmentationTable.Collapsed.DropdownMenu>
-            <SegmentationTable.Collapsed.Selector />
-            {/* <SegmentationTable.Collapsed.Info /> */}
-          </SegmentationTable.Collapsed.Header>
           <SegmentationTable.Collapsed.Content>
             <SegmentationTable.AddSegmentRow />
             {renderSegments()}
@@ -176,11 +173,7 @@ export default function PanelSegmentation({ children }: withAppTypes) {
       <>
         <SegmentationTable.Expanded>
           <SegmentationTable.Expanded.Header>
-            <SegmentationTable.Expanded.DropdownMenu>
-              <CustomDropdownMenuContent />
-            </SegmentationTable.Expanded.DropdownMenu>
             <SegmentationTable.Expanded.Label />
-            {/* <SegmentationTable.Expanded.Info /> */}
           </SegmentationTable.Expanded.Header>
 
           <SegmentationTable.Expanded.Content>

@@ -8,7 +8,7 @@ export const AddSegmentationRow: React.FC<{ children?: React.ReactNode }> = ({
 }) => {
   const { t } = useTranslation('SegmentationTable');
 
-  const { onSegmentationAdd, data, disableEditing, mode, disabled } =
+  const { onSegmentationAdd, data, disableEditing, mode, disabled, disableAddSegmentation } =
     useSegmentationTableContext('AddSegmentationRow');
 
   const isEmpty = data.length === 0;
@@ -23,8 +23,8 @@ export const AddSegmentationRow: React.FC<{ children?: React.ReactNode }> = ({
 
   return (
     <div
-      className={`group ${disabled ? 'pointer-events-none cursor-not-allowed opacity-70' : ''}`}
-      onClick={() => !disabled && onSegmentationAdd('')}
+      className={`group ${disabled || disableAddSegmentation ? 'pointer-events-none cursor-not-allowed opacity-50' : ''}`}
+      onClick={disabled || disableAddSegmentation ? undefined : () => onSegmentationAdd('')}
     >
       {children}
       <div className="text-primary group-hover:bg-secondary-dark flex items-center rounded-[4px] pl-1 group-hover:cursor-pointer">
