@@ -10,11 +10,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 const showErrorBoundaryFlag = (process.env.SHOW_ERROR_BOUNDARY || '').toString();
 const SHOW_ERROR_BOUNDARY =
-  showErrorBoundaryFlag === 'true'
-    ? true
-    : showErrorBoundaryFlag === 'false'
-      ? false
-      : !isProduction;
+  showErrorBoundaryFlag === 'false' ? false : showErrorBoundaryFlag === 'true' || !isProduction;
 
 /**
  * Parses an error stack trace to extract important information
