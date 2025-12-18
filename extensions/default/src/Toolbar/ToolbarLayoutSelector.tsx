@@ -97,13 +97,6 @@ function ToolbarLayoutSelectorWithServices({
             protocolId: '3d-primary',
           },
         },
-        {
-          title: 'Frame View',
-          icon: 'icon-stack',
-          commandOptions: {
-            protocolId: 'frame-view',
-          },
-        },
       ];
 
   // Unified selection handler that dispatches to the appropriate command
