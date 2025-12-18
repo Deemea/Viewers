@@ -49,6 +49,8 @@ const defineValues = {
   'process.env.LOCIZE_PROJECTID': JSON.stringify(process.env.LOCIZE_PROJECTID || ''),
   'process.env.LOCIZE_API_KEY': JSON.stringify(process.env.LOCIZE_API_KEY || ''),
   'process.env.REACT_APP_I18N_DEBUG': JSON.stringify(process.env.REACT_APP_I18N_DEBUG || ''),
+  // Error Boundary toggle
+  'process.env.SHOW_ERROR_BOUNDARY': JSON.stringify(process.env.SHOW_ERROR_BOUNDARY || ''),
   'process.env.TEST_ENV': JSON.stringify(process.env.TEST_ENV || ''),
 };
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ErrorBoundary as ReactErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent } from '../Dialog/Dialog';
@@ -7,6 +7,10 @@ import { Button } from '../Button/Button';
 import { useNotification } from '../../contextProviders';
 
 const isProduction = process.env.NODE_ENV === 'production';
+
+const showErrorBoundaryFlag = (process.env.SHOW_ERROR_BOUNDARY || '').toString();
+const SHOW_ERROR_BOUNDARY =
+  showErrorBoundaryFlag === 'false' ? false : showErrorBoundaryFlag === 'true' || !isProduction;
 
 /**
  * Parses an error stack trace to extract important information
@@ -131,7 +135,7 @@ interface ErrorBoundaryProps {
 const DefaultFallback = ({
   error,
   context,
-  resetErrorBoundary = () => {},
+  resetErrorBoundary = () => { },
 }: DefaultFallbackProps) => {
   const { t } = useTranslation('ErrorBoundary');
   const [showDetails, setShowDetails] = useState(false);
@@ -172,7 +176,7 @@ const DefaultFallback = ({
     });
   }, [error, errorTitle, subtitle, t, title, show]);
 
-  if (isProduction) {
+  if (!SHOW_ERROR_BOUNDARY) {
     return null;
   }
 
@@ -245,14 +249,22 @@ const DefaultFallback = ({
 
 const ErrorBoundary = ({
   context = 'OHIF',
-  onReset = () => {},
-  onError = () => {},
+  onReset = () => { },
+  onError = () => { },
   fallbackComponent: FallbackComponent = DefaultFallback,
   children,
   fallbackRoute = null,
   isPage,
 }: ErrorBoundaryProps) => {
   const [error, setError] = useState<ErrorBoundaryError | null>(null);
+
+  const onErrorHandler = useCallback(
+    (error: ErrorBoundaryError, componentStack: string | null) => {
+      console.debug(`${context} Error Boundary`, error, componentStack, context);
+      onError(error, componentStack || '', context);
+    },
+    [context, onError]
+  );
 
   const onResetHandler = () => {
     setError(null);
@@ -261,6 +273,9 @@ const ErrorBoundary = ({
 
   // Add error event listener to window
   useEffect(() => {
+    if (!SHOW_ERROR_BOUNDARY) {
+      return;
+    }
     let errorTimeout: NodeJS.Timeout;
 
     const handleError = (event: ErrorEvent) => {
@@ -289,12 +304,7 @@ const ErrorBoundary = ({
       window.removeEventListener('error', handleError);
       window.removeEventListener('unhandledrejection', handleRejection);
     };
-  }, []);
-
-  const onErrorHandler = (error: ErrorBoundaryError, componentStack: string | null) => {
-    console.debug(`${context} Error Boundary`, error, componentStack, context);
-    onError(error, componentStack || '', context);
-  };
+  }, [onErrorHandler]);
 
   return (
     <ReactErrorBoundary

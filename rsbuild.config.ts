@@ -4,6 +4,9 @@ import { pluginNodePolyfill } from '@rsbuild/plugin-node-polyfill';
 import path from 'path';
 import writePluginImportsFile from './platform/app/.webpack/writePluginImportsFile';
 import fs from 'fs';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const SRC_DIR = path.resolve(__dirname, './platform/app/src');
 const DIST_DIR = path.resolve(__dirname, './platform/app/dist');
@@ -14,7 +17,6 @@ const APP_CONFIG = process.env.APP_CONFIG || 'config/default.js';
 const PUBLIC_URL = process.env.PUBLIC_URL || '/';
 
 // Add these constants
-const NODE_ENV = process.env.NODE_ENV;
 const BUILD_NUM = process.env.CIRCLE_BUILD_NUM || '0';
 const VERSION_NUMBER = fs.readFileSync(path.join(__dirname, './version.txt'), 'utf8') || '';
 const COMMIT_HASH = fs.readFileSync(path.join(__dirname, './commit.txt'), 'utf8') || '';
@@ -43,6 +45,8 @@ export default defineConfig({
       'process.env.LOCIZE_PROJECTID': JSON.stringify(process.env.LOCIZE_PROJECTID || ''),
       'process.env.LOCIZE_API_KEY': JSON.stringify(process.env.LOCIZE_API_KEY || ''),
       'process.env.REACT_APP_I18N_DEBUG': JSON.stringify(process.env.REACT_APP_I18N_DEBUG || ''),
+      // Expose Error Boundary toggle to the client
+      'process.env.SHOW_ERROR_BOUNDARY': JSON.stringify(process.env.SHOW_ERROR_BOUNDARY || ''),
     },
   },
   plugins: [pluginReact(), pluginNodePolyfill()],
