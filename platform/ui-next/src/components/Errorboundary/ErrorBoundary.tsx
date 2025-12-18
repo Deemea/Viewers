@@ -310,8 +310,6 @@ const ErrorBoundary = ({
     };
   }, [onErrorHandler]);
 
-  // onErrorHandler defined above with useCallback for stable reference
-
   return (
     <ReactErrorBoundary
       fallbackRender={props => (
