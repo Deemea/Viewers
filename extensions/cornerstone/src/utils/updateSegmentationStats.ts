@@ -161,26 +161,16 @@ export function updateSegmentBidirectionalStats({
 
   // Only calculate and update if we have valid measurements
   if (maxMajor > 0 && maxMinor > 0) {
-    // Bidirectional is not displayed correctly for now (NaN values), so we comment it out
-    // namedStats.bidirectional = {
-    //   name: 'bidirectional',
-    //   label: 'Bidirectional',
-    //   annotationUID: annotation.annotationUID,
-    //   value: {
-    //     maxMajor,
-    //     maxMinor,
-    //     majorAxis,
-    //     minorAxis,
-    //   },
-    //   unit: 'mm',
-    // };
-
-    // Sending only the biggest diameter for now
-    namedStats.diameter = {
-      name: 'diameter',
-      label: 'Diameter',
+    namedStats.bidirectional = {
+      name: 'bidirectional',
+      label: 'Bidirectional',
       annotationUID: annotation.annotationUID,
-      value: maxMajor,
+      value: {
+        maxMajor,
+        maxMinor,
+        majorAxis,
+        minorAxis,
+      },
       unit: 'mm',
     };
 
