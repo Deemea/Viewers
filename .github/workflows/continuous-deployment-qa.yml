@@ -18,6 +18,9 @@ jobs:
           echo "AWS_ACCESS_KEY_ID=${{ secrets.QA_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
           echo "AWS_SECRET_ACCESS_KEY=${{ secrets.QA_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
 
+      - name: Copy env file
+        run: echo "${{ secrets.QA_ENV_FILE }}" > .env
+
       - name: Install dependencies
         run:
           yarn install && yarn run cli link-mode deemea-mode && yarn run cli link-extension
