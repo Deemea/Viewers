@@ -14,28 +14,8 @@ function getHangingProtocolModule() {
       protocol: mpr,
     },
     {
-      name: mprAnd3DVolumeViewport.id,
-      protocol: mprAnd3DVolumeViewport,
-    },
-    {
-      name: fourUp.id,
-      protocol: fourUp,
-    },
-    {
-      name: main3D.id,
-      protocol: main3D,
-    },
-    {
       name: primaryAxial.id,
       protocol: primaryAxial,
-    },
-    {
-      name: only3D.id,
-      protocol: only3D,
-    },
-    {
-      name: primary3D.id,
-      protocol: primary3D,
     },
   ];
 }
