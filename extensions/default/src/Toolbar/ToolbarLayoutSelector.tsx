@@ -101,7 +101,7 @@ function ToolbarLayoutSelectorWithServices({
               )}
 
               {advancedPresets.length > 0 && (
-                <LayoutSelector.PresetSection title="">
+                <LayoutSelector.PresetSection>
                   {advancedPresets.map((preset, index) => (
                     <LayoutSelector.Preset
                       key={`advanced-preset-${index}`}
