@@ -34,21 +34,21 @@ function ToolbarLayoutSelectorWithServices({
   const advancedPresets = advancedPresetsGenerator
     ? advancedPresetsGenerator({ servicesManager })
     : [
-      {
-        title: 'MPR',
-        icon: 'layout-three-col',
-        commandOptions: {
-          protocolId: 'mpr',
+        {
+          title: 'MPR',
+          icon: 'layout-three-col',
+          commandOptions: {
+            protocolId: 'mpr',
+          },
         },
-      },
-      {
-        title: 'Axial Primary',
-        icon: 'layout-side-by-side',
-        commandOptions: {
-          protocolId: 'axial-primary',
+        {
+          title: 'Axial Primary',
+          icon: 'layout-side-by-side',
+          commandOptions: {
+            protocolId: 'axial-primary',
+          },
         },
-      },
-    ];
+      ];
 
   // Unified selection handler that dispatches to the appropriate command
   const handleSelectionChange = useCallback(
@@ -101,7 +101,7 @@ function ToolbarLayoutSelectorWithServices({
               )}
 
               {advancedPresets.length > 0 && (
-                <LayoutSelector.PresetSection>
+                <LayoutSelector.PresetSection title="">
                   {advancedPresets.map((preset, index) => (
                     <LayoutSelector.Preset
                       key={`advanced-preset-${index}`}
