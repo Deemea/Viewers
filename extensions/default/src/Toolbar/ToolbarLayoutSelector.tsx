@@ -82,7 +82,7 @@ function ToolbarLayoutSelectorWithServices({
         <LayoutSelector.Trigger tooltip="Change layout" />
         <LayoutSelector.Content>
           {/* Left side - Presets */}
-          {advancedPresets.length > 0 && (
+          {(commonPresets.length > 0 || advancedPresets.length > 0) && (
             <div className="bg-popover flex flex-col rounded-lg p-2">
               {commonPresets.length > 0 && (
                 <>
