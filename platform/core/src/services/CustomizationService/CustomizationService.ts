@@ -335,8 +335,8 @@ export default class CustomizationService extends PubSubService {
 
     this.transformedCustomizations.clear();
     this._broadcastEvent(this.EVENTS.GLOBAL_CUSTOMIZATION_MODIFIED, {
-      buttons: this.defaultCustomizations,
-      button: this.defaultCustomizations.get(id),
+      buttons: this.globalCustomizations,
+      button: this.globalCustomizations.get(id),
     });
   }
 

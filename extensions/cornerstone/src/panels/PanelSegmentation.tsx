@@ -59,7 +59,8 @@ export default function PanelSegmentation({ children }: withAppTypes) {
     return () => {
       subscriptions.forEach(sub => sub.unsubscribe());
     };
-  }, [customizationService, getCustomizations]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [customizationService]);
 
   // Extract customization options from state
   const {
@@ -68,7 +69,6 @@ export default function PanelSegmentation({ children }: withAppTypes) {
     disableEditing,
     showAddSegment,
     disableAddSegmentation,
-    CustomDropdownMenuContent,
     CustomSegmentStatisticsHeader,
   } = customizations;
 
