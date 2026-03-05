@@ -95,6 +95,9 @@ export function setupSegmentationDataModifiedHandler({
               type: OHIFMessageType.SAVE_SEGMENTATION,
               message: {
                 seriesInstanceUID: naturalizedReport.SeriesInstanceUID,
+                segments: Object.values(updatedSegmentation.segments).map(segment => ({
+                  label: segment.label,
+                })),
               },
             },
             '*'
