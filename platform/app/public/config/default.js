@@ -472,9 +472,9 @@ window.config = {
       configuration: {
         friendlyName: 'gpu-qa-didier',
         name: 'gpu-qa-didier',
-        wadoUriRoot: 'https://gpu-qa.deemea.com/api/v1/didier',
-        qidoRoot: 'https://gpu-qa.deemea.com/api/v1/didier',
-        wadoRoot: 'https://gpu-qa.deemea.com/api/v1/didier',
+        wadoUriRoot: 'https://gpu.qa.deemea.com/api/v1/didier',
+        qidoRoot: 'https://gpu.qa.deemea.com/api/v1/didier',
+        wadoRoot: 'https://gpu.qa.deemea.com/api/v1/didier',
         qidoSupportsIncludeField: false,
         imageRendering: 'wadors',
         thumbnailRendering: 'wadors',
