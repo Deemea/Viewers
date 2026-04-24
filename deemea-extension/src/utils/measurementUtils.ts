@@ -12,11 +12,16 @@ function convertFromDicomCoordinates(
   dicomZ,
   imageWidth,
   imageHeight,
+  imageDepth,
+  numberOfSlices,
   pixelSpacingX,
   pixelSpacingY,
+  pixelSpacingZ,
+  currentSliceNumber,
   imagePositionPatient,
   orientationMatrix
 ) {
+  console.log('convert from dicom coord: ', [dicomX, dicomY, dicomZ]);
   // Step 1: Calculate the difference vector from the Image Position (Patient)
   const diffX = dicomX - imagePositionPatient[0];
   const diffY = dicomY - imagePositionPatient[1];
@@ -25,50 +30,86 @@ function convertFromDicomCoordinates(
   // Step 2: Extract row and column direction vectors from the orientation matrix
   const rowDir = [orientationMatrix[0], orientationMatrix[1], orientationMatrix[2]]; // [rx, ry, rz]
   const colDir = [orientationMatrix[3], orientationMatrix[4], orientationMatrix[5]]; // [cx, cy, cz]
+  const sliceDir = [orientationMatrix[6], orientationMatrix[7], orientationMatrix[8]]; // [sx, sy, sz]
 
   // Step 3: Project the difference vector onto the row and column directions to get physical coordinates
   const physicalX = diffX * rowDir[0] + diffY * rowDir[1] + diffZ * rowDir[2];
   const physicalY = diffX * colDir[0] + diffY * colDir[1] + diffZ * colDir[2];
-
+  const physicalZ = diffX * sliceDir[0] + diffY * sliceDir[1] + diffZ * sliceDir[2];
   // Step 4: Convert physical coordinates to pixel coordinates using pixel spacing
   const pixelX = physicalX / pixelSpacingX;
   const pixelY = physicalY / pixelSpacingY;
+  const pixelZ = physicalZ / pixelSpacingZ; // Use the actual Z spacing
 
   // Step 5: Normalize pixel coordinates to the range [0, 1]
   const normalizedX = pixelX / imageWidth;
   const normalizedY = pixelY / imageHeight;
 
-  return [normalizedX, normalizedY];
+  // const normalizedZ = numberOfSlices === 1 ? null : currentSliceNumber / numberOfSlices;
+  const normalizedZ = pixelZ / imageDepth;
+
+  console.log('z: ', {
+    diffZ,
+    sliceDir,
+    physicalZ,
+    pixelZ,
+    normalizedZ,
+  });
+
+  console.log('normalized coord: ', [normalizedX, normalizedY, normalizedZ]);
+  return [normalizedX, normalizedY, normalizedZ];
 }
 
 function convertToDicomCoordinates(
   normalizedX,
   normalizedY,
+  normalizedZ,
   imageWidth,
   imageHeight,
+  imageDepth,
+  numberOfSlices,
   pixelSpacingX,
   pixelSpacingY,
+  pixelSpacingZ,
   imagePositionPatient,
   orientationMatrix
 ) {
+  console.log('normalized coord: ', [normalizedX, normalizedY, normalizedZ]);
   // Step 1: Convert normalized coordinates (0 to 1) to pixel coordinates (0 to imageWidth/Height)
   const pixelX = normalizedX * imageWidth;
   const pixelY = normalizedY * imageHeight;
+  const pixelZ = normalizedZ * imageDepth;
 
   // Step 2: Convert pixel coordinates to physical distance in mm using pixel spacing
   const physicalX = pixelX * pixelSpacingX;
   const physicalY = pixelY * pixelSpacingY;
+  const physicalZ = pixelZ * pixelSpacingZ;
 
   // Step 3: Use the Image Orientation (Patient) matrix to convert to physical coordinates
   const rowDir = [orientationMatrix[0], orientationMatrix[1], orientationMatrix[2]]; // [rx, ry, rz]
   const colDir = [orientationMatrix[3], orientationMatrix[4], orientationMatrix[5]]; // [cx, cy, cz]
+  const sliceDir = [orientationMatrix[6], orientationMatrix[7], orientationMatrix[8]]; // [sx, sy, sz]
 
   // Compute DICOM coordinates
-  const dicomX = imagePositionPatient[0] + physicalX * rowDir[0] + physicalY * colDir[0];
-  const dicomY = imagePositionPatient[1] + physicalX * rowDir[1] + physicalY * colDir[1];
-  const dicomZ = imagePositionPatient[2] + physicalX * rowDir[2] + physicalY * colDir[2];
+  const dicomX =
+    imagePositionPatient[0] +
+    physicalX * rowDir[0] +
+    physicalY * colDir[0] +
+    physicalZ * sliceDir[0];
+  const dicomY =
+    imagePositionPatient[1] +
+    physicalX * rowDir[1] +
+    physicalY * colDir[1] +
+    physicalZ * sliceDir[1];
+  const dicomZ =
+    imagePositionPatient[2] +
+    physicalX * rowDir[2] +
+    physicalY * colDir[2] +
+    physicalZ * sliceDir[2];
 
-  return [dicomX, dicomY, dicomZ];
+  console.log('dicom coord: ', [dicomX, dicomY, dicomZ]);
+
+  return [dicomX, dicomY, numberOfSlices === 1 ? null : dicomZ];
 }
 
 async function matchNameWithAxis(
@@ -89,7 +130,6 @@ async function matchNameWithAngle(
   pointName2,
   pointName3
 ): Promise<{ color: string; highlighted: string; dotted?: boolean } | null> {
-
   const matchedAngle = angles.find(
     angle =>
       (pointName1 === angle.head && pointName2 === angle.middle && pointName3 === angle.tail) ||
@@ -197,7 +237,7 @@ function lockMeasurementIfNeeded(data, imageStatus: boolean): void {
   annotations?.forEach(annotation => {
     if (
       (annotation.data.label! as unknown as { measurementId: string }).measurementId ===
-        data.measurementId &&
+      data.measurementId &&
       (data.locked === true || imageStatus)
     ) {
       cs3dTools.annotation.locking.setAnnotationLocked(annotation.annotationUID!, true);
@@ -251,20 +291,28 @@ export function createRectangleROI(viewport, imageMetadata, data: RelatedPoint) 
     const normalizedPoints = data.points.map(point => {
       const normalizedX = point.x ? point.x : point.xOrigin;
       const normalizedY = point.y ? point.y : point.yOrigin;
+      const normalizedZ = point.z;
       const imageWidth = imageMetadata.dimensions[0];
       const imageHeight = imageMetadata.dimensions[1];
+      const imageDepth = imageMetadata.dimensions[2];
       const pixelSpacingX = imageMetadata.spacing[0];
       const pixelSpacingY = imageMetadata.spacing[1];
+      const pixelSpacingZ = imageMetadata.spacing[2];
       const imagePositionPatient = imageMetadata.origin;
       const orientationMatrix = imageMetadata.direction;
+      const numberOfSlices = viewport.getNumberOfSlices();
 
       return convertToDicomCoordinates(
         normalizedX,
         normalizedY,
+        normalizedZ,
         imageWidth,
         imageHeight,
+        imageDepth,
+        numberOfSlices,
         pixelSpacingX,
         pixelSpacingY,
+        pixelSpacingZ,
         imagePositionPatient,
         orientationMatrix
       );
@@ -303,20 +351,28 @@ export function createPoint(viewport, imageMetadata, data: RelatedPoint, imageId
   try {
     const normalizedX = data.points[0].x ? data.points[0].x : data.points[0].xOrigin;
     const normalizedY = data.points[0].y ? data.points[0].y : data.points[0].yOrigin;
+    const normalizedZ = data.points[0].z;
     const imageWidth = imageMetadata.dimensions[0];
     const imageHeight = imageMetadata.dimensions[1];
+    const imageDepth = imageMetadata.dimensions[2];
+    const numberOfSlices = viewport.getNumberOfSlices();
     const pixelSpacingX = imageMetadata.spacing[0];
     const pixelSpacingY = imageMetadata.spacing[1];
+    const pixelSpacingZ = imageMetadata.spacing[2];
     const imagePositionPatient = imageMetadata.origin;
     const orientationMatrix = imageMetadata.direction;
 
     const dicomCoords = convertToDicomCoordinates(
       normalizedX,
       normalizedY,
+      normalizedZ,
       imageWidth,
       imageHeight,
+      imageDepth,
+      numberOfSlices,
       pixelSpacingX,
       pixelSpacingY,
+      pixelSpacingZ,
       imagePositionPatient,
       orientationMatrix
     );
@@ -359,40 +415,56 @@ export function createLength(viewport, imageMetadata, data: RelatedPoint, imageI
   try {
     const normalizedX = data.points[0].x ? data.points[0].x : data.points[0].xOrigin;
     const normalizedY = data.points[0].y ? data.points[0].y : data.points[0].yOrigin;
+    const normalizedZ = data.points[0].z;
     const imageWidth = imageMetadata.dimensions[0];
     const imageHeight = imageMetadata.dimensions[1];
+    const imageDepth = imageMetadata.dimensions[2];
+    const numberOfSlices = viewport.getNumberOfSlices();
     const pixelSpacingX = imageMetadata.spacing[0];
     const pixelSpacingY = imageMetadata.spacing[1];
+    const pixelSpacingZ = imageMetadata.spacing[2];
     const imagePositionPatient = imageMetadata.origin;
     const orientationMatrix = imageMetadata.direction;
 
     const dicomCoords = convertToDicomCoordinates(
       normalizedX,
       normalizedY,
+      normalizedZ,
       imageWidth,
       imageHeight,
+      imageDepth,
+      numberOfSlices,
       pixelSpacingX,
       pixelSpacingY,
+      pixelSpacingZ,
       imagePositionPatient,
       orientationMatrix
     );
 
     const normalizedX2 = data.points[1].x ? data.points[1].x : data.points[1].xOrigin;
     const normalizedY2 = data.points[1].y ? data.points[1].y : data.points[1].yOrigin;
+    const normalizedZ2 = data.points[1].z;
     const imageWidth2 = imageMetadata.dimensions[0];
     const imageHeight2 = imageMetadata.dimensions[1];
+    const imageDepth2 = imageMetadata.dimensions[2];
+    const numberOfSlices2 = viewport.getNumberOfSlices();
     const pixelSpacingX2 = imageMetadata.spacing[0];
     const pixelSpacingY2 = imageMetadata.spacing[1];
+    const pixelSpacingZ2 = imageMetadata.spacing[2];
     const imagePositionPatient2 = imageMetadata.origin;
     const orientationMatrix2 = imageMetadata.direction;
 
     const dicomCoords2 = convertToDicomCoordinates(
       normalizedX2,
       normalizedY2,
+      normalizedZ2,
       imageWidth2,
       imageHeight2,
+      imageDepth2,
+      numberOfSlices2,
       pixelSpacingX2,
       pixelSpacingY2,
+      pixelSpacingZ2,
       imagePositionPatient2,
       orientationMatrix2
     );
@@ -437,20 +509,28 @@ export function createAngleROI(viewport, imageMetadata, data: RelatedPoint, imag
     const normalizedPoints = data.points.map(point => {
       const normalizedX = point.x ? point.x : point.xOrigin;
       const normalizedY = point.y ? point.y : point.yOrigin;
+      const normalizedZ = point.z;
       const imageWidth = imageMetadata.dimensions[0];
       const imageHeight = imageMetadata.dimensions[1];
+      const imageDepth = imageMetadata.dimensions[2];
+      const numberOfSlices = viewport.getNumberOfSlices();
       const pixelSpacingX = imageMetadata.spacing[0];
       const pixelSpacingY = imageMetadata.spacing[1];
+      const pixelSpacingZ = imageMetadata.spacing[2];
       const imagePositionPatient = imageMetadata.origin;
       const orientationMatrix = imageMetadata.direction;
 
       return convertToDicomCoordinates(
         normalizedX,
         normalizedY,
+        normalizedZ,
         imageWidth,
         imageHeight,
+        imageDepth,
+        numberOfSlices,
         pixelSpacingX,
         pixelSpacingY,
+        pixelSpacingZ,
         imagePositionPatient,
         orientationMatrix
       );
@@ -489,32 +569,54 @@ export function createAngleROI(viewport, imageMetadata, data: RelatedPoint, imag
 }
 
 export async function createMeasurement(servicesManager, points) {
-  const { ViewportGridService, CornerstoneViewportService } = servicesManager.services;
+  console.log('create measurement with points: ', points);
+  try {
+    const { ViewportGridService, CornerstoneViewportService } = servicesManager.services;
+    console.log('testa');
+  } catch (error) {
+    console.log('test');
+  }
 
   const viewportId = ViewportGridService.getActiveViewportId();
+  console.log('testb');
   const viewport = CornerstoneViewportService.getCornerstoneViewport(viewportId);
+  console.log('testc');
 
   const imageId = viewport.getCurrentImageId();
+  console.log('testd');
 
   const imageMetadata = viewport.getImageData(imageId);
-
+  console.log('test');
   const imageWidth = imageMetadata.dimensions[0];
   const imageHeight = imageMetadata.dimensions[1];
+  console.log('test1');
+  const imageDepth = imageMetadata.dimensions[2];
+  const numberOfSlices = viewport.getNumberOfSlices();
+  console.log('test2');
   const pixelSpacingX = imageMetadata.spacing[0];
   const pixelSpacingY = imageMetadata.spacing[1];
+  const pixelSpacingZ = imageMetadata.spacing[2];
+  const currentSliceNumber = viewport.getSliceIndex();
+  console.log('test3');
   const imagePositionPatient = imageMetadata.origin;
   const orientationMatrix = imageMetadata.direction;
+  console.log(imageMetadata);
 
   const normalizedPoints: number[][] = [];
   points?.forEach(point => {
+    console.log(points);
     const normalizedCoords = convertFromDicomCoordinates(
       point[0],
       point[1],
       point[2],
       imageWidth,
       imageHeight,
+      imageDepth,
+      numberOfSlices,
       pixelSpacingX,
       pixelSpacingY,
+      pixelSpacingZ,
+      currentSliceNumber,
       imagePositionPatient,
       orientationMatrix
     );
