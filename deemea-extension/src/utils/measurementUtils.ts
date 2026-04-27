@@ -569,35 +569,22 @@ export function createAngleROI(viewport, imageMetadata, data: RelatedPoint, imag
 }
 
 export async function createMeasurement(servicesManager, points) {
-  console.log('create measurement with points: ', points);
-  try {
-    const { ViewportGridService, CornerstoneViewportService } = servicesManager.services;
-    console.log('testa');
-  } catch (error) {
-    console.log('test');
-  }
+  const { ViewportGridService, CornerstoneViewportService } = servicesManager.services;
 
   const viewportId = ViewportGridService.getActiveViewportId();
-  console.log('testb');
   const viewport = CornerstoneViewportService.getCornerstoneViewport(viewportId);
-  console.log('testc');
 
   const imageId = viewport.getCurrentImageId();
-  console.log('testd');
 
   const imageMetadata = viewport.getImageData(imageId);
-  console.log('test');
   const imageWidth = imageMetadata.dimensions[0];
   const imageHeight = imageMetadata.dimensions[1];
-  console.log('test1');
   const imageDepth = imageMetadata.dimensions[2];
   const numberOfSlices = viewport.getNumberOfSlices();
-  console.log('test2');
   const pixelSpacingX = imageMetadata.spacing[0];
   const pixelSpacingY = imageMetadata.spacing[1];
   const pixelSpacingZ = imageMetadata.spacing[2];
   const currentSliceNumber = viewport.getSliceIndex();
-  console.log('test3');
   const imagePositionPatient = imageMetadata.origin;
   const orientationMatrix = imageMetadata.direction;
   console.log(imageMetadata);
