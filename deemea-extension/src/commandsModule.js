@@ -276,9 +276,7 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
 
       let dataToSend = [];
       measurementService.subscribe(measurementService.EVENTS.MEASUREMENT_UPDATED, async event => {
-        console.log('ohif points', event.measurement.points);
         const normalizedPoints = await createMeasurement(servicesManager, event.measurement.points);
-        console.log('normalizedPoints: ', normalizedPoints);
         const matchedPoints = [];
         if (event?.measurement?.label?.predicted) {
           event?.measurement?.label.pointsInfo.forEach((point, index) => {
@@ -286,7 +284,7 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
               ...point,
               x: normalizedPoints[index][0],
               y: normalizedPoints[index][1],
-              z: normalizedPoints[index][2],
+              sliceIndex: normalizedPoints[index][2],
             });
           });
         } else {
@@ -294,7 +292,7 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
             matchedPoints.push({
               x: normalizedPoints[index][0],
               y: normalizedPoints[index][1],
-              z: normalizedPoints[index][2],
+              sliceIndex: normalizedPoints[index][2],
             });
           });
         }
