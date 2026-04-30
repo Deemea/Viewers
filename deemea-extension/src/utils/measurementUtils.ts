@@ -1,4 +1,5 @@
 import * as cs3dTools from '@cornerstonejs/tools';
+import * as cornerstone from '@cornerstonejs/core';
 import { axis } from './axisColors';
 import { angles } from './angleColors';
 import { points } from './pointsColors';
@@ -9,6 +10,7 @@ import { RelatedPoint } from './relatedPoint';
 function convertFromDicomCoordinates(
   dicomX,
   dicomY,
+  worldZ,
   sliceIndex,
   imageWidth,
   imageHeight,
@@ -20,7 +22,7 @@ function convertFromDicomCoordinates(
   // Step 1: Calculate the difference vector from the Image Position (Patient)
   const diffX = dicomX - imagePositionPatient[0];
   const diffY = dicomY - imagePositionPatient[1];
-  const diffZ = sliceIndex - imagePositionPatient[2];
+  const diffZ = worldZ - imagePositionPatient[2];
 
   // Step 2: Extract row and column direction vectors from the orientation matrix
   const rowDir = [orientationMatrix[0], orientationMatrix[1], orientationMatrix[2]]; // [rx, ry, rz]
@@ -44,7 +46,7 @@ function convertFromDicomCoordinates(
 function convertToDicomCoordinates(
   normalizedX,
   normalizedY,
-  Z,
+  sliceIndex,
   imageWidth,
   imageHeight,
   numberOfSlices,
@@ -69,7 +71,7 @@ function convertToDicomCoordinates(
   const dicomX = imagePositionPatient[0] + physicalX * rowDir[0] + physicalY * colDir[0];
   const dicomY = imagePositionPatient[1] + physicalX * rowDir[1] + physicalY * colDir[1];
 
-  return [dicomX, dicomY, numberOfSlices === 1 ? null : Z];
+  return [dicomX, dicomY, numberOfSlices === 1 ? null : sliceIndex];
 }
 
 async function matchNameWithAxis(
@@ -217,7 +219,10 @@ export async function demonstrateMeasurementService(
 
   const imageId = viewport.getCurrentImageId();
 
-  const imageMetadata = viewport.getImageData(imageId);
+  const isVolumeViewport = viewport.type === 'volume' || viewport.getImageIds;
+  const imageMetadata = isVolumeViewport
+    ? viewport.getImageData() // Volume viewport - no argument
+    : viewport.getImageData(imageId); // Stack viewport - needs imageId
 
   if (!imageId) {
     console.error('No image ID found');
@@ -235,6 +240,12 @@ export async function demonstrateMeasurementService(
     } else if (data.points.length === 1) {
       createPoint(viewport, imageMetadata, data);
     } else if (data.points.length === 2) {
+      const volume = viewport.getDefaultActor()?.actor;
+      if (!volume) {
+        console.log('Volume not ready, delaying...');
+        setTimeout(() => createLength(viewport, imageMetadata, data), 5000);
+        return;
+      }
       createLength(viewport, imageMetadata, data);
     } else if (data.points.length === 3) {
       createAngleROI(viewport, imageMetadata, data);
@@ -426,35 +437,99 @@ export function createLength(viewport, imageMetadata, data: RelatedPoint) {
       imagePositionPatient2,
       orientationMatrix2
     );
+    const frameOfReferenceUID = viewport.getFrameOfReferenceUID();
 
-    cs3dTools.LengthTool.createAndAddAnnotation(viewport, {
-      metadata: {
-        referencedImageId: imageId,
-      },
-      data: {
-        handles: {
-          points: [dicomCoords, dicomCoords2],
-          headName: data.points[0].name,
-          tailName: data.points[1].name,
-          name: data.points[0].name,
+    // Use addAnnotation directly instead of createAndAddAnnotation
+    const test = cs3dTools.annotation.state.addAnnotation(
+      {
+        annotationUID: crypto.randomUUID(),
+        highlighted: false,
+        isLocked: false,
+        invalidated: false,
+        isVisible: true,
+        metadata: {
+          toolName: 'Length',
+          FrameOfReferenceUID: frameOfReferenceUID,
+          referencedImageId: imageId,
         },
-        label: {
-          measurementId: data?.measurementId,
-          pointsInfo: data.points,
-          predicted: true,
-          imagingData: data?.imagingData,
-          hide: data.hide || false,
-          forceHide: data.forceHide || false,
-          locked: data.locked || false,
-        },
-        cachedStats: {
-          [`imageId:${imageId}`]: {
-            length: 'X',
-            unit: 'px',
+        data: {
+          handles: {
+            points: [dicomCoords, dicomCoords2],
+            activeHandleIndex: null,
+            textBox: {
+              hasMoved: false,
+              worldPosition: [0, 0, 0],
+              worldBoundingBox: {
+                topLeft: [0, 0, 0],
+                topRight: [0, 0, 0],
+                bottomLeft: [0, 0, 0],
+                bottomRight: [0, 0, 0],
+              },
+            },
+            headName: data.points[0].name,
+            tailName: data.points[1].name,
+            name: data.points[0].name,
+            label: {
+              measurementId: data?.measurementId,
+              pointsInfo: data.points,
+              predicted: true,
+              imagingData: data?.imagingData,
+              hide: data.hide || false,
+              forceHide: data.forceHide || false,
+              locked: data.locked || false,
+            },
+          },
+          label: {
+            measurementId: data?.measurementId,
+            pointsInfo: data.points,
+            predicted: true,
+            imagingData: data?.imagingData,
+            hide: data.hide || false,
+            forceHide: data.forceHide || false,
+            locked: data.locked || false,
+          },
+          cachedStats: {
+            [`imageId:${imageId}`]: {
+              length: 'X',
+              unit: 'px',
+            },
           },
         },
       },
-    });
+      viewport.element
+    );
+    console.log('Added annotation:', test);
+
+    // Trigger render to show the annotation
+    viewport.render();
+    // cs3dTools.LengthTool.createAndAddAnnotation(viewport, {
+    //   metadata: {
+    //     referencedImageId: imageId,
+    //   },
+    //   data: {
+    //     handles: {
+    //       points: [dicomCoords, dicomCoords2],
+    //       headName: data.points[0].name,
+    //       tailName: data.points[1].name,
+    //       name: data.points[0].name,
+    //     },
+    //     label: {
+    //       measurementId: data?.measurementId,
+    //       pointsInfo: data.points,
+    //       predicted: true,
+    //       imagingData: data?.imagingData,
+    //       hide: data.hide || false,
+    //       forceHide: data.forceHide || false,
+    //       locked: data.locked || false,
+    //     },
+    //     cachedStats: {
+    //       [`imageId:${imageId}`]: {
+    //         length: 'X',
+    //         unit: 'px',
+    //       },
+    //     },
+    //   },
+    // });
   } catch (error) {
     console.error('Error adding measurement:', error);
   }
@@ -543,6 +618,8 @@ export async function createMeasurement(servicesManager, points) {
   const imageWidth = imageMetadata.dimensions[0];
   const imageHeight = imageMetadata.dimensions[1];
   const sliceIndex = viewport.getSliceIndex();
+  const imagePlaneModule = cornerstone.metaData.get('imagePlaneModule', imageId);
+  const worldZ = imagePlaneModule?.imagePositionPatient?.[2];
   const pixelSpacingX = imageMetadata.spacing[0];
   const pixelSpacingY = imageMetadata.spacing[1];
   const imagePositionPatient = imageMetadata.origin;
@@ -553,6 +630,7 @@ export async function createMeasurement(servicesManager, points) {
     const normalizedCoords = convertFromDicomCoordinates(
       point[0],
       point[1],
+      worldZ,
       sliceIndex,
       imageWidth,
       imageHeight,
