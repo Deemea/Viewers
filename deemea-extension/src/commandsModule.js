@@ -35,24 +35,15 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
         return;
       }
 
-      // Add a listener to track when annotations are removed
-      console.log(cs3dTools.annotation.state);
-      // cs3dTools.annotation.state.subscribe(
-      //   cs3dTools.annotation.state.EVENTS.ANNOTATION_REMOVED,
-      //   evt => {
-      //     console.log('Annotation removed:', evt);
-      //   }
-      // );
-      // CornerstoneViewportService.subscribe(
-      //   CornerstoneViewportService.EVENTS.ANNOTATION_REMOVED,
-      //   () => {
-      //     console.log('Annotation removed:');
-      //   }
-      // );
-
       CornerstoneViewportService.subscribe(
         CornerstoneViewportService.EVENTS.VIEWPORT_DATA_CHANGED,
         () => {
+          window.parent.postMessage(
+            {
+              type: OHIFMessageType.IMAGE_READY,
+            },
+            '*'
+          );
           if (segmentationLoaded) {
             return;
           }
@@ -100,13 +91,6 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
               }
             }
           }
-
-          window.parent.postMessage(
-            {
-              type: OHIFMessageType.IMAGE_READY,
-            },
-            '*'
-          );
         }
       );
 
