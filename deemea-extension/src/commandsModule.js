@@ -38,6 +38,8 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
       CornerstoneViewportService.subscribe(
         CornerstoneViewportService.EVENTS.VIEWPORT_DATA_CHANGED,
         () => {
+          console.log('IMAGE READY ???');
+
           window.parent.postMessage(
             {
               type: OHIFMessageType.IMAGE_READY,

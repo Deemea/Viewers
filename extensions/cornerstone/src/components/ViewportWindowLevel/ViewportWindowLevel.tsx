@@ -183,6 +183,7 @@ const ViewportWindowLevel = ({
     const { unsubscribe } = cornerstoneViewportService.subscribe(
       cornerstoneViewportService.EVENTS.VIEWPORT_VOLUMES_CHANGED,
       ({ viewportInfo }) => {
+        console.log('VIEWPORT VOLUME CHANGED 2');
         if (viewportInfo.viewportId === viewportId) {
           updateViewportHistograms();
         }
