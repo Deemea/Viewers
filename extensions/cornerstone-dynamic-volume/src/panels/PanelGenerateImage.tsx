@@ -33,6 +33,7 @@ export default function PanelGenerateImage({ servicesManager, commandsManager }:
     const cineStateChangedEvt = servicesManager.services.cineService.EVENTS.CINE_STATE_CHANGED;
 
     const viewportDataChangedCallback = evtDetails => {
+      console.log('VIEWPORT_DATA_CHANGED 3');
       evtDetails.viewportData.data.forEach(volumeData => {
         if (volumeData.volume?.isDynamicVolume()) {
           setDynamicVolume(volumeData.volume);

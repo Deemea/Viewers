@@ -18,6 +18,7 @@ function CornerstoneOverlays(props: withAppTypes) {
     const { unsubscribe } = cornerstoneViewportService.subscribe(
       cornerstoneViewportService.EVENTS.VIEWPORT_DATA_CHANGED,
       props => {
+        console.log('VIEWPORT_DATA_CHANGED 2');
         if (props.viewportId !== viewportId) {
           return;
         }

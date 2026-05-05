@@ -1,4 +1,5 @@
 import * as cs3dTools from '@cornerstonejs/tools';
+import * as cornerstone from '@cornerstonejs/core';
 import { axis } from './axisColors';
 import { angles } from './angleColors';
 import { points } from './pointsColors';
@@ -9,7 +10,8 @@ import { RelatedPoint } from './relatedPoint';
 function convertFromDicomCoordinates(
   dicomX,
   dicomY,
-  dicomZ,
+  worldZ,
+  sliceIndex,
   imageWidth,
   imageHeight,
   pixelSpacingX,
@@ -20,7 +22,7 @@ function convertFromDicomCoordinates(
   // Step 1: Calculate the difference vector from the Image Position (Patient)
   const diffX = dicomX - imagePositionPatient[0];
   const diffY = dicomY - imagePositionPatient[1];
-  const diffZ = dicomZ - imagePositionPatient[2];
+  const diffZ = worldZ - imagePositionPatient[2];
 
   // Step 2: Extract row and column direction vectors from the orientation matrix
   const rowDir = [orientationMatrix[0], orientationMatrix[1], orientationMatrix[2]]; // [rx, ry, rz]
@@ -38,14 +40,16 @@ function convertFromDicomCoordinates(
   const normalizedX = pixelX / imageWidth;
   const normalizedY = pixelY / imageHeight;
 
-  return [normalizedX, normalizedY];
+  return [normalizedX, normalizedY, sliceIndex];
 }
 
 function convertToDicomCoordinates(
   normalizedX,
   normalizedY,
+  sliceIndex,
   imageWidth,
   imageHeight,
+  numberOfSlices,
   pixelSpacingX,
   pixelSpacingY,
   imagePositionPatient,
@@ -66,9 +70,8 @@ function convertToDicomCoordinates(
   // Compute DICOM coordinates
   const dicomX = imagePositionPatient[0] + physicalX * rowDir[0] + physicalY * colDir[0];
   const dicomY = imagePositionPatient[1] + physicalX * rowDir[1] + physicalY * colDir[1];
-  const dicomZ = imagePositionPatient[2] + physicalX * rowDir[2] + physicalY * colDir[2];
 
-  return [dicomX, dicomY, dicomZ];
+  return [dicomX, dicomY, numberOfSlices === 1 ? null : sliceIndex];
 }
 
 async function matchNameWithAxis(
@@ -89,7 +92,6 @@ async function matchNameWithAngle(
   pointName2,
   pointName3
 ): Promise<{ color: string; highlighted: string; dotted?: boolean } | null> {
-
   const matchedAngle = angles.find(
     angle =>
       (pointName1 === angle.head && pointName2 === angle.middle && pointName3 === angle.tail) ||
@@ -197,7 +199,7 @@ function lockMeasurementIfNeeded(data, imageStatus: boolean): void {
   annotations?.forEach(annotation => {
     if (
       (annotation.data.label! as unknown as { measurementId: string }).measurementId ===
-        data.measurementId &&
+      data.measurementId &&
       (data.locked === true || imageStatus)
     ) {
       cs3dTools.annotation.locking.setAnnotationLocked(annotation.annotationUID!, true);
@@ -217,7 +219,10 @@ export async function demonstrateMeasurementService(
 
   const imageId = viewport.getCurrentImageId();
 
-  const imageMetadata = viewport.getImageData(imageId);
+  const isVolumeViewport = viewport.type === 'volume' || viewport.getImageIds;
+  const imageMetadata = isVolumeViewport
+    ? viewport.getImageData() // Volume viewport - no argument
+    : viewport.getImageData(imageId); // Stack viewport - needs imageId
 
   if (!imageId) {
     console.error('No image ID found');
@@ -233,11 +238,17 @@ export async function demonstrateMeasurementService(
     if (data.forceHide || data.hide) {
       return;
     } else if (data.points.length === 1) {
-      createPoint(viewport, imageMetadata, data, imageId);
+      createPoint(viewport, imageMetadata, data);
     } else if (data.points.length === 2) {
-      createLength(viewport, imageMetadata, data, imageId);
+      const volume = viewport.getDefaultActor()?.actor;
+      if (!volume) {
+        console.log('Volume not ready, delaying...');
+        setTimeout(() => createLength(viewport, imageMetadata, data), 5000);
+        return;
+      }
+      createLength(viewport, imageMetadata, data);
     } else if (data.points.length === 3) {
-      createAngleROI(viewport, imageMetadata, data, imageId);
+      createAngleROI(viewport, imageMetadata, data);
     } else if (data.points.length === 4) {
       createRectangleROI(viewport, imageMetadata, data);
     }
@@ -248,6 +259,11 @@ export async function demonstrateMeasurementService(
 
 export function createRectangleROI(viewport, imageMetadata, data: RelatedPoint) {
   try {
+    const numberOfSlices = viewport.getNumberOfSlices();
+    const imageIds = viewport.getImageIds();
+    const sliceIndex = data.points[0].sliceIndex;
+    const imageId = sliceIndex ? imageIds[sliceIndex] : imageIds[0];
+
     const normalizedPoints = data.points.map(point => {
       const normalizedX = point.x ? point.x : point.xOrigin;
       const normalizedY = point.y ? point.y : point.yOrigin;
@@ -261,8 +277,10 @@ export function createRectangleROI(viewport, imageMetadata, data: RelatedPoint) 
       return convertToDicomCoordinates(
         normalizedX,
         normalizedY,
+        sliceIndex,
         imageWidth,
         imageHeight,
+        numberOfSlices,
         pixelSpacingX,
         pixelSpacingY,
         imagePositionPatient,
@@ -271,6 +289,9 @@ export function createRectangleROI(viewport, imageMetadata, data: RelatedPoint) 
     });
 
     cs3dTools.RectangleROITool.createAndAddAnnotation(viewport, {
+      metadata: {
+        referencedImageId: imageId,
+      },
       data: {
         label: {
           measurementId: data?.measurementId,
@@ -294,13 +315,18 @@ export function createRectangleROI(viewport, imageMetadata, data: RelatedPoint) 
   }
 }
 
-export function createPoint(viewport, imageMetadata, data: RelatedPoint, imageId) {
+export function createPoint(viewport, imageMetadata, data: RelatedPoint) {
   if (!imageMetadata) {
     console.error('No image metadata found');
     return;
   }
 
   try {
+    const numberOfSlices = viewport.getNumberOfSlices();
+    const imageIds = viewport.getImageIds();
+    const sliceIndex = data.points[0].sliceIndex;
+    const imageId = sliceIndex ? imageIds[sliceIndex] : imageIds[0];
+
     const normalizedX = data.points[0].x ? data.points[0].x : data.points[0].xOrigin;
     const normalizedY = data.points[0].y ? data.points[0].y : data.points[0].yOrigin;
     const imageWidth = imageMetadata.dimensions[0];
@@ -313,8 +339,10 @@ export function createPoint(viewport, imageMetadata, data: RelatedPoint, imageId
     const dicomCoords = convertToDicomCoordinates(
       normalizedX,
       normalizedY,
+      sliceIndex,
       imageWidth,
       imageHeight,
+      numberOfSlices,
       pixelSpacingX,
       pixelSpacingY,
       imagePositionPatient,
@@ -322,6 +350,9 @@ export function createPoint(viewport, imageMetadata, data: RelatedPoint, imageId
     );
 
     cs3dTools.ProbeTool.createAndAddAnnotation(viewport, {
+      metadata: {
+        referencedImageId: imageId,
+      },
       data: {
         handles: {
           points: [dicomCoords],
@@ -350,13 +381,18 @@ export function createPoint(viewport, imageMetadata, data: RelatedPoint, imageId
   }
 }
 
-export function createLength(viewport, imageMetadata, data: RelatedPoint, imageId) {
+export function createLength(viewport, imageMetadata, data: RelatedPoint) {
   if (!imageMetadata) {
     console.error('No image metadata found');
     return;
   }
 
   try {
+    const numberOfSlices = viewport.getNumberOfSlices();
+    const imageIds = viewport.getImageIds();
+    const sliceIndex = data.points[0].sliceIndex;
+    const imageId = sliceIndex ? imageIds[sliceIndex] : imageIds[0];
+
     const normalizedX = data.points[0].x ? data.points[0].x : data.points[0].xOrigin;
     const normalizedY = data.points[0].y ? data.points[0].y : data.points[0].yOrigin;
     const imageWidth = imageMetadata.dimensions[0];
@@ -369,8 +405,10 @@ export function createLength(viewport, imageMetadata, data: RelatedPoint, imageI
     const dicomCoords = convertToDicomCoordinates(
       normalizedX,
       normalizedY,
+      sliceIndex,
       imageWidth,
       imageHeight,
+      numberOfSlices,
       pixelSpacingX,
       pixelSpacingY,
       imagePositionPatient,
@@ -381,6 +419,7 @@ export function createLength(viewport, imageMetadata, data: RelatedPoint, imageI
     const normalizedY2 = data.points[1].y ? data.points[1].y : data.points[1].yOrigin;
     const imageWidth2 = imageMetadata.dimensions[0];
     const imageHeight2 = imageMetadata.dimensions[1];
+    const numberOfSlices2 = viewport.getNumberOfSlices();
     const pixelSpacingX2 = imageMetadata.spacing[0];
     const pixelSpacingY2 = imageMetadata.spacing[1];
     const imagePositionPatient2 = imageMetadata.origin;
@@ -389,51 +428,125 @@ export function createLength(viewport, imageMetadata, data: RelatedPoint, imageI
     const dicomCoords2 = convertToDicomCoordinates(
       normalizedX2,
       normalizedY2,
+      sliceIndex,
       imageWidth2,
       imageHeight2,
+      numberOfSlices2,
       pixelSpacingX2,
       pixelSpacingY2,
       imagePositionPatient2,
       orientationMatrix2
     );
+    const frameOfReferenceUID = viewport.getFrameOfReferenceUID();
 
-    cs3dTools.LengthTool.createAndAddAnnotation(viewport, {
-      data: {
-        handles: {
-          points: [dicomCoords, dicomCoords2],
-          headName: data.points[0].name,
-          tailName: data.points[1].name,
-          name: data.points[0].name,
+    // Use addAnnotation directly instead of createAndAddAnnotation
+    const test = cs3dTools.annotation.state.addAnnotation(
+      {
+        annotationUID: crypto.randomUUID(),
+        highlighted: false,
+        isLocked: false,
+        invalidated: false,
+        isVisible: true,
+        metadata: {
+          toolName: 'Length',
+          FrameOfReferenceUID: frameOfReferenceUID,
+          referencedImageId: imageId,
         },
-        label: {
-          measurementId: data?.measurementId,
-          pointsInfo: data.points,
-          predicted: true,
-          imagingData: data?.imagingData,
-          hide: data.hide || false,
-          forceHide: data.forceHide || false,
-          locked: data.locked || false,
-        },
-        cachedStats: {
-          [`imageId:${imageId}`]: {
-            length: 'X',
-            unit: 'px',
+        data: {
+          handles: {
+            points: [dicomCoords, dicomCoords2],
+            activeHandleIndex: null,
+            textBox: {
+              hasMoved: false,
+              worldPosition: [0, 0, 0],
+              worldBoundingBox: {
+                topLeft: [0, 0, 0],
+                topRight: [0, 0, 0],
+                bottomLeft: [0, 0, 0],
+                bottomRight: [0, 0, 0],
+              },
+            },
+            headName: data.points[0].name,
+            tailName: data.points[1].name,
+            name: data.points[0].name,
+            label: {
+              measurementId: data?.measurementId,
+              pointsInfo: data.points,
+              predicted: true,
+              imagingData: data?.imagingData,
+              hide: data.hide || false,
+              forceHide: data.forceHide || false,
+              locked: data.locked || false,
+            },
+          },
+          label: {
+            measurementId: data?.measurementId,
+            pointsInfo: data.points,
+            predicted: true,
+            imagingData: data?.imagingData,
+            hide: data.hide || false,
+            forceHide: data.forceHide || false,
+            locked: data.locked || false,
+          },
+          cachedStats: {
+            [`imageId:${imageId}`]: {
+              length: 'X',
+              unit: 'px',
+            },
           },
         },
       },
-    });
+      viewport.element
+    );
+    console.log('Added annotation:', test);
+
+    // Trigger render to show the annotation
+    viewport.render();
+    // cs3dTools.LengthTool.createAndAddAnnotation(viewport, {
+    //   metadata: {
+    //     referencedImageId: imageId,
+    //   },
+    //   data: {
+    //     handles: {
+    //       points: [dicomCoords, dicomCoords2],
+    //       headName: data.points[0].name,
+    //       tailName: data.points[1].name,
+    //       name: data.points[0].name,
+    //     },
+    //     label: {
+    //       measurementId: data?.measurementId,
+    //       pointsInfo: data.points,
+    //       predicted: true,
+    //       imagingData: data?.imagingData,
+    //       hide: data.hide || false,
+    //       forceHide: data.forceHide || false,
+    //       locked: data.locked || false,
+    //     },
+    //     cachedStats: {
+    //       [`imageId:${imageId}`]: {
+    //         length: 'X',
+    //         unit: 'px',
+    //       },
+    //     },
+    //   },
+    // });
   } catch (error) {
     console.error('Error adding measurement:', error);
   }
 }
 
-export function createAngleROI(viewport, imageMetadata, data: RelatedPoint, imageId) {
+export function createAngleROI(viewport, imageMetadata, data: RelatedPoint) {
   if (!imageMetadata) {
     console.error('No image metadata found');
     return;
   }
 
   try {
+    const numberOfSlices = viewport.getNumberOfSlices();
+    const imageIds = viewport.getImageIds();
+    const sliceIndex = data.points[0].sliceIndex;
+    const imageId = sliceIndex ? imageIds[sliceIndex] : imageIds[0];
+
     const normalizedPoints = data.points.map(point => {
       const normalizedX = point.x ? point.x : point.xOrigin;
       const normalizedY = point.y ? point.y : point.yOrigin;
@@ -447,8 +560,10 @@ export function createAngleROI(viewport, imageMetadata, data: RelatedPoint, imag
       return convertToDicomCoordinates(
         normalizedX,
         normalizedY,
+        sliceIndex,
         imageWidth,
         imageHeight,
+        numberOfSlices,
         pixelSpacingX,
         pixelSpacingY,
         imagePositionPatient,
@@ -457,6 +572,9 @@ export function createAngleROI(viewport, imageMetadata, data: RelatedPoint, imag
     });
 
     cs3dTools.AngleTool.createAndAddAnnotation(viewport, {
+      metadata: {
+        referencedImageId: imageId,
+      },
       data: {
         handles: {
           points: normalizedPoints,
@@ -497,9 +615,11 @@ export async function createMeasurement(servicesManager, points) {
   const imageId = viewport.getCurrentImageId();
 
   const imageMetadata = viewport.getImageData(imageId);
-
   const imageWidth = imageMetadata.dimensions[0];
   const imageHeight = imageMetadata.dimensions[1];
+  const sliceIndex = viewport.getSliceIndex();
+  const imagePlaneModule = cornerstone.metaData.get('imagePlaneModule', imageId);
+  const worldZ = imagePlaneModule?.imagePositionPatient?.[2];
   const pixelSpacingX = imageMetadata.spacing[0];
   const pixelSpacingY = imageMetadata.spacing[1];
   const imagePositionPatient = imageMetadata.origin;
@@ -510,7 +630,8 @@ export async function createMeasurement(servicesManager, points) {
     const normalizedCoords = convertFromDicomCoordinates(
       point[0],
       point[1],
-      point[2],
+      worldZ,
+      sliceIndex,
       imageWidth,
       imageHeight,
       pixelSpacingX,

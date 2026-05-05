@@ -7,6 +7,7 @@ import toolbarButtons3d from '../../deemea-mode-3d/src/toolbarButtons3d';
 import segmentationButtonsValidated from '../../deemea-mode-3d/src/segmentationButtonsValidated';
 import segmentationButtons from '../../deemea-mode-3d/src/segmentationButtons';
 import { CustomizationScope } from '@ohif/core/src/services/CustomizationService/CustomizationService';
+import * as cs3dTools from '@cornerstonejs/tools';
 
 const commandsModule = ({ servicesManager, commandsManager }) => {
   let segmentationLoaded = false;
@@ -37,6 +38,14 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
       CornerstoneViewportService.subscribe(
         CornerstoneViewportService.EVENTS.VIEWPORT_DATA_CHANGED,
         () => {
+          console.log('IMAGE READY ???');
+
+          window.parent.postMessage(
+            {
+              type: OHIFMessageType.IMAGE_READY,
+            },
+            '*'
+          );
           if (segmentationLoaded) {
             return;
           }
@@ -84,17 +93,11 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
               }
             }
           }
-
-          window.parent.postMessage(
-            {
-              type: OHIFMessageType.IMAGE_READY,
-            },
-            '*'
-          );
         }
       );
 
       window.addEventListener('message', event => {
+        console.log(event.data.type);
         if (event.data.type === OHIFMessageType.IMAGE_STATUS) {
           if (event.data.message.status === 'Validated') {
             if (event.data.message.imageType === '2D') {
@@ -181,13 +184,31 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
           }
         }
         if (event.data.type === OHIFMessageType.SEND_MEASURE) {
+          const viewportId = ViewportGridService.getActiveViewportId();
+          const viewport = CornerstoneViewportService.getCornerstoneViewport(viewportId);
+          if (!viewport?.getCurrentImageId?.()) {
+            console.log('Viewport not ready, delaying SEND_MEASURE');
+            setTimeout(() => {
+              // Re-dispatch the event
+              window.dispatchEvent(new MessageEvent('message', { data: event.data }));
+            }, 1000);
+            return;
+          }
           measurementService.clearMeasurements();
           const relatedPoints = event.data.message.measures;
           demonstrateMeasurementService(servicesManager, relatedPoints, event.data.message.status);
-          const viewportId = ViewportGridService.getActiveViewportId();
-          const viewport = CornerstoneViewportService.getCornerstoneViewport(viewportId);
+          const allAnnotations = cs3dTools.annotation.state.getAllAnnotations();
           const imageId = viewport.getCurrentImageId();
-          const imageMetadata = viewport.getImageData(imageId);
+          console.log('imageId in SEND_MEASURE:', imageId);
+          const isVolumeViewport = viewport.type === 'volume' || viewport.getImageIds;
+          const imageMetadata = isVolumeViewport
+            ? viewport.getImageData() // Volume viewport - no argument
+            : viewport.getImageData(imageId); // Stack viewport - needs imageId
+          console.log('value in SEND_MEASURE:', {
+            imageMetadata,
+            imageId,
+            allAnnotations,
+          });
 
           const imageWidth = imageMetadata.dimensions[0];
           const imageHeight = imageMetadata.dimensions[1];
@@ -284,6 +305,7 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
               ...point,
               x: normalizedPoints[index][0],
               y: normalizedPoints[index][1],
+              sliceIndex: normalizedPoints[index][2],
             });
           });
         } else {
@@ -291,6 +313,7 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
             matchedPoints.push({
               x: normalizedPoints[index][0],
               y: normalizedPoints[index][1],
+              sliceIndex: normalizedPoints[index][2],
             });
           });
         }
