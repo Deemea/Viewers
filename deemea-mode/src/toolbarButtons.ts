@@ -80,7 +80,13 @@ const toolbarButtons: Button[] = [
       icon: 'tool-window-level',
       label: 'Window Level',
       commands: setToolActiveToolbar,
-      evaluate: 'evaluate.cornerstoneTool',
+      evaluate: [
+        'evaluate.cornerstoneTool',
+        {
+          name: 'evaluate.modality.supported',
+          unsupportedModalities: ['MG'],
+        },
+      ],
     },
   },
   // Pan...
