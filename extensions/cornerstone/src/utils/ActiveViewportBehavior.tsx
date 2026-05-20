@@ -63,8 +63,6 @@ const ActiveViewportBehavior = memo(
       const subscription = cornerstoneViewportService.subscribe(
         cornerstoneViewportService.EVENTS.VIEWPORT_DATA_CHANGED,
         () => {
-          console.log('VIEWPORT_DATA_CHANGED');
-
           const activeViewportId = viewportGridService.getActiveViewportId();
           setActiveViewportId(activeViewportId);
           handleCineEnable();

@@ -38,8 +38,7 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
       CornerstoneViewportService.subscribe(
         CornerstoneViewportService.EVENTS.VIEWPORT_DATA_CHANGED,
         () => {
-          console.log('IMAGE READY ???');
-
+          console.log('Viewport data changed, sending IMAGE_READY message');
           window.parent.postMessage(
             {
               type: OHIFMessageType.IMAGE_READY,
@@ -187,7 +186,6 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
           const viewportId = ViewportGridService.getActiveViewportId();
           const viewport = CornerstoneViewportService.getCornerstoneViewport(viewportId);
           if (!viewport?.getCurrentImageId?.()) {
-            console.log('Viewport not ready, delaying SEND_MEASURE');
             setTimeout(() => {
               // Re-dispatch the event
               window.dispatchEvent(new MessageEvent('message', { data: event.data }));
@@ -199,16 +197,10 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
           demonstrateMeasurementService(servicesManager, relatedPoints, event.data.message.status);
           const allAnnotations = cs3dTools.annotation.state.getAllAnnotations();
           const imageId = viewport.getCurrentImageId();
-          console.log('imageId in SEND_MEASURE:', imageId);
           const isVolumeViewport = viewport.type === 'volume' || viewport.getImageIds;
           const imageMetadata = isVolumeViewport
             ? viewport.getImageData() // Volume viewport - no argument
             : viewport.getImageData(imageId); // Stack viewport - needs imageId
-          console.log('value in SEND_MEASURE:', {
-            imageMetadata,
-            imageId,
-            allAnnotations,
-          });
 
           const imageWidth = imageMetadata.dimensions[0];
           const imageHeight = imageMetadata.dimensions[1];

@@ -83,7 +83,6 @@ function TrackedCornerstoneViewport(
     const { unsubscribe } = cornerstoneViewportService.subscribe(
       cornerstoneViewportService.EVENTS.VIEWPORT_DATA_CHANGED,
       props => {
-        console.log('VIEWPORT_DATA_CHANGED 6');
         if (props.viewportId !== viewportId) {
           return;
         }

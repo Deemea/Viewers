@@ -78,8 +78,6 @@ function modeFactory({ modeConfiguration }) {
       const { unsubscribe } = cornerstoneViewportService.subscribe(
         cornerstoneViewportService.EVENTS.VIEWPORT_VOLUMES_CHANGED,
         () => {
-          console.log('VIEWPORT VOLUME CHANGED');
-
           const viewportId = viewportGridService.getActiveViewportId();
           const csViewport = cornerstoneViewportService.getCornerstoneViewport(viewportId);
           cineService.playClip(csViewport.element, { viewportId });
