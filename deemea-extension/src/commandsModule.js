@@ -183,6 +183,7 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
           }
         }
         if (event.data.type === OHIFMessageType.SEND_MEASURE) {
+          console.log('Received SEND_MEASURE message: ', event.data.message);
           const viewportId = ViewportGridService.getActiveViewportId();
           const viewport = CornerstoneViewportService.getCornerstoneViewport(viewportId);
           if (!viewport?.getCurrentImageId?.()) {
@@ -206,6 +207,10 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
           const imageHeight = imageMetadata.dimensions[1];
           const pixelSpacing = imageMetadata.spacing[0];
 
+          console.log('data: ', {
+            viewport,
+            allAnnotations,
+          });
           viewport.render();
 
           window.parent.postMessage(
