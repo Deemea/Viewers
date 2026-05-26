@@ -38,7 +38,6 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
       CornerstoneViewportService.subscribe(
         CornerstoneViewportService.EVENTS.VIEWPORT_DATA_CHANGED,
         () => {
-          console.log('Viewport data changed, sending IMAGE_READY message');
           window.parent.postMessage(
             {
               type: OHIFMessageType.IMAGE_READY,
@@ -96,7 +95,6 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
       );
 
       window.addEventListener('message', event => {
-        console.log(event.data.type);
         if (event.data.type === OHIFMessageType.IMAGE_STATUS) {
           if (event.data.message.status === 'Validated') {
             if (event.data.message.imageType === '2D') {
@@ -183,7 +181,6 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
           }
         }
         if (event.data.type === OHIFMessageType.SEND_MEASURE) {
-          console.log('Received SEND_MEASURE message: ', event.data.message);
           const viewportId = ViewportGridService.getActiveViewportId();
           const viewport = CornerstoneViewportService.getCornerstoneViewport(viewportId);
           if (!viewport?.getCurrentImageId?.()) {
@@ -207,10 +204,6 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
           const imageHeight = imageMetadata.dimensions[1];
           const pixelSpacing = imageMetadata.spacing[0];
 
-          console.log('data: ', {
-            viewport,
-            allAnnotations,
-          });
           viewport.render();
 
           window.parent.postMessage(

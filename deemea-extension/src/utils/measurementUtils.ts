@@ -251,7 +251,6 @@ export async function demonstrateMeasurementService(
       createRectangleROI(viewport, imageMetadata, data);
     }
     const allAnnotations = cs3dTools.annotation.state.getAllAnnotations();
-    console.log('data allAnnotations:', allAnnotations);
     lockMeasurementIfNeeded(data, imageStatus);
     setMeasurementStyle();
   });
@@ -497,13 +496,6 @@ export function createLength(viewport, imageMetadata, data: RelatedPoint) {
         },
       },
     });
-    const annotationManager = cs3dTools.annotation.state.getAnnotationManager();
-    console.log('All annotations by FOR:', annotationManager.annotations);
-
-    // Check specific FOR
-    const forUID = viewport.getFrameOfReferenceUID();
-    console.log('Current viewport FOR:', forUID);
-    console.log('Annotations for this FOR:', annotationManager.annotations[forUID]);
   } catch (error) {
     console.error('Error adding measurement:', error);
   }
@@ -600,7 +592,8 @@ export async function createMeasurement(servicesManager, points) {
 
   const imageId = viewport.getCurrentImageId();
 
-  const isVolumeViewport = viewport.type === 'volume' || viewport.getImageIds;
+  const imageIds = viewport.getImageIds();
+  const isVolumeViewport = viewport.type === 'volume' || imageIds.length > 1;
   const imageMetadata = isVolumeViewport
     ? viewport.getImageData() // Volume viewport - no argument
     : viewport.getImageData(imageId); // Stack viewport - needs imageId
