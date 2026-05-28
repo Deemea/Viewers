@@ -193,7 +193,6 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
           measurementService.clearMeasurements();
           const relatedPoints = event.data.message.measures;
           demonstrateMeasurementService(servicesManager, relatedPoints, event.data.message.status);
-          const allAnnotations = cs3dTools.annotation.state.getAllAnnotations();
           const imageId = viewport.getCurrentImageId();
           const isVolumeViewport = viewport.type === 'volume' || viewport.getImageIds;
           const imageMetadata = isVolumeViewport

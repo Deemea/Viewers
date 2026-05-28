@@ -250,7 +250,6 @@ export async function demonstrateMeasurementService(
     } else if (data.points.length === 4) {
       createRectangleROI(viewport, imageMetadata, data);
     }
-    const allAnnotations = cs3dTools.annotation.state.getAllAnnotations();
     lockMeasurementIfNeeded(data, imageStatus);
     setMeasurementStyle();
   });
