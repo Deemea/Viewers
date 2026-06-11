@@ -434,6 +434,34 @@ window.config = {
     },
     {
       namespace: '@ohif/extension-default.dataSourcesModule.dicomweb',
+      sourceName: 'CHU_TOURS_SAAS',
+      configuration: {
+        friendlyName: 'chu-tours-saas-didier',
+        name: 'chu-tours-saas-didier',
+        wadoUriRoot: 'https://chu-tours-saas.deemea.com/api/v1/didier',
+        qidoRoot: 'https://chu-tours-saas.deemea.com/api/v1/didier',
+        wadoRoot: 'https://chu-tours-saas.deemea.com/api/v1/didier',
+        qidoSupportsIncludeField: false,
+        imageRendering: 'wadors',
+        thumbnailRendering: 'wadors',
+        enableStudyLazyLoad: true,
+        supportsFuzzyMatching: true,
+        supportsWildcard: false,
+        staticWado: true,
+        singlepart: 'bulkdata,video',
+        // whether the data source should use retrieveBulkData to grab metadata,
+        // and in case of relative path, what would it be relative to, options
+        // are in the series level or study level (some servers like series some study)
+        bulkDataURI: {
+          enabled: true,
+          relativeResolution: 'studies',
+          transform: url => url.replace('/pixeldata.mp4', '/rendered'),
+        },
+        omitQuotationForMultipartRequest: true,
+      },
+    },
+    {
+      namespace: '@ohif/extension-default.dataSourcesModule.dicomweb',
       sourceName: 'RADYON',
       configuration: {
         friendlyName: 'radyon-didier',
