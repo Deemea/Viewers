@@ -21,6 +21,9 @@ jobs:
       - name: Copy env file
         run: echo "${{ secrets.PROD_ENV_FILE }}" > .env
 
+      - name: Load default file
+        run: echo "${{ secrets.PROD_DEFAULT_FILE }}" > platform/app/public/config/default.js
+
       - name: Install dependencies
         run:
           yarn install && yarn run cli link-mode deemea-mode && yarn run cli link-extension
