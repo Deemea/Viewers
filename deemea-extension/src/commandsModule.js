@@ -339,7 +339,7 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
         window.parent.postMessage(
           {
             type: OHIFMessageType.DELETE_MEASURE,
-            message: { measurementId },
+            message: { uid, measurementId },
           },
           '*'
         );
