@@ -118,6 +118,11 @@ module.exports = (env, argv) => {
             from: `${PUBLIC_DIR}/config/google.js`,
             to: `${DIST_DIR}/google.js`,
           },
+          // Shared Deemea config helpers, loaded before app-config.js by the HTML template
+          {
+            from: `${PUBLIC_DIR}/config/deemea-shared.js`,
+            to: `${DIST_DIR}/config/deemea-shared.js`,
+          },
           // Copy over and rename our target app config file
           {
             from: `${PUBLIC_DIR}/${APP_CONFIG}`,

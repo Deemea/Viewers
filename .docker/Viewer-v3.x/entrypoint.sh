@@ -14,6 +14,16 @@ else
   echo "Not using custom APP_CONFIG"
 fi
 
+# Inject Cognito OIDC settings (non-secret public identifiers) into app-config.js
+if [ -n "$COGNITO_USER_POOL_ID" ]; then
+  echo "Injecting COGNITO_USER_POOL_ID into app-config.js"
+  sed -i -e "s/%COGNITO_USER_POOL_ID%/$COGNITO_USER_POOL_ID/g" /usr/share/nginx/html${PUBLIC_URL}app-config.js
+fi
+if [ -n "$COGNITO_USER_POOL_CLIENT_ID" ]; then
+  echo "Injecting COGNITO_USER_POOL_CLIENT_ID into app-config.js"
+  sed -i -e "s/%COGNITO_USER_POOL_CLIENT_ID%/$COGNITO_USER_POOL_CLIENT_ID/g" /usr/share/nginx/html${PUBLIC_URL}app-config.js
+fi
+
 if [ -f /usr/share/nginx/html${PUBLIC_URL}app-config.js ]; then
   if [ -s /usr/share/nginx/html${PUBLIC_URL}app-config.js ]; then
     echo "Detected non-empty app-config.js. Ensuring .gz file is updated..."
