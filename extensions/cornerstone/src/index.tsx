@@ -34,8 +34,6 @@ import PlanarFreehandROI from './utils/measurementServiceMappings/PlanarFreehand
 import RectangleROI from './utils/measurementServiceMappings/RectangleROI';
 import type { PublicViewportOptions } from './services/ViewportService/Viewport';
 import ImageOverlayViewerTool from './tools/ImageOverlayViewerTool';
-import ViewportActionCornersService from './services/ViewportActionCornersService/ViewportActionCornersService';
-import { ViewportActionCornersProvider } from './contextProviders/ViewportActionCornersProvider';
 import getSOPInstanceAttributes from './utils/measurementServiceMappings/utils/getSOPInstanceAttributes';
 import { findNearbyToolData } from './utils/findNearbyToolData';
 import { createFrameViewSynchronizer } from './synchronizers/frameViewSynchronizer';
@@ -46,6 +44,7 @@ import {
   usePositionPresentationStore,
   useSegmentationPresentationStore,
   useSynchronizersStore,
+  useSelectedSegmentationsForViewportStore,
 } from './stores';
 import { useToggleOneUpViewportGridStore } from '@ohif/extension-default';
 import { useActiveViewportSegmentationRepresentations } from './hooks/useActiveViewportSegmentationRepresentations';
@@ -57,6 +56,10 @@ import { useSegmentations } from './hooks/useSegmentations';
 import { StudySummaryFromMetadata } from './components/StudySummaryFromMetadata';
 import CornerstoneViewportDownloadForm from './utils/CornerstoneViewportDownloadForm';
 import utils from './utils';
+import { useMeasurementTracking } from './hooks/useMeasurementTracking';
+import { setUpSegmentationEventHandlers } from './utils/setUpSegmentationEventHandlers';
+import { setUpAnnotationEventHandlers } from './utils/setUpAnnotationEventHandlers';
+import update from 'immutability-helper';
 export * from './components';
 
 const { imageRetrieveMetadataProvider } = cornerstone.utilities;
@@ -73,7 +76,7 @@ const OHIFCornerstoneViewport = props => {
   );
 };
 
-const stackRetrieveOptions = {
+const DEFAULT_STACK_RETRIEVE_OPTIONS = {
   retrieveOptions: {
     single: {
       streaming: true,
@@ -81,6 +84,12 @@ const stackRetrieveOptions = {
     },
   },
 };
+
+/** Normalize to immutability-helper spec: plain object → $merge, otherwise use as-is. */
+const toUpdateSpec = (obj: object) =>
+  obj != null && typeof obj === 'object' && Object.keys(obj).some(k => k.startsWith('$'))
+    ? obj
+    : { $merge: (obj ?? {}) as object };
 
 const unsubscriptions = [];
 /**
@@ -92,9 +101,23 @@ const cornerstoneExtension: Types.Extensions.Extension = {
    */
   id,
 
-  onModeEnter: ({ servicesManager }: withAppTypes): void => {
+  onModeEnter: ({
+    servicesManager,
+    commandsManager,
+    extensionManager,
+  }: withAppTypes): void => {
     const { cornerstoneViewportService, toolbarService, segmentationService } =
       servicesManager.services;
+
+    const { unsubscriptions: segmentationUnsubscriptions } = setUpSegmentationEventHandlers({
+      servicesManager,
+      commandsManager,
+    });
+    unsubscriptions.push(...segmentationUnsubscriptions);
+
+    const annotationUnsubscriptions = setUpAnnotationEventHandlers();
+    unsubscriptions.push(...annotationUnsubscriptions);
+
     toolbarService.registerEventForToolbarUpdate(cornerstoneViewportService, [
       cornerstoneViewportService.EVENTS.VIEWPORT_DATA_CHANGED,
     ]);
@@ -102,6 +125,7 @@ const cornerstoneExtension: Types.Extensions.Extension = {
     toolbarService.registerEventForToolbarUpdate(segmentationService, [
       segmentationService.EVENTS.SEGMENTATION_REMOVED,
       segmentationService.EVENTS.SEGMENTATION_MODIFIED,
+      segmentationService.EVENTS.SEGMENTATION_ANNOTATION_CUT_MERGE_PROCESS_COMPLETED,
     ]);
 
     toolbarService.registerEventForToolbarUpdate(cornerstone.eventTarget, [
@@ -118,13 +142,24 @@ const cornerstoneExtension: Types.Extensions.Extension = {
       'volume',
       cornerstone.ProgressiveRetrieveImages.interleavedRetrieveStages
     );
-    // The default stack loading option is to progressive load HTJ2K images
-    // There are other possible options, but these need more thought about
-    // how to define them.
-    imageRetrieveMetadataProvider.add('stack', stackRetrieveOptions);
+
+    /**
+     * Stack retrieve options: read from active data source configuration.
+     * Pass an immutability-helper spec (e.g. { $merge: {...} } or { $set: {...} }) in
+     * stackRetrieveOptions to customize. Plain object is treated as $merge for backward compat.
+     * Set streaming: false for uncompressed DICOM that requires full file before decode.
+     */
+    const sourceConfig = extensionManager?.getActiveDataSource?.()?.[0]?.getConfig?.() ?? {};
+    const config = sourceConfig.stackRetrieveOptions ?? {};
+    const stackOptions = update(DEFAULT_STACK_RETRIEVE_OPTIONS, toUpdateSpec(config)) as typeof DEFAULT_STACK_RETRIEVE_OPTIONS;
+    imageRetrieveMetadataProvider.add('stack', stackOptions);
   },
   getPanelModule,
   onModeExit: ({ servicesManager }: withAppTypes): void => {
+    unsubscriptions.forEach(unsubscribe => unsubscribe());
+    // Clear the unsubscriptions
+    unsubscriptions.length = 0;
+
     const { cineService, segmentationService } = servicesManager.services;
     // Empty out the image load and retrieval pools to prevent memory leaks
     // on the mode exits
@@ -142,9 +177,10 @@ const cornerstoneExtension: Types.Extensions.Extension = {
     useSynchronizersStore.getState().clearSynchronizersStore();
     useToggleOneUpViewportGridStore.getState().clearToggleOneUpViewportGridStore();
     useSegmentationPresentationStore.getState().clearSegmentationPresentationStore();
+    useSelectedSegmentationsForViewportStore
+      .getState()
+      .clearSelectedSegmentationsForViewportStore();
     segmentationService.removeAllSegmentations();
-
-    unsubscriptions.forEach(unsubscribe => unsubscribe());
   },
 
   /**
@@ -153,30 +189,18 @@ const cornerstoneExtension: Types.Extensions.Extension = {
    * @param configuration.csToolsConfig - Passed directly to `initCornerstoneTools`
    */
   preRegistration: async function (props: Types.Extensions.ExtensionParams): Promise<void> {
-    const { servicesManager, serviceProvidersManager } = props;
+    const { servicesManager } = props;
     servicesManager.registerService(CornerstoneViewportService.REGISTRATION);
     servicesManager.registerService(ToolGroupService.REGISTRATION);
     servicesManager.registerService(SyncGroupService.REGISTRATION);
     servicesManager.registerService(SegmentationService.REGISTRATION);
     servicesManager.registerService(CornerstoneCacheService.REGISTRATION);
-    servicesManager.registerService(ViewportActionCornersService.REGISTRATION);
     servicesManager.registerService(ColorbarService.REGISTRATION);
-
-    serviceProvidersManager.registerProvider(
-      ViewportActionCornersService.REGISTRATION.name,
-      ViewportActionCornersProvider
-    );
 
     const { syncGroupService } = servicesManager.services;
     syncGroupService.registerCustomSynchronizer('frameview', createFrameViewSynchronizer);
 
-    const initResult = await init.call(this, props);
-
-    unsubscriptions.push(...initResult.unsubscriptions);
-
-    return {
-      ...initResult,
-    };
+    await init.call(this, props);
   },
   getToolbarModule,
   getHangingProtocolModule,
@@ -198,7 +222,7 @@ const cornerstoneExtension: Types.Extensions.Extension = {
       {
         name: 'cornerstone',
         component: ExtendedOHIFCornerstoneViewport,
-        isReferenceViewable: props => utils.isReferenceViewable({ ...props, servicesManager }),
+        isReferenceViewable: utils.isReferenceViewable.bind(null, servicesManager),
       },
     ];
   },
@@ -259,6 +283,7 @@ export {
   usePositionPresentationStore,
   useSegmentationPresentationStore,
   useSynchronizersStore,
+  useSelectedSegmentationsForViewportStore,
   Enums,
   useMeasurements,
   useActiveViewportSegmentationRepresentations,
@@ -268,5 +293,10 @@ export {
   StudySummaryFromMetadata,
   CornerstoneViewportDownloadForm,
   utils,
+  OHIFCornerstoneViewport,
+  useMeasurementTracking,
 };
+
+// Export constants
+export { VOLUME_LOADER_SCHEME, DYNAMIC_VOLUME_LOADER_SCHEME } from './constants';
 export default cornerstoneExtension;

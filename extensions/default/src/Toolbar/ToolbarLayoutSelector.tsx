@@ -3,7 +3,8 @@ import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { CommandsManager } from '@ohif/core';
 
-import { LayoutSelector } from '../../../../platform/ui-next/src/components/LayoutSelector';
+import { LayoutSelector } from '@ohif/ui-next';
+import { useTranslation } from 'react-i18next';
 
 function ToolbarLayoutSelectorWithServices({
   commandsManager,
@@ -13,6 +14,7 @@ function ToolbarLayoutSelectorWithServices({
   ...props
 }) {
   const { customizationService } = servicesManager.services;
+  const { t } = useTranslation('ToolbarLayoutSelector');
 
   // Get the presets from the customization service
   const commonPresets = customizationService?.getCustomization('layoutSelector.commonPresets') || [
@@ -34,21 +36,21 @@ function ToolbarLayoutSelectorWithServices({
   const advancedPresets = advancedPresetsGenerator
     ? advancedPresetsGenerator({ servicesManager })
     : [
-        {
-          title: 'MPR',
-          icon: 'layout-three-col',
-          commandOptions: {
-            protocolId: 'mpr',
-          },
+      {
+        title: 'MPR',
+        icon: 'layout-three-col',
+        commandOptions: {
+          protocolId: 'mpr',
         },
-        {
-          title: 'Axial Primary',
-          icon: 'layout-side-by-side',
-          commandOptions: {
-            protocolId: 'axial-primary',
-          },
+      },
+      {
+        title: 'Axial Primary',
+        icon: 'layout-side-by-side',
+        commandOptions: {
+          protocolId: 'axial-primary',
         },
-      ];
+      },
+    ];
 
   // Unified selection handler that dispatches to the appropriate command
   const handleSelectionChange = useCallback(
@@ -79,7 +81,7 @@ function ToolbarLayoutSelectorWithServices({
         onSelectionChange={handleSelectionChange}
         {...props}
       >
-        <LayoutSelector.Trigger tooltip="Change layout" />
+        <LayoutSelector.Trigger tooltip={t('Change layout')} />
         <LayoutSelector.Content>
           {/* Left side - Presets */}
           {(commonPresets.length > 0 || advancedPresets.length > 0) && (
@@ -116,6 +118,20 @@ function ToolbarLayoutSelectorWithServices({
               )}
             </div>
           )}
+
+          {/* Right Side - Grid Layout */}
+          {/* <div className="bg-muted flex flex-col gap-2.5 border-l-2 border-solid border-black p-2">
+            <div className="text-muted-foreground text-xs">{t('Custom')}</div>
+            <LayoutSelector.GridSelector
+              rows={rows}
+              columns={columns}
+            />
+            <LayoutSelector.HelpText>
+              {t('Hover to select')} <br />
+              {t('rows and columns')} <br />
+              {t('Click to apply')}
+            </LayoutSelector.HelpText>
+          </div> */}
         </LayoutSelector.Content>
       </LayoutSelector>
     </div>

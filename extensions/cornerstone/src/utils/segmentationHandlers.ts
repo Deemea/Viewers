@@ -3,6 +3,9 @@ import { updateSegmentationStats } from './updateSegmentationStats';
 import { DicomMetadataStore } from '@ohif/core';
 import { OHIFMessageType } from 'deemea-extension/src/utils/enums';
 import axios from 'axios';
+import { useSelectedSegmentationsForViewportStore } from '../stores';
+import { SegmentationRepresentations } from '@cornerstonejs/tools/enums';
+
 /**
  * Sets up the handler for segmentation data modification events
  */
@@ -15,7 +18,11 @@ export function setupSegmentationDataModifiedHandler({
   commandsManager,
   extensionManager,
 }) {
-  const { unsubscribe } = segmentationService.subscribeDebounced(
+  // A flag to indicate if the event is unsubscribed to. This is important because
+  // the debounced callback does an await and in that period of time the event may have
+  // been unsubscribed.
+  let isUnsubscribed = false;
+  const { unsubscribe: debouncedUnsubscribe } = segmentationService.subscribeDebounced(
     segmentationService.EVENTS.SEGMENTATION_DATA_MODIFIED,
     async ({ segmentationId, action }) => {
       const waitingMessage = uiNotificationService.show({
@@ -24,10 +31,13 @@ export function setupSegmentationDataModifiedHandler({
         duration: 5000,
       });
 
+      const disableUpdateSegmentationStats = customizationService.getCustomization(
+        'panelSegmentation.disableUpdateSegmentationStats'
+      );
+
       const segmentation = segmentationService.getSegmentation(segmentationId);
 
-      if (!segmentation) {
-        uiNotificationService.hide(waitingMessage);
+      if (!segmentation || disableUpdateSegmentationStats) {
         return;
       }
 
@@ -65,6 +75,7 @@ export function setupSegmentationDataModifiedHandler({
 
           return;
         }
+      if (!isUnsubscribed && updatedSegmentation) {
         segmentationService.addOrUpdateSegmentation({
           segmentationId,
           segments: updatedSegmentation.segments,
@@ -125,10 +136,15 @@ export function setupSegmentationDataModifiedHandler({
           throw error;
         }
       }
+      }
     },
     500
   );
 
+  const unsubscribe = () => {
+    isUnsubscribed = true;
+    debouncedUnsubscribe();
+  };
   return { unsubscribe };
 }
 
@@ -151,27 +167,21 @@ export function setupSegmentationModifiedHandler({ segmentationService }) {
           annotation.metadata.toolName === cornerstoneTools.SegmentBidirectionalTool.toolName
       );
 
-      let toRemoveUIDs = [];
-      if (!segmentation) {
-        toRemoveUIDs = bidirectionalAnnotations.map(
-          annotation => annotation.metadata.segmentationId === segmentationId
-        );
-        return;
-      } else {
-        const segmentIndices = Object.keys(segmentation.segments)
-          .map(index => parseInt(index))
-          .filter(index => index > 0);
+      const segmentIndices = Object.keys(segmentation.segments)
+        .map(index => parseInt(index))
+        .filter(index => index > 0);
 
-        // check if there is a bidirectional data that exists but the segment
-        // does not exists anymore we need to remove the bidirectional data
-        const bidirectionalAnnotationsToRemove = bidirectionalAnnotations.filter(
-          annotation =>
-            annotation.metadata.segmentationId === segmentationId &&
-            !segmentIndices.includes(annotation.metadata.segmentIndex)
-        );
+      // check if there is a bidirectional data that exists but the segment
+      // does not exists anymore we need to remove the bidirectional data
+      const bidirectionalAnnotationsToRemove = bidirectionalAnnotations.filter(
+        annotation =>
+          annotation.metadata.segmentationId === segmentationId &&
+          !segmentIndices.includes(annotation.metadata.segmentIndex)
+      );
 
-        toRemoveUIDs = bidirectionalAnnotationsToRemove.map(annotation => annotation.annotationUID);
-      }
+      const toRemoveUIDs = bidirectionalAnnotationsToRemove.map(
+        annotation => annotation.annotationUID
+      );
 
       toRemoveUIDs.forEach(uid => {
         cornerstoneTools.annotation.state.removeAnnotation(uid);
@@ -180,4 +190,50 @@ export function setupSegmentationModifiedHandler({ segmentationService }) {
   );
 
   return { unsubscribe };
+}
+
+/**
+ * Sets up auto tab switching for when the first segmentation is added into the viewer.
+ */
+export function setUpSelectedSegmentationsForViewportHandler({ segmentationService }) {
+  const selectedSegmentationsForViewportEvents = [
+    segmentationService.EVENTS.SEGMENTATION_MODIFIED,
+    segmentationService.EVENTS.SEGMENTATION_REPRESENTATION_MODIFIED,
+  ];
+
+  const unsubscribeSelectedSegmentationsForViewportEvents = selectedSegmentationsForViewportEvents
+    .map(eventName =>
+      segmentationService.subscribe(eventName, event => {
+        const { viewportId } = event;
+
+        if (!viewportId) {
+          return;
+        }
+
+        const { selectedSegmentationsForViewport, setSelectedSegmentationsForViewport } =
+          useSelectedSegmentationsForViewportStore.getState();
+
+        const representations = segmentationService.getSegmentationRepresentations(viewportId);
+
+        const activeRepresentation = representations.find(representation => representation.active);
+
+        const typeToSegmentationIdMap =
+          selectedSegmentationsForViewport[viewportId] ??
+          new Map<SegmentationRepresentations, string>();
+
+        if (activeRepresentation) {
+          typeToSegmentationIdMap.set(
+            activeRepresentation.type,
+            activeRepresentation.segmentationId
+          );
+        } else {
+          typeToSegmentationIdMap.clear();
+        }
+
+        setSelectedSegmentationsForViewport(viewportId, typeToSegmentationIdMap);
+      })
+    )
+    .map(subscription => subscription.unsubscribe);
+
+  return { unsubscribeSelectedSegmentationsForViewportEvents };
 }

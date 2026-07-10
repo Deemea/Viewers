@@ -1,15 +1,13 @@
 import dcmjs from 'dcmjs';
-import { classes, Types } from '@ohif/core';
+import { classes, Types, utils } from '@ohif/core';
 import { cache, metaData } from '@cornerstonejs/core';
 import { segmentation as cornerstoneToolsSegmentation } from '@cornerstonejs/tools';
 import { adaptersRT, helpers, adaptersSEG } from '@cornerstonejs/adapters';
-import { createReportDialogPrompt } from '@ohif/extension-default';
+import { createReportDialogPrompt, useUIStateStore } from '@ohif/extension-default';
 import { DicomMetadataStore } from '@ohif/core';
 import { OHIFMessageType } from '../../../deemea-extension/src/utils/enums';
 
 import PROMPT_RESPONSES from '../../default/src/utils/_shared/PROMPT_RESPONSES';
-
-const { datasetToBlob } = dcmjs.data;
 
 const getTargetViewport = ({ viewportId, viewportGridService }) => {
   const { viewports, activeViewportId } = viewportGridService.getState();
@@ -28,7 +26,7 @@ const {
 
 const {
   Cornerstone3D: {
-    RTSS: { generateRTSSFromSegmentations },
+    RTSS: { generateRTSSFromRepresentation },
   },
 } = adaptersRT;
 
@@ -38,7 +36,7 @@ const commandsModule = ({
   servicesManager,
   extensionManager,
 }: Types.Extensions.ExtensionParams): Types.Extensions.CommandsModule => {
-  const { segmentationService, displaySetService, viewportGridService, toolGroupService } =
+  const { segmentationService, displaySetService, viewportGridService } =
     servicesManager.services as AppTypes.Services;
 
   const actions = {
@@ -93,6 +91,7 @@ const commandsModule = ({
      */
     generateSegmentation: ({ segmentationId, options = {} }) => {
       const segmentation = cornerstoneToolsSegmentation.state.getSegmentation(segmentationId);
+      const predecessorImageId = options.predecessorImageId ?? segmentation.predecessorImageId;
 
       const { imageIds } = segmentation.representationData.Labelmap;
 
@@ -174,12 +173,10 @@ const commandsModule = ({
         labelmap3D.metadata[segmentIndex] = segmentMetadata;
       });
 
-      const generatedSegmentation = generateSegmentation(
-        referencedImages,
-        labelmap3D,
-        metaData,
-        options
-      );
+      const generatedSegmentation = generateSegmentation(referencedImages, labelmap3D, metaData, {
+        predecessorImageId,
+        ...options,
+      });
 
       return generatedSegmentation;
     },
@@ -213,24 +210,28 @@ const commandsModule = ({
      * @returns {Object|void} Returns the naturalized report if successfully stored,
      * otherwise throws an error.
      */
-    storeSegmentation: async ({ segmentationId, dataSource }) => {
+    storeSegmentation: async ({ segmentationId, dataSource, modality = 'SEG' }) => {
       const segmentation = segmentationService.getSegmentation(segmentationId);
 
       if (!segmentation) {
         throw new Error('No segmentation found');
       }
 
-      const { label } = segmentation;
-      const defaultDataSource = dataSource ?? extensionManager.getActiveDataSource();
+      const { label, predecessorImageId } = segmentation;
+      const defaultDataSource = dataSource ?? extensionManager.getActiveDataSource()[0];
 
       const {
         value: reportName,
         dataSourceName: selectedDataSource,
+        series,
+        priorSeriesNumber,
         action,
       } = await createReportDialogPrompt({
         servicesManager,
         extensionManager,
+        predecessorImageId,
         title: 'Store Segmentation',
+        modality,
       });
 
       if (action === PROMPT_RESPONSES.CREATE_REPORT) {
@@ -239,12 +240,18 @@ const commandsModule = ({
             ? extensionManager.getDataSources(selectedDataSource)[0]
             : defaultDataSource;
 
-          const generatedData = actions.generateSegmentation({
+          const args = {
             segmentationId,
             options: {
-              SeriesDescription: reportName || label || 'Research Derived Series',
+              SeriesDescription: series ? undefined : reportName || label || 'Contour Series',
+              SeriesNumber: series ? undefined : 1 + priorSeriesNumber,
+              predecessorImageId: series,
             },
-          });
+          };
+          const generatedDataAsync =
+            (modality === 'SEG' && actions.generateSegmentation(args)) ||
+            (modality === 'RTSTRUCT' && actions.generateContour(args));
+          const generatedData = await generatedDataAsync;
 
           if (!generatedData || !generatedData.dataset) {
             throw new Error('Error during segmentation generation');
@@ -252,6 +259,13 @@ const commandsModule = ({
 
           const { dataset: naturalizedReport } = generatedData;
 
+          // DCMJS assigns a dummy study id during creation, and this can cause problems, so clearing it out
+          if (naturalizedReport.StudyID === 'No Study ID') {
+            naturalizedReport.StudyID = '';
+          }
+
+          // TODO: Vérifier si c'est selectedDataSourceConfig.store ou selectedDataSourceConfig[0].store
+          // await selectedDataSourceConfig.store.dicom(naturalizedReport);
           await selectedDataSourceConfig[0].store.dicom(naturalizedReport);
 
           // add the information for where we stored it to the instance as well
@@ -266,14 +280,9 @@ const commandsModule = ({
         }
       }
     },
-    /**
-     * Converts segmentations into RTSS for download.
-     * This sample function retrieves all segentations and passes to
-     * cornerstone tool adapter to convert to DICOM RTSS format. It then
-     * converts dataset to downloadable blob.
-     *
-     */
-    downloadRTSS: async ({ segmentationId }) => {
+
+    generateContour: async args => {
+      const { segmentationId, options } = args;
       const segmentations = segmentationService.getSegmentation(segmentationId);
 
       // inject colors to the segmentIndex
@@ -283,45 +292,54 @@ const commandsModule = ({
         segment.color = segmentationService.getSegmentColor(
           firstRepresentation.viewportId,
           segmentationId,
-          segmentIndex
+          Number(segmentIndex)
         );
       });
+      const predecessorImageId = options?.predecessorImageId ?? segmentations.predecessorImageId;
+      const dataset = await generateRTSSFromRepresentation(segmentations, {
+        predecessorImageId,
+        ...options,
+      });
+      return { dataset };
+    },
 
-      const RTSS = await generateRTSSFromSegmentations(
-        segmentations,
-        classes.MetadataProvider,
-        DicomMetadataStore
-      );
+    /**
+     * Downloads an RTSS instance from a segmentation or contour
+     * representation.
+     */
+    downloadRTSS: async args => {
+      const { dataset } = await actions.generateContour(args);
+      const { InstanceNumber: instanceNumber = 1, SeriesInstanceUID: seriesUID } = dataset;
 
       try {
-        const reportBlob = datasetToBlob(RTSS);
-
         //Create a URL for the binary.
-        const objectUrl = URL.createObjectURL(reportBlob);
-        window.location.assign(objectUrl);
+        const filename = `rtss-${seriesUID}-${instanceNumber}.dcm`;
+        downloadDICOMData(dataset, filename);
       } catch (e) {
         console.warn(e);
+      }
+    },
+
+    toggleActiveSegmentationUtility: ({ itemId: buttonId }) => {
+      const { uiState, setUIState } = useUIStateStore.getState();
+      const isButtonActive = uiState['activeSegmentationUtility'] === buttonId;
+      console.log('toggleActiveSegmentationUtility', isButtonActive, buttonId);
+      // if the button is active, clear the active segmentation utility
+      if (isButtonActive) {
+        setUIState('activeSegmentationUtility', null);
+      } else {
+        setUIState('activeSegmentationUtility', buttonId);
       }
     },
   };
 
   const definitions = {
-    loadSegmentationsForViewport: {
-      commandFn: actions.loadSegmentationsForViewport,
-    },
-
-    generateSegmentation: {
-      commandFn: actions.generateSegmentation,
-    },
-    downloadSegmentation: {
-      commandFn: actions.downloadSegmentation,
-    },
-    storeSegmentation: {
-      commandFn: actions.storeSegmentation,
-    },
-    downloadRTSS: {
-      commandFn: actions.downloadRTSS,
-    },
+    loadSegmentationsForViewport: actions.loadSegmentationsForViewport,
+    generateSegmentation: actions.generateSegmentation,
+    downloadSegmentation: actions.downloadSegmentation,
+    storeSegmentation: actions.storeSegmentation,
+    downloadRTSS: actions.downloadRTSS,
+    toggleActiveSegmentationUtility: actions.toggleActiveSegmentationUtility,
   };
 
   return {

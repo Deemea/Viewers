@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode, useCallback, useEffect, useState } from 'react';
+import React, { createContext, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 
 import DividerItem from './DividerItem';
 import PanelSelector from './PanelSelector';
@@ -50,7 +50,9 @@ export interface MenuProps {
   showHeaderDivider?: boolean;
   activePanelIndex?: number;
   onVisibilityChange?: (isVisible: boolean) => void;
-  horizontalDirection?: HorizontalDirection;
+  // New props that can be used as alternatives to horizontalDirection and verticalDirection
+  align?: 'start' | 'end' | 'center';
+  side?: 'top' | 'bottom' | 'left' | 'right';
   children: ReactNode;
 }
 type MenuContextProps = {
@@ -58,6 +60,7 @@ type MenuContextProps = {
   hideMenu: () => void;
   addItemPanel: (index: number, label: string) => void;
   horizontalDirection: HorizontalDirection;
+  verticalDirection?: VerticalDirection;
   activePanelIndex: number;
 };
 
@@ -76,8 +79,23 @@ const Menu = (props: MenuProps) => {
     preventHideMenu,
     menuClassName,
     menuStyle,
-    horizontalDirection = HorizontalDirection.LeftToRight,
+    align,
+    side,
   } = props;
+
+  // Derive horizontalDirection and verticalDirection from align and side if provided
+  let horizontalDirection = HorizontalDirection.LeftToRight;
+  let verticalDirection = VerticalDirection.BottomToTop;
+
+  if (align !== undefined) {
+    horizontalDirection =
+      align === 'start' ? HorizontalDirection.LeftToRight : HorizontalDirection.RightToLeft;
+  }
+
+  if (side !== undefined) {
+    verticalDirection =
+      side === 'bottom' ? VerticalDirection.TopToBottom : VerticalDirection.BottomToTop;
+  }
 
   const [isMenuVisible, setIsMenuVisible] = useState(isVisible);
 
@@ -90,24 +108,49 @@ const Menu = (props: MenuProps) => {
   ]);
   const [itemPanelLabels, setItemPanelLabels] = useState<Array<string>>([]);
 
+  // Store latest function references in refs so we can use them in effects
+  // without triggering re-runs when they change
+  const onVisibilityChangeRef = useRef(onVisibilityChange);
+  const preventHideMenuRef = useRef(preventHideMenu);
+
+  // Keep refs up to date
+  useEffect(() => {
+    onVisibilityChangeRef.current = onVisibilityChange;
+  }, [onVisibilityChange]);
+
+  useEffect(() => {
+    preventHideMenuRef.current = preventHideMenu;
+  }, [preventHideMenu]);
+
+  // If the props change for the this top level menu then we have to update the menu path
+  // because the props to be rendered are maintained in the state.
+  useEffect(() => {
+    setMenuPath(menuPath => [
+      { props, activePanelIndex: activePanelIndex || 0 },
+      ...menuPath.slice(1),
+    ]);
+  }, [activePanelIndex, props]);
+
   const hideMenu = useCallback(() => {
-    if (preventHideMenu) {
+    if (preventHideMenuRef.current) {
       return;
     }
     setMenuPath(path => [path[0]]);
     setItemPanelLabels([]);
     setIsMenuVisible(false);
-    onVisibilityChange?.(false);
-  }, [preventHideMenu, onVisibilityChange]);
+    onVisibilityChangeRef.current?.(false);
+  }, []);
 
+  // Only run this effect when isVisible changes, not when functions change.
+  // Note that hideMenu is stable with no dependencies and thus will not trigger the useEffect to run.
   useEffect(() => {
     if (isVisible) {
       setIsMenuVisible(isVisible);
-      onVisibilityChange?.(isVisible);
+      onVisibilityChangeRef.current?.(isVisible);
     } else {
       hideMenu();
     }
-  }, [hideMenu, isVisible, onVisibilityChange]);
+  }, [isVisible, hideMenu]);
 
   const showSubMenu = useCallback((subMenuProps: MenuProps) => {
     setMenuPath(path => {
@@ -151,6 +194,7 @@ const Menu = (props: MenuProps) => {
           addItemPanel,
           activePanelIndex: currentMenuActivePanelIndex,
           horizontalDirection,
+          verticalDirection,
         }}
       >
         {isMenuVisible && (

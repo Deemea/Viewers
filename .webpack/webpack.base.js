@@ -26,6 +26,7 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 const NODE_ENV = process.env.NODE_ENV;
 const QUICK_BUILD = process.env.QUICK_BUILD;
 const BUILD_NUM = process.env.CIRCLE_BUILD_NUM || '0';
+const IS_COVERAGE = process.env.COVERAGE === 'true';
 
 // read from ../version.txt
 const VERSION_NUMBER = fs.readFileSync(path.join(__dirname, '../version.txt'), 'utf8') || '';
@@ -102,14 +103,30 @@ module.exports = (env, argv, { SRC_DIR, ENTRY }) => {
         ...(isProdBuild
           ? []
           : [
-              {
-                test: /\.[jt]sx?$/,
-                exclude: /node_modules/,
-                loader: 'babel-loader',
-                options: {
-                  plugins: isProdBuild ? [] : ['react-refresh/babel'],
-                },
-              },
+              ...(IS_COVERAGE
+                ? [
+                    {
+                      test: /\.[jt]sx?$/,
+                      exclude: /node_modules/,
+                      use: {
+                        loader: 'babel-loader',
+                        options: {
+                          presets: ['@babel/preset-typescript', '@babel/preset-react'],
+                          plugins: ['istanbul'],
+                        },
+                      },
+                    },
+                  ]
+                : [
+                    {
+                      test: /\.[jt]sx?$/,
+                      exclude: /node_modules/,
+                      loader: 'babel-loader',
+                      options: {
+                        plugins: isProdBuild ? [] : ['react-refresh/babel'],
+                      },
+                    },
+                  ]),
             ]),
         {
           test: /\.svg?$/,
@@ -186,8 +203,6 @@ module.exports = (env, argv, { SRC_DIR, ENTRY }) => {
         '@hooks': path.resolve(__dirname, '../platform/app/src/hooks'),
         '@routes': path.resolve(__dirname, '../platform/app/src/routes'),
         '@state': path.resolve(__dirname, '../platform/app/src/state'),
-        'dicom-microscopy-viewer':
-          'dicom-microscopy-viewer/dist/dynamic-import/dicomMicroscopyViewer.min.js',
       },
       // Which directories to search when resolving modules
       modules: [
