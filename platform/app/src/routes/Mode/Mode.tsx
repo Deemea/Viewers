@@ -75,9 +75,45 @@ export default function ModeRoute({
   const token = lowerCaseSearchParams.get('token');
   const studyId = lowerCaseSearchParams.get('studyid');
 
+  // authReady: true as soon as we have a valid auth header configured.
+  // - Immediate if a legacy ?token= URL param is present.
+  // - Otherwise wait for the parent window to send SET_AUTH_TOKEN via postMessage.
+  const isEmbedded = window.self !== window.top;
+  const [authReady, setAuthReady] = useState<boolean>(!!token || !isEmbedded);
+
   if (token) {
     updateAuthServiceAndCleanUrl(token, studyId, location, userAuthenticationService);
   }
+
+  // postMessage-based token injection (preferred over URL param — token never appears in the URL).
+  useEffect(() => {
+    if (authReady) {
+      return;
+    }
+
+    const handler = (ev: MessageEvent): void => {
+      if (ev.data?.type !== 'set_auth_token') {
+        return;
+      }
+      const { token: msgToken, studyId: msgStudyId } = ev.data.message ?? {};
+      if (!msgToken) {
+        return;
+      }
+      userAuthenticationService.setServiceImplementation({
+        getAuthorizationHeader: () => ({
+          Authorization: 'Bearer ' + msgToken,
+          'x-study-id': msgStudyId,
+        }),
+      });
+      setAuthReady(true);
+    };
+
+    window.addEventListener('message', handler);
+    // Ask the parent window for the token
+    window.parent.postMessage({ type: 'request_auth_token' }, '*');
+
+    return () => window.removeEventListener('message', handler);
+  }, [authReady]);
 
   // An undefined dataSourceName implies that the active data source that is already set in the ExtensionManager should be used.
   if (dataSourceName !== undefined) {
@@ -120,6 +156,10 @@ export default function ModeRoute({
       return;
     }
 
+    if (!authReady) {
+      return;
+    }
+
     // Todo: this should not be here, data source should not care about params
     const initializeDataSource = async (params, query) => {
       await dataSource.initialize({
@@ -133,7 +173,7 @@ export default function ModeRoute({
     return () => {
       layoutTemplateData.current = null;
     };
-  }, [location, ExtensionDependenciesLoaded]);
+  }, [location, ExtensionDependenciesLoaded, authReady]);
 
   useEffect(() => {
     if (!ExtensionDependenciesLoaded || !studyInstanceUIDs?.length) {
