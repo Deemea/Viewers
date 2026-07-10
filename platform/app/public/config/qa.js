@@ -1,13 +1,11 @@
 /** @type {AppTypes.Config} */
 // QA environment configuration.
 // Built with: APP_CONFIG=config/qa.js
-const { baseConfig, createDataSources, createCognitoOidc } = window.deemeaConfig;
+const { baseConfig, createDataSources } = window.deemeaConfig;
 
 window.config = {
   ...baseConfig,
   name: 'config/qa.js',
-  // OIDC values injected at container startup by entrypoint.sh
-  oidc: createCognitoOidc('%COGNITO_USER_POOL_ID%', '%COGNITO_USER_POOL_CLIENT_ID%'),
   defaultDataSourceName: 'CLOUD_QA',
   dangerouslyUseDynamicConfig: {
     enabled: true,

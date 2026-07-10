@@ -54,26 +54,6 @@
     });
   }
 
-  /**
-   * Builds the OIDC config for a Cognito user pool.
-   * Values are injected at container startup by entrypoint.sh (COGNITO_* env vars),
-   * or hardcoded per environment file.
-   */
-  function createCognitoOidc(userPoolId, clientId) {
-    return [
-      {
-        authority: 'https://cognito-idp.eu-west-3.amazonaws.com/' + userPoolId,
-        client_id: clientId,
-        redirect_uri: '/callback',
-        response_type: 'code', // Authorization Code Flow + PKCE
-        scope: 'openid email profile',
-        post_logout_redirect_uri: '/logout-redirect.html',
-        automaticSilentRenew: true,
-        revokeAccessTokenOnSignout: true,
-      },
-    ];
-  }
-
   /** Base config shared by all environments. */
   const baseConfig = {
     routerBasename: null,
@@ -110,6 +90,5 @@
     baseConfig: baseConfig,
     createDidierDataSource: createDidierDataSource,
     createDataSources: createDataSources,
-    createCognitoOidc: createCognitoOidc,
   };
 })();
