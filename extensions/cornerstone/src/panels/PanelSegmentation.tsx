@@ -153,6 +153,7 @@ export default function PanelSegmentation({
     disableEditing,
     showAddSegment,
     disableAddSegmentation,
+    CustomDropdownMenuContent,
     CustomSegmentStatisticsHeader,
   } = customizations;
 

@@ -12,7 +12,7 @@ const ohif = {
 
 const cornerstone = {
   viewport: '@ohif/extension-cornerstone.viewportModule.cornerstone',
-  panelTool: '@ohif/extension-cornerstone.panelModule.panelSegmentationWithTools',
+  panelTool: '@ohif/extension-cornerstone.panelModule.panelSegmentationWithToolsLabelMap',
   measurements: '@ohif/extension-cornerstone.panelModule.panelMeasurement',
 };
 
@@ -63,10 +63,15 @@ function modeFactory({ modeConfiguration }) {
       // Init Default and SR ToolGroups
       initToolGroups(extensionManager, toolGroupService, commandsManager);
 
-      toolbarService.addButtons(toolbarButtons);
-      toolbarService?.addButtons(segmentationButtons);
+      toolbarService.register(toolbarButtons);
+      toolbarService?.register(segmentationButtons);
 
-      toolbarService.createButtonSection('primary', [
+      toolbarService.updateSection(toolbarService.sections.viewportActionMenu.topLeft, [
+        'orientationMenu',
+        'dataOverlayMenu',
+      ]);
+
+      toolbarService.updateSection('primary', [
         'Length',
         'RectangleROI',
         'Angle',
@@ -81,7 +86,7 @@ function modeFactory({ modeConfiguration }) {
         'MoreTools',
       ]);
 
-      toolbarService.createButtonSection('moreToolsSection', [
+      toolbarService.updateSection('moreToolsSection', [
         'Reset',
         'rotate-right',
         'flipHorizontal',
@@ -94,22 +99,22 @@ function modeFactory({ modeConfiguration }) {
         'TagBrowser',
       ]);
 
-      toolbarService.createButtonSection('segmentationToolbox', [
+      toolbarService.updateSection('segmentationToolbox', [
         'SegmentationUtilities',
         'SegmentationTools',
       ]);
-      toolbarService.createButtonSection('segmentationToolboxUtilitySection', [
+      toolbarService.updateSection('segmentationToolboxUtilitySection', [
         'LabelmapSlicePropagation',
         'InterpolateLabelmap',
         'SegmentBidirectional',
       ]);
-      toolbarService.createButtonSection('segmentationToolboxToolsSection', [
+      toolbarService.updateSection('segmentationToolboxToolsSection', [
         'BrushTools',
         // 'MarkerLabelmap',
         // 'RegionSegmentPlus',
         // 'Shapes',
       ]);
-      toolbarService.createButtonSection('brushToolsSection', ['Brush', 'Eraser', 'Threshold']);
+      toolbarService.updateSection('brushToolsSection', ['Brush', 'Eraser', 'Threshold']);
     },
     onModeExit: ({ servicesManager }: withAppTypes) => {
       const {

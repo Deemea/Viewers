@@ -1,6 +1,7 @@
 // TODO: torn, can either bake this here; or have to create a whole new button type
 // Only ways that you can pass in a custom React component for render :l
 import type { Button } from '@ohif/core/types';
+import i18n from 'i18next';
 
 export const setToolActiveToolbar = {
   commandName: 'setToolActiveToolbar',
@@ -119,6 +120,18 @@ const toolbarButtons: Button[] = [
         },
       ],
       evaluate: 'evaluate.action',
+    },
+  },
+  {
+    id: 'dataOverlayMenu',
+    uiType: 'ohif.dataOverlayMenu',
+    props: {
+      icon: 'ViewportViews',
+      label: i18n.t('Buttons:Data Overlay'),
+      tooltip: i18n.t(
+        'Buttons:Configure data overlay options and manage foreground/background display sets'
+      ),
+      evaluate: 'evaluate.dataOverlayMenu',
     },
   },
 ];

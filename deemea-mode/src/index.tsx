@@ -8,7 +8,7 @@ const ohif = {
   sopClassHandler: '@ohif/extension-default.sopClassHandlerModule.stack',
   hangingProtocol: '@ohif/extension-default.hangingProtocolModule.default',
   leftPanel: '@ohif/extension-default.panelModule.seriesList',
-  rightPanel: '@ohif/extension-default.panelModule.measurements',
+  rightPanel: '@ohif/extension-cornerstone.panelModule.panelMeasurement',
 };
 
 const cornerstone = {
@@ -56,8 +56,13 @@ function modeFactory({ modeConfiguration }) {
       // Init Default and SR ToolGroups
       initToolGroups(extensionManager, toolGroupService, commandsManager);
 
-      toolbarService?.addButtons(toolbarButtons);
-      toolbarService.createButtonSection('primary', [
+      toolbarService?.register(toolbarButtons);
+
+      toolbarService.updateSection(toolbarService.sections.viewportActionMenu.topLeft, [
+        'dataOverlayMenu',
+      ]);
+
+      toolbarService.updateSection('primary', [
         'ResetButton',
         'Length',
         'RectangleROI',

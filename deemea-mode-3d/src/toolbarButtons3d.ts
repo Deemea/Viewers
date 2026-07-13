@@ -1,5 +1,6 @@
 import type { Button } from '@ohif/core/types';
 import { ViewportGridService } from '@ohif/core';
+import i18n from 'i18next';
 
 const setToolActiveToolbar = {
   commandName: 'setToolActiveToolbar',
@@ -231,6 +232,33 @@ const toolbarButtons: Button[] = [
         disabledText: 'Create new segmentation to enable this tool.',
       },
       commands: 'runSegmentBidirectional',
+    },
+  },
+  {
+    id: 'dataOverlayMenu',
+    uiType: 'ohif.dataOverlayMenu',
+    props: {
+      icon: 'ViewportViews',
+      label: i18n.t('Buttons:Data Overlay'),
+      tooltip: i18n.t(
+        'Buttons:Configure data overlay options and manage foreground/background display sets'
+      ),
+      evaluate: 'evaluate.dataOverlayMenu',
+    },
+  },
+  {
+    id: 'orientationMenu',
+    uiType: 'ohif.orientationMenu',
+    props: {
+      icon: 'OrientationSwitch',
+      label: i18n.t('Buttons:Orientation'),
+      tooltip: i18n.t(
+        'Buttons:Change viewport orientation between axial, sagittal, coronal and reformat planes'
+      ),
+      evaluate: {
+        name: 'evaluate.orientationMenu',
+        // hideWhenDisabled: true,
+      },
     },
   },
   // {
