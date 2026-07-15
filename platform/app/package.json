@@ -23,7 +23,6 @@
     "build": "node --max_old_space_size=8096 ./../../node_modules/webpack/bin/webpack.js --progress --config .webpack/webpack.pwa.js",
     "clean": "shx rm -rf dist",
     "clean:deep": "yarn run clean && shx rm -rf node_modules",
-    "dev:fast": "rsbuild dev --config ../../rsbuild.config.ts",
     "dev": "cross-env NODE_ENV=development webpack serve --config .webpack/webpack.pwa.js",
     "dev:no:cache": "cross-env NODE_ENV=development webpack serve --no-cache --config .webpack/webpack.pwa.js",
     "dev:viewer": "yarn run dev",
