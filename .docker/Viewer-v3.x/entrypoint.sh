@@ -14,16 +14,6 @@ else
   echo "Not using custom APP_CONFIG"
 fi
 
-# Inject Cognito OIDC settings (non-secret public identifiers) into app-config.js
-if [ -n "$COGNITO_USER_POOL_ID" ]; then
-  echo "Injecting COGNITO_USER_POOL_ID into app-config.js"
-  sed -i -e "s/%COGNITO_USER_POOL_ID%/$COGNITO_USER_POOL_ID/g" /usr/share/nginx/html${PUBLIC_URL}app-config.js
-fi
-if [ -n "$COGNITO_USER_POOL_CLIENT_ID" ]; then
-  echo "Injecting COGNITO_USER_POOL_CLIENT_ID into app-config.js"
-  sed -i -e "s/%COGNITO_USER_POOL_CLIENT_ID%/$COGNITO_USER_POOL_CLIENT_ID/g" /usr/share/nginx/html${PUBLIC_URL}app-config.js
-fi
-
 if [ -f /usr/share/nginx/html${PUBLIC_URL}app-config.js ]; then
   if [ -s /usr/share/nginx/html${PUBLIC_URL}app-config.js ]; then
     echo "Detected non-empty app-config.js. Ensuring .gz file is updated..."
@@ -38,35 +28,6 @@ else
   echo "No app-config.js file found. Skipping compression."
 fi
 
-
-
-if [ -n "$CLIENT_ID" ] || [ -n "$HEALTHCARE_API_ENDPOINT" ]
-  then
-    # If CLIENT_ID is specified, use the google.js configuration with the modified ID
-    if [ -n "$CLIENT_ID" ]
-      then
-  	    echo "Google Cloud Healthcare \$CLIENT_ID has been provided: "
-  	    echo "$CLIENT_ID"
-  	    echo "Updating config..."
-
-  	    # - Use SED to replace the CLIENT_ID that is currently in google.js
-	      sed -i -e "s/YOURCLIENTID.apps.googleusercontent.com/$CLIENT_ID/g" /usr/share/nginx/html/google.js
-	  fi
-
-    # If HEALTHCARE_API_ENDPOINT is specified, use the google.js configuration with the modified endpoint
-    if [ -n "$HEALTHCARE_API_ENDPOINT" ]
-      then
-        echo "Google Cloud Healthcare \$HEALTHCARE_API_ENDPOINT has been provided: "
-        echo "$HEALTHCARE_API_ENDPOINT"
-        echo "Updating config..."
-
-        # - Use SED to replace the HEALTHCARE_API_ENDPOINT that is currently in google.js
-        sed -i -e "s+https://healthcare.googleapis.com/v1+$HEALTHCARE_API_ENDPOINT+g" /usr/share/nginx/html/google.js
-    fi
-
-	  # - Copy google.js to overwrite app-config.js
-	  cp /usr/share/nginx/html/google.js /usr/share/nginx/html/app-config.js
-fi
 
 echo "Starting Nginx to serve the OHIF Viewer on ${PUBLIC_URL}"
 
