@@ -145,18 +145,6 @@ const toolbarButtonsValidated3d: Button[] = [
     },
   },
   {
-    id: 'dataOverlayMenu',
-    uiType: 'ohif.dataOverlayMenu',
-    props: {
-      icon: 'ViewportViews',
-      label: i18n.t('Buttons:Data Overlay'),
-      tooltip: i18n.t(
-        'Buttons:Configure data overlay options and manage foreground/background display sets'
-      ),
-      evaluate: 'evaluate.dataOverlayMenu',
-    },
-  },
-  {
     id: 'orientationMenu',
     uiType: 'ohif.orientationMenu',
     props: {

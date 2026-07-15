@@ -58,10 +58,6 @@ function modeFactory({ modeConfiguration }) {
 
       toolbarService?.register(toolbarButtons);
 
-      toolbarService.updateSection(toolbarService.sections.viewportActionMenu.topLeft, [
-        'dataOverlayMenu',
-      ]);
-
       toolbarService.updateSection('primary', [
         'ResetButton',
         'Length',

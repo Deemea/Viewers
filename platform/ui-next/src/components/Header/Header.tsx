@@ -92,6 +92,7 @@ function Header({
                     variant="ghost"
                     size="icon"
                     className="text-primary hover:bg-primary-dark mt-2 h-full w-full"
+                    onClick={() => menuOptions[0].onClick()}
                   >
                     <Icons.GearSettings />
                   </Button>
