@@ -91,7 +91,22 @@ export default function ModeRoute({
       return;
     }
 
+    const parentOrigin = (() => {
+      try {
+        return new URL(document.referrer).origin;
+      } catch {
+        return null;
+      }
+    })();
+
     const handler = (ev: MessageEvent): void => {
+      // Only accept messages from the embedding parent window (and, when possible, its origin).
+      if (ev.source !== window.parent) {
+        return;
+      }
+      if (parentOrigin && ev.origin !== parentOrigin) {
+        return;
+      }
       if (ev.data?.type !== 'set_auth_token') {
         return;
       }
@@ -100,20 +115,23 @@ export default function ModeRoute({
         return;
       }
       userAuthenticationService.setServiceImplementation({
-        getAuthorizationHeader: () => ({
-          Authorization: 'Bearer ' + msgToken,
-          'x-study-id': msgStudyId,
-        }),
+        getAuthorizationHeader: () => {
+          const headers: Record<string, string> = { Authorization: `Bearer ${msgToken}` };
+          if (msgStudyId) {
+            headers['x-study-id'] = String(msgStudyId);
+          }
+          return headers;
+        },
       });
       setAuthReady(true);
     };
 
     window.addEventListener('message', handler);
     // Ask the parent window for the token
-    window.parent.postMessage({ type: 'request_auth_token' }, '*');
+    window.parent.postMessage({ type: 'request_auth_token' }, parentOrigin ?? '*');
 
     return () => window.removeEventListener('message', handler);
-  }, [authReady]);
+  }, [authReady, userAuthenticationService]);
 
   // An undefined dataSourceName implies that the active data source that is already set in the ExtensionManager should be used.
   if (dataSourceName !== undefined) {
