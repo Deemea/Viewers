@@ -13,6 +13,8 @@ window.config = {
       /(https:\/\/[a-zA-Z0-9-]+\.deemea\.com(\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]*)*)|(http:\/\/localhost(:[0-9]+)?(\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]*)*)/,
   },
   dataSources: createDataSources({
+    SANDBOX: 'https://sandbox.deemea.com/api/v1/didier',
+    SANDBOX_V2: 'https://sandbox-v2.deemea.com/api/v1/didier',
     DEV_SANTY: 'https://santy-dev.deemea.com/api/v1/didier',
     DEV_F4C: 'https://dev.f4c.deemea.com/api/v1/didier',
   }),
