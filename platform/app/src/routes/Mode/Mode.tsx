@@ -11,6 +11,7 @@ import { history } from '../../utils/history';
 import loadModules from '../../pluginImports';
 import { defaultRouteInit } from './defaultRouteInit';
 import { updateAuthServiceAndCleanUrl } from './updateAuthServiceAndCleanUrl';
+import { OHIFMessageType } from 'deemea-extension/src/utils/enums';
 
 const { getSplitParam } = utils;
 
@@ -107,7 +108,7 @@ export default function ModeRoute({
       if (parentOrigin && ev.origin !== parentOrigin) {
         return;
       }
-      if (ev.data?.type !== 'set_auth_token') {
+      if (ev.data?.type !== OHIFMessageType.SET_AUTH_TOKEN) {
         return;
       }
       const { token: msgToken, studyId: msgStudyId } = ev.data.message ?? {};
@@ -128,7 +129,7 @@ export default function ModeRoute({
 
     window.addEventListener('message', handler);
     // Ask the parent window for the token
-    window.parent.postMessage({ type: 'request_auth_token' }, parentOrigin ?? '*');
+    window.parent.postMessage({ type: OHIFMessageType.REQUEST_AUTH_TOKEN }, parentOrigin ?? '*');
 
     return () => window.removeEventListener('message', handler);
   }, [authReady, userAuthenticationService]);
