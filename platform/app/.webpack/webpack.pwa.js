@@ -112,11 +112,10 @@ module.exports = (env, argv) => {
             from: '../../../node_modules/onnxruntime-web/dist',
             to: `${DIST_DIR}/ort`,
           },
-          // Short term solution to make sure GCloud config is available in output
-          // for our docker implementation
+          // Shared Deemea config helpers, loaded before app-config.js by the HTML template
           {
-            from: `${PUBLIC_DIR}/config/google.js`,
-            to: `${DIST_DIR}/google.js`,
+            from: `${PUBLIC_DIR}/config/deemea-shared.js`,
+            to: `${DIST_DIR}/config/deemea-shared.js`,
           },
           // Copy over and rename our target app config file
           {

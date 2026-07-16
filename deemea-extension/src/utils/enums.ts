@@ -13,4 +13,6 @@ export enum OHIFMessageType {
   SAVE_SEGMENTATION_STATS = 'save_segmentation_stats',
   SEND_SEGMENTATION_STATS = 'send_segmentation_stats',
   EXPORT_AVAILABLE = 'export_available',
+  REQUEST_AUTH_TOKEN = 'request_auth_token',
+  SET_AUTH_TOKEN = 'set_auth_token',
 }
