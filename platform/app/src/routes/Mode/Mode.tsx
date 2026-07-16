@@ -10,6 +10,7 @@ import Compose from './Compose';
 import loadModules from '../../pluginImports';
 import { defaultRouteInit } from './defaultRouteInit';
 import { updateAuthServiceAndCleanUrl } from './updateAuthServiceAndCleanUrl';
+import { OHIFMessageType } from 'deemea-extension/src/utils/enums';
 
 const { getSplitParam } = utils;
 
@@ -71,9 +72,63 @@ export default function ModeRoute({
   const token = lowerCaseSearchParams.get('token');
   const studyId = lowerCaseSearchParams.get('studyid');
 
+  // authReady: true as soon as we have a valid auth header configured.
+  // - Immediate if a legacy ?token= URL param is present.
+  // - Otherwise wait for the parent window to send SET_AUTH_TOKEN via postMessage.
+  const isEmbedded = window.self !== window.top;
+  const [authReady, setAuthReady] = useState<boolean>(!!token || !isEmbedded);
+
   if (token) {
     updateAuthServiceAndCleanUrl(token, studyId, location, userAuthenticationService);
   }
+
+  // postMessage-based token injection (preferred over URL param — token never appears in the URL).
+  useEffect(() => {
+    if (authReady) {
+      return;
+    }
+
+    const parentOrigin = (() => {
+      try {
+        return new URL(document.referrer).origin;
+      } catch {
+        return null;
+      }
+    })();
+
+    const handler = (ev: MessageEvent): void => {
+      // Only accept messages from the embedding parent window (and, when possible, its origin).
+      if (ev.source !== window.parent) {
+        return;
+      }
+      if (parentOrigin && ev.origin !== parentOrigin) {
+        return;
+      }
+      if (ev.data?.type !== OHIFMessageType.SET_AUTH_TOKEN) {
+        return;
+      }
+      const { token: msgToken, studyId: msgStudyId } = ev.data.message ?? {};
+      if (!msgToken) {
+        return;
+      }
+      userAuthenticationService.setServiceImplementation({
+        getAuthorizationHeader: () => {
+          const headers: Record<string, string> = { Authorization: `Bearer ${msgToken}` };
+          if (msgStudyId) {
+            headers['x-study-id'] = String(msgStudyId);
+          }
+          return headers;
+        },
+      });
+      setAuthReady(true);
+    };
+
+    window.addEventListener('message', handler);
+    // Ask the parent window for the token
+    window.parent.postMessage({ type: OHIFMessageType.REQUEST_AUTH_TOKEN }, parentOrigin ?? '*');
+
+    return () => window.removeEventListener('message', handler);
+  }, [authReady, userAuthenticationService]);
 
   // An undefined dataSourceName implies that the active data source that is already set in the ExtensionManager should be used.
   if (dataSourceName !== undefined) {
@@ -116,6 +171,10 @@ export default function ModeRoute({
       return;
     }
 
+    if (!authReady) {
+      return;
+    }
+
     // Todo: this should not be here, data source should not care about params
     const initializeDataSource = async (params, query) => {
       await dataSource.initialize({
@@ -129,7 +188,7 @@ export default function ModeRoute({
     return () => {
       layoutTemplateData.current = null;
     };
-  }, [location, ExtensionDependenciesLoaded]);
+  }, [location, ExtensionDependenciesLoaded, authReady]);
 
   useEffect(() => {
     if (!ExtensionDependenciesLoaded || !studyInstanceUIDs?.length) {
