@@ -91,9 +91,9 @@ export function setupSegmentationDataModifiedHandler({
           .getActiveDisplaySets()
           .filter(ds => ds.Modality === 'SEG');
 
-        const segDisplaySet =
-          segDisplaySets.find(ds => ds.displaySetInstanceUID === segmentationId) ??
-          segDisplaySets[0];
+        const segDisplaySet = segDisplaySets.find(
+          ds => ds.displaySetInstanceUID === segmentationId
+        );
         const defaultDataSource = extensionManager.getActiveDataSource();
 
         const storedSeries = storedSeriesBySegmentationId.get(segmentationId);
