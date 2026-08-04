@@ -659,9 +659,6 @@ const commandsModule = ({
           displaySetInstanceUID: defaultDisplaySetInstanceUID,
         },
         title: 'DICOM Tag Browser',
-        // The tag table sizes itself to the viewport (see DicomTagTable), so the
-        // dialog fits on its own and only the table scrolls. The cap here is just a
-        // safety net: overflow-y-auto shows no scrollbar unless it is ever exceeded.
         containerClassName: 'max-w-3xl max-h-[90vh] overflow-y-auto',
       });
     },
