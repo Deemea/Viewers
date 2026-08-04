@@ -96,6 +96,12 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
 
       window.addEventListener('message', event => {
         if (event.data.type === OHIFMessageType.IMAGE_STATUS) {
+          // Skip default mode for our other viewers (deemea and deemea-3d) to avoid unnecessary toolbar updates
+          const activeRoute = window.location.pathname.split('/')[1];
+          if (activeRoute !== 'deemea' && activeRoute !== 'deemea-3d') {
+            return;
+          }
+
           if (event.data.message.status === 'Validated') {
             if (event.data.message.imageType === '2D') {
               const style = document.createElement('style');
