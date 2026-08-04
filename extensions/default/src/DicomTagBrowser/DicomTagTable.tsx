@@ -19,7 +19,7 @@ const indentationPadding = 8;
 // Rough guess at the space the dialog needs around the virtualised list (title,
 // series and search controls, column headers, paddings). Only used for the first
 // render - it is corrected against the real dialog right after, see below.
-const tableChromeEstimatePx = 210;
+const tableEstimatePx = 210;
 const minTableHeightPx = 160;
 const maxTableHeightPx = 512; // 32rem, the original design height
 const tableBorderPx = 4; // border-2 on the list container, top + bottom
@@ -35,7 +35,7 @@ function clampTableHeight(height: number) {
  * it a second scrollbar on top of the list's own.
  */
 function getAvailableTableHeight() {
-  return clampTableHeight(window.innerHeight - tableChromeEstimatePx);
+  return clampTableHeight(window.innerHeight - tableEstimatePx);
 }
 
 const RowComponent = ({
@@ -188,12 +188,12 @@ function DicomTagTable({ rows }: { rows: Row[] }) {
       return;
     }
 
-    const chromeHeight = dialog.scrollHeight - container.getBoundingClientRect().height;
+    const windowHeight = dialog.scrollHeight - container.getBoundingClientRect().height;
 
     const maxDialogHeight = parseFloat(getComputedStyle(dialog).maxHeight);
     const dialogBudget = Number.isFinite(maxDialogHeight) ? maxDialogHeight : window.innerHeight;
 
-    const fittedHeight = clampTableHeight(dialogBudget - chromeHeight);
+    const fittedHeight = clampTableHeight(dialogBudget - windowHeight);
 
     if (Math.abs(fittedHeight - tableHeight) > 1) {
       setTableHeight(fittedHeight);
