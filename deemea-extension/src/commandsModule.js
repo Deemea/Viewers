@@ -37,13 +37,30 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
 
       CornerstoneViewportService.subscribe(
         CornerstoneViewportService.EVENTS.VIEWPORT_DATA_CHANGED,
-        () => {
+        ({ viewportId }) => {
           window.parent.postMessage(
             {
               type: OHIFMessageType.IMAGE_READY,
             },
             '*'
           );
+
+          const imageMetadata =
+            CornerstoneViewportService.getCornerstoneViewport(viewportId)?.getImageData?.();
+
+          if (imageMetadata) {
+            window.parent.postMessage(
+              {
+                type: OHIFMessageType.IMAGE_SIZE,
+                message: {
+                  width: imageMetadata.dimensions[0],
+                  height: imageMetadata.dimensions[1],
+                  pixelSpacing: imageMetadata.spacing[0],
+                },
+              },
+              '*'
+            );
+          }
           if (segmentationLoaded) {
             return;
           }
