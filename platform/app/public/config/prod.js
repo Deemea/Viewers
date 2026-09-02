@@ -24,7 +24,7 @@ window.config = {
     EVESIO: 'https://evesio.deemea.com/api/v1/didier',
     CHU_TOURS: 'https://deemea-prod.chu-tours.fr/api/v1/didier',
     CHU_TOURS_SAAS: 'https://chu-tours-saas.deemea.com/api/v1/didier',
-    RADYON: 'https://radyon.deemea.com/api/v1/didier',
+    RADYON: 'https://vidi-radyon.deemea.com/api/v1/didier',
     PROD_F4C: 'https://prod.f4c.deemea.com/api/v1/didier',
   }),
 };
