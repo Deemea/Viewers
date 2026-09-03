@@ -25,6 +25,9 @@ window.config = {
     CHU_TOURS: 'https://deemea-prod.chu-tours.fr/api/v1/didier',
     CHU_TOURS_SAAS: 'https://chu-tours-saas.deemea.com/api/v1/didier',
     RADYON: 'https://vidi-radyon.deemea.com/api/v1/didier',
+    RIM29SUD: 'https://vidi-rim29sud.prod.deemea.com/api/v1/didier',
+    SAINT_QUENTIN: 'https://saint-quentin.prod.deemea.com/api/v1/didier',
+
     GHICL: 'https://ghicl.prod.deemea.com/api/v1/didier',
     PROD_F4C: 'https://prod.f4c.deemea.com/api/v1/didier',
   }),
