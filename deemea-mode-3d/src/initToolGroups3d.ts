@@ -108,9 +108,6 @@ function createTools(utilityModule) {
       { toolName: toolNames.SphereScissors },
       { toolName: toolNames.WindowLevelRegion },
       {
-        toolName: toolNames.LabelMapEditWithContourTool,
-      },
-      {
         toolName: toolNames.PlanarFreehandContourSegmentation,
       },
       { toolName: toolNames.LivewireContourSegmentation },

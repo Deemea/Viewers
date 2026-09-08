@@ -1,6 +1,5 @@
 import type { Button } from '@ohif/core/types';
 import { ViewportGridService } from '@ohif/core';
-import i18n from 'i18next';
 
 const callbacks = (toolName: string) => [
   {
@@ -398,33 +397,6 @@ const segmentationButtons: Button[] = [
     uiType: 'ohif.toolBoxButtonGroup',
     props: {
       buttonSection: true,
-    },
-  },
-  {
-    id: 'LabelMapEditWithContour',
-    uiType: 'ohif.toolBoxButton',
-    props: {
-      icon: 'tool-labelmap-edit-with-contour',
-      label: i18n.t('Buttons:Labelmap Edit with Contour Tool'),
-      tooltip: i18n.t('Buttons:Labelmap Edit with Contour Tool'),
-      commands: [
-        'setToolActiveToolbar',
-        {
-          commandName: 'activateSelectedSegmentationOfType',
-          commandOptions: { segmentationRepresentationType: 'Labelmap' },
-        },
-      ],
-      evaluate: [
-        {
-          name: 'evaluate.cornerstone.segmentation',
-          toolNames: ['LabelMapEditWithContour'],
-          disabledText: i18n.t('Buttons:Create new segmentation to enable this tool.'),
-        },
-        {
-          name: 'evaluate.cornerstone.hasSegmentationOfType',
-          segmentationRepresentationType: 'Labelmap',
-        },
-      ],
     },
   },
 ];
