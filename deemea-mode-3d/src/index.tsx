@@ -136,7 +136,6 @@ function modeFactory({ modeConfiguration }) {
         // 'Shapes',
         // 'InterpolateLabelmap',
         'SegmentBidirectional',
-        'LabelMapEditWithContour',
       ]);
       toolbarService.updateSection('brushToolsSection', ['Brush', 'Eraser', 'Threshold']);
     },
