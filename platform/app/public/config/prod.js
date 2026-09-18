@@ -28,8 +28,8 @@ window.config = {
     RIM29SUD: 'https://vidi-rim29sud.prod.deemea.com/api/v1/didier',
     SAINT_QUENTIN: 'https://saint-quentin.prod.deemea.com/api/v1/didier',
     GHICL: 'https://ghicl.prod.deemea.com/api/v1/didier',
-    ESLAN_CLERMONT: 'https://cimror.deemea.elsan.partners/api/v1/didier',
-    ESLAN_CONTI: 'https://conti.deemea.elsan.partners/api/v1/didier',
+    ELSAN_CLERMONT: 'https://cimror.deemea.elsan.partners/api/v1/didier',
+    ELSAN_CONTI: 'https://conti.deemea.elsan.partners/api/v1/didier',
     PROD_F4C: 'https://prod.f4c.deemea.com/api/v1/didier',
   }),
 };
