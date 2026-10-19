@@ -1,4 +1,5 @@
 import commandsModule from './commandsModule';
+import { initWindowLevelPersistence } from './utils/windowLevelPersistence';
 let onModeInit = false;
 
 const extension = {
@@ -11,6 +12,7 @@ const extension = {
   onModeEnter: ({ extensionManager, servicesManager, commandsManager }) => {
     const { measurementService } = servicesManager.services;
     commandsManager.runCommand('demonstrateMeasurementService');
+    initWindowLevelPersistence(servicesManager);
 
     measurementService.clearMeasurements();
     if (!onModeInit) {

@@ -159,6 +159,18 @@ const toolbarButtonsValidated3d: Button[] = [
       },
     },
   },
+  {
+    id: 'windowLevelMenu',
+    uiType: 'ohif.windowLevelMenu',
+    props: {
+      icon: 'WindowLevel',
+      label: i18n.t('Buttons:Window Level'),
+      tooltip: i18n.t('Buttons:Adjust window/level presets and customize image contrast settings'),
+      evaluate: {
+        name: 'evaluate.windowLevelMenu',
+      },
+    },
+  },
 ];
 
 export default toolbarButtonsValidated3d;
