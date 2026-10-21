@@ -1,5 +1,6 @@
 import commandsModule from './commandsModule';
 import { initWindowLevelPersistence } from './utils/windowLevelPersistence';
+import { ColorLutMenu } from './components/ColorLutMenu';
 let onModeInit = false;
 
 const extension = {
@@ -29,6 +30,10 @@ const extension = {
 
   getCommandsModule({ servicesManager }) {
     return commandsModule({ servicesManager });
+  },
+
+  getToolbarModule() {
+    return [{ name: 'deemea.colorLutMenu', defaultComponent: ColorLutMenu }];
   },
 };
 

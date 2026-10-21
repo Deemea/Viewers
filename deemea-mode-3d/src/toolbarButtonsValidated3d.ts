@@ -161,11 +161,10 @@ const toolbarButtonsValidated3d: Button[] = [
   },
   {
     id: 'windowLevelMenu',
-    uiType: 'ohif.windowLevelMenu',
+    uiType: 'deemea.colorLutMenu',
     props: {
       icon: 'WindowLevel',
-      label: i18n.t('Buttons:Window Level'),
-      tooltip: i18n.t('Buttons:Adjust window/level presets and customize image contrast settings'),
+      label: i18n.t('WindowLevelActionMenu:Color LUT'),
       evaluate: {
         name: 'evaluate.windowLevelMenu',
       },
