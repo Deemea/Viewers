@@ -249,6 +249,17 @@ const toolbarButtons: Button[] = [
       },
     },
   },
+  {
+    id: 'windowLevelMenu',
+    uiType: 'deemea.colorLutMenu',
+    props: {
+      icon: 'WindowLevel',
+      label: i18n.t('WindowLevelActionMenu:Color LUT'),
+      evaluate: {
+        name: 'evaluate.windowLevelMenu',
+      },
+    },
+  },
   // {
   //   id: 'RegionSegmentPlus',
   //   uiType: 'ohif.toolBoxButton',

@@ -58,6 +58,10 @@ function modeFactory({ modeConfiguration }) {
 
       toolbarService?.register(toolbarButtons);
 
+      toolbarService.updateSection(toolbarService.sections.viewportActionMenu.topRight, [
+        'windowLevelMenu',
+      ]);
+
       toolbarService.updateSection('primary', [
         'ResetButton',
         'Length',
