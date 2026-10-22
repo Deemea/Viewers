@@ -80,6 +80,10 @@ function modeFactory({ modeConfiguration }) {
         'orientationMenu',
       ]);
 
+      toolbarService.updateSection(toolbarService.sections.viewportActionMenu.topRight, [
+        'windowLevelMenu',
+      ]);
+
       toolbarService.updateSection('primary', [
         'Length',
         'RectangleROI',
