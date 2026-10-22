@@ -1,4 +1,6 @@
 import commandsModule from './commandsModule';
+import { initWindowLevelPersistence } from './utils/windowLevelPersistence';
+import { ColorLutMenu } from './components/ColorLutMenu';
 let onModeInit = false;
 
 const extension = {
@@ -11,6 +13,7 @@ const extension = {
   onModeEnter: ({ extensionManager, servicesManager, commandsManager }) => {
     const { measurementService } = servicesManager.services;
     commandsManager.runCommand('demonstrateMeasurementService');
+    initWindowLevelPersistence(servicesManager);
 
     measurementService.clearMeasurements();
     if (!onModeInit) {
@@ -27,6 +30,10 @@ const extension = {
 
   getCommandsModule({ servicesManager }) {
     return commandsModule({ servicesManager });
+  },
+
+  getToolbarModule() {
+    return [{ name: 'deemea.colorLutMenu', defaultComponent: ColorLutMenu }];
   },
 };
 

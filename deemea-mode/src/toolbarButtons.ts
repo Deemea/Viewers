@@ -122,6 +122,17 @@ const toolbarButtons: Button[] = [
       evaluate: 'evaluate.action',
     },
   },
+  {
+    id: 'windowLevelMenu',
+    uiType: 'deemea.colorLutMenu',
+    props: {
+      icon: 'WindowLevel',
+      label: i18n.t('WindowLevelActionMenu:Color LUT'),
+      evaluate: {
+        name: 'evaluate.windowLevelMenu',
+      },
+    },
+  },
 ];
 
 export default toolbarButtons;

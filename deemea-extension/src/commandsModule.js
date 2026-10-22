@@ -119,6 +119,9 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
             return;
           }
 
+          // Viewport-dependent buttons (e.g. windowLevelMenu) are evaluated as disabled without a viewportId
+          const refreshProps = { viewportId: ViewportGridService.getActiveViewportId() };
+
           if (event.data.message.status === 'Validated') {
             if (event.data.message.imageType === '2D') {
               const style = document.createElement('style');
@@ -128,10 +131,10 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
               }`;
               document.head.appendChild(style);
               toolbarService?.setButtons(toolbarButtonsValidated);
-              toolbarService?.refreshToolbarState();
+              toolbarService?.refreshToolbarState(refreshProps);
             } else {
               toolbarService?.setButtons(toolbarButtonsValidated3d);
-              toolbarService?.refreshToolbarState();
+              toolbarService?.refreshToolbarState(refreshProps);
               toolbarService?.addButtons(segmentationButtonsValidated, true);
               customizationService.setCustomizations(
                 [
@@ -156,10 +159,10 @@ const commandsModule = ({ servicesManager, commandsManager }) => {
               }`;
               document.head.appendChild(style);
               toolbarService?.setButtons(toolbarButtons);
-              toolbarService?.refreshToolbarState();
+              toolbarService?.refreshToolbarState(refreshProps);
             } else {
               toolbarService?.setButtons(toolbarButtons3d);
-              toolbarService?.refreshToolbarState();
+              toolbarService?.refreshToolbarState(refreshProps);
               toolbarService?.addButtons(segmentationButtons, true);
 
               customizationService.setCustomizations(
